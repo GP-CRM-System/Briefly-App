@@ -1,74 +1,93 @@
-# React + TypeScript + Vite
+# CRM System Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern CRM client built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Current Status
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- The app currently renders a temporary landing page: `Briefly CRM`.
+- Routing is set up with `react-router-dom` and currently maps `/` to the landing page.
+- Core asset and shared component structure is in place for upcoming CRM modules.
+- Feature folders for CRM domains exist as scaffolding and are ready for implementation.
 
-## React Compiler
+## Tech Stack (Current)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React `19`
+- TypeScript `6`
+- Vite `8`
+- Tailwind CSS `4` via `@tailwindcss/vite`
+- React Router (`react-router-dom`, `react-router-hash-link`)
+- SVG as React components via `vite-plugin-svgr`
+- ESLint `9` + `typescript-eslint`
 
-## Expanding the ESLint configuration
+## Scripts
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `npm run dev` - Start development server
+- `npm run build` - Type-check and create production build
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build locally
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. Install dependencies:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open in browser:
+
+   [http://localhost:5173](http://localhost:5173)
+
+## Current Project Structure
+
+```text
+src/
+  App.tsx
+  main.tsx
+  index.css
+  router.tsx
+  vite-env.d.ts
+
+  core/
+    assets/
+      icons/
+        dashboard/
+        form/
+        landing/
+        logo/
+        navbar/
+        sidebar/
+        social/
+      images/
+      index.ts
+    components/
+      Icon.tsx
+      Image.tsx
+      index.ts
+
+  features/
+    landing/
+      LandingPage.tsx
+    Analytics/
+    Companies/
+    Contacts/
+    Customers/
+    Deals/
+    Employess/
+    OnBoarding/
+    Orders/
+    Profile/
+    settings/
+    Tickets/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Notes
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# Briefly-App
+- `src/features/landing/LandingPage.tsx` is currently the only implemented feature page.
+- Other feature directories are present as scaffolds for future CRM development.
