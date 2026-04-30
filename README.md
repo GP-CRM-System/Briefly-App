@@ -1,93 +1,69 @@
-# CRM System Client
+# Briefly CRM - Client
 
-Modern CRM client built with React, TypeScript, and Vite.
+Briefly is a modern, high-performance Customer Relationship Management (CRM) dashboard designed to streamline business operations and centralize company data. This repository contains the React-based frontend client.
 
-## Current Status
+## 🚀 Tech Stack
 
-- The app currently renders a temporary landing page: `Briefly CRM`.
-- Routing is set up with `react-router-dom` and currently maps `/` to the landing page.
-- Core asset and shared component structure is in place for upcoming CRM modules.
-- Feature folders for CRM domains exist as scaffolding and are ready for implementation.
+We use a modern, robust tech stack designed for scalability and developer experience:
 
-## Tech Stack (Current)
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Routing**: [React Router v7](https://reactrouter.com/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management**: 
+  - Server State: [TanStack Query v5](https://tanstack.com/query/latest) (Caching, fetching, synchronization)
+  - Client State: [Zustand v5](https://zustand-demo.pmnd.rs/) (Lightweight UI state)
+- **Forms & Validation**: [Formik](https://formik.org/) + [Yup](https://github.com/jquense/yup)
+- **API Client**: [Axios](https://axios-http.com/)
+- **UI Notifications**: [React Hot Toast](https://react-hot-toast.com/)
 
-- React `19`
-- TypeScript `6`
-- Vite `8`
-- Tailwind CSS `4` via `@tailwindcss/vite`
-- React Router (`react-router-dom`, `react-router-hash-link`)
-- SVG as React components via `vite-plugin-svgr`
-- ESLint `9` + `typescript-eslint`
+## 📂 Folder Structure
 
-## Scripts
+The project follows a feature-sliced architectural pattern to keep domains separated as the CRM scales:
 
-- `npm run dev` - Start development server
-- `npm run build` - Type-check and create production build
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build locally
+```text
+src/
+├── api/                  # API client setup and endpoint definitions
+│   ├── client.ts         # Axios instance and interceptors (planned)
+│   └── endpoints/        # API route constants and typed fetch functions
+├── app/                  # Application entry point and global wrappers
+│   ├── App.tsx           # Main component rendering providers and router
+│   ├── providers.tsx     # Global context providers (React Query, Toaster, etc.)
+│   └── router.tsx        # Centralized route definitions
+├── core/                 # Shared, feature-agnostic code
+│   ├── components/       # Reusable UI components (Buttons, Inputs, Icons)
+│   ├── hooks/            # Global custom hooks
+│   ├── layouts/          # Layout shells (Dashboard, Auth)
+│   ├── types/            # Shared TypeScript interfaces
+│   └── utils/            # Helper functions and formatters
+├── features/             # Business domain modules (e.g., Contacts, Deals)
+│   └── Analytics/        # Example feature module
+├── pages/                # Public/unauthenticated routes
+│   ├── auth/             # Login, Signup
+│   └── landing/          # Landing page sections
+├── index.css             # Global CSS and Tailwind entry
+└── main.tsx              # React DOM render entry
+```
 
-## Getting Started
+## 🛠️ Development Setup
 
-1. Install dependencies:
-
+1. **Install Dependencies**
+   Make sure you are using Node.js v20+.
    ```bash
    npm install
    ```
 
-2. Start the development server:
-
+2. **Run Development Server**
    ```bash
    npm run dev
    ```
 
-3. Open in browser:
+3. **Build for Production**
+   ```bash
+   npm run build
+   ```
 
-   [http://localhost:5173](http://localhost:5173)
+## 🏗️ Architecture Guidelines
 
-## Current Project Structure
-
-```text
-src/
-  App.tsx
-  main.tsx
-  index.css
-  router.tsx
-  vite-env.d.ts
-
-  core/
-    assets/
-      icons/
-        dashboard/
-        form/
-        landing/
-        logo/
-        navbar/
-        sidebar/
-        social/
-      images/
-      index.ts
-    components/
-      Icon.tsx
-      Image.tsx
-      index.ts
-
-  features/
-    landing/
-      LandingPage.tsx
-    Analytics/
-    Companies/
-    Contacts/
-    Customers/
-    Deals/
-    Employess/
-    OnBoarding/
-    Orders/
-    Profile/
-    settings/
-    Tickets/
-```
-
-## Notes
-
-- `src/features/landing/LandingPage.tsx` is currently the only implemented feature page.
-- Other feature directories are present as scaffolds for future CRM development.
+- **Server State vs Client State**: Do not sync API data into Zustand. Use React Query (`useQuery`, `useMutation`) for all server interactions. Use Zustand only for global UI coordination (e.g., sidebar state, theme).
+- **Feature Slices**: When creating a new CRM module (like Tickets), create a new folder under `features/Tickets/`. Keep all components, hooks, and types specific to that domain inside that folder.
+- **Routing**: All new routes should be registered in `src/app/router.tsx`.

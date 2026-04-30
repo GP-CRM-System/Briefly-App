@@ -1,9 +1,0 @@
-export { default as home } from "./home.svg";
-export { default as contact } from "./contact.svg";
-export { default as companies } from "./company.svg";
-export { default as deals } from "./deal.svg";
-export { default as tickets } from "./ticket.svg";
-export { default as order } from "./order.svg";
-export { default as employee } from "./employee.svg";
-export { default as logout } from "./logout.svg";
-export { default as analytics } from './analytics.svg'
