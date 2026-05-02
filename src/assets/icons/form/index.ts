@@ -6,3 +6,6 @@ export { default as copy } from "./copy.svg?react";
 export { default as emailIcon } from "./email.svg?react";
 export { default as businessIcon } from "./Business.svg?react";
 export { default as dotsIcon } from './dots.svg?react';
+export { default as eye } from './eye.svg?react';
+export { default as eyeOff } from './eye-slash.svg?react';
+// export { default as phone } from './phone.svg?react';
