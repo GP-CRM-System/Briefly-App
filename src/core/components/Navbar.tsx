@@ -3,6 +3,8 @@ import { Icon } from "@/core/components";
 import { useAuthStore } from "@/store/auth.store";
 import { notification } from "@/assets/icons/navbar/navbar";
 
+import { useUIStore } from "@/store/ui.store";
+
 /* ── Route → Page title mapping ── */
 const pageTitles: Record<string, string> = {
     "/dashboard": "Dashboard",
@@ -21,8 +23,14 @@ const Navbar = () => {
     const { pathname } = useLocation();
     const user = useAuthStore((s) => s.user);
     const role = useAuthStore((s) => s.role);
+    const { setSidebarOpen } = useUIStore();
 
-    const pageTitle = pageTitles[pathname] || "Dashboard";
+    const pageTitle = pageTitles[pathname]
+        || (pathname.includes("/customers/") ? "Customer Profile"
+        : pathname.includes("/segments/") ? "Segment Details"
+        : pathname.includes("/campaigns/") ? "Campaign Details"
+        : pathname.includes("/products/") ? "Product Details"
+        : "Dashboard");
 
     return (
         <header className="w-full bg-white border-b border-gray-100">
@@ -30,6 +38,15 @@ const Navbar = () => {
             <div className="flex items-center justify-between px-5 lg:px-8 h-[64px]">
                 {/* Left */}
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 focus:outline-none flex items-center justify-center"
+                        aria-label="Open sidebar"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                     <h1 className="text-xl font-medium text-gray-900">{pageTitle}</h1>
                 </div>
 

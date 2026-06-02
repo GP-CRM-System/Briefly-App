@@ -4,6 +4,18 @@ import Sidebar from "../components/Sidebar.tsx";
 import Navbar from "../components/Navbar.tsx";
 import Customers from "@/features/customers";
 import CustomerProfile from "@/features/customers/components/CustomerProfile";
+import Segments from "@/features/segments";
+import SegmentDetails from "@/features/segments/components/SegmentDetails";
+import Campaigns from "@/features/campaigns";
+import CampaignDetails from "@/features/campaigns/components/CampaignDetails";
+import Products from "@/features/products";
+import ProductDetails from "@/features/products/components/ProductDetails";
+import Orders from "@/features/orders";
+import OrderDetails from "@/features/orders/components/OrderDetails";
+import Tickets from "@/features/tickets";
+import TicketDetails from "@/features/tickets/components/TicketDetails";
+import Employees from "@/features/employees";
+import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 
 const Dashboard = () => {
   return (
@@ -17,6 +29,18 @@ const Dashboard = () => {
             <Route path="/" element={<div className="text-gray-500">Dashboard Home</div>} />
             <Route path="customers" element={<Customers />} />
             <Route path="customers/:id" element={<CustomerProfile />} />
+            <Route path="segments" element={<Segments />} />
+            <Route path="segments/:id" element={<SegmentDetails />} />
+            <Route path="campaigns" element={<Campaigns />} />
+            <Route path="campaigns/:id" element={<CampaignDetails />} />
+            <Route path="products" element={<Products />} />
+            <Route path="products/:id" element={<ProductDetails />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="orders/:id" element={<OrderDetails />} />
+            <Route path="tickets" element={<Tickets />} />
+            <Route path="tickets/:id" element={<TicketDetails />} />
+            <Route path="employees" element={<Employees />} />
+            <Route path="employees/:id" element={<EmployeeProfile />} />
           </Routes>
         </main>
       </div>

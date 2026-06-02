@@ -9,3 +9,4 @@ export { default as resetPasswordImage } from "./reset-password.svg";
 export { default as crmHome } from "./CRM-Home.svg";
 export { default as customerFrame } from "./customer-frame.svg";
 export { default as person1 } from "./person1.svg";
+export { default as gift } from "./gift.svg";

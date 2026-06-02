@@ -29,6 +29,7 @@
   --color-info: #3b82f6;
 
   --color-text-title: #1A1A1A;
+  --color-text-subtitle: #6B7280;
   --color-text-button: #FFFFFF;
   --color-text-body: #8A8A8A;
   --color-text-input: #B3B3B3;
@@ -55,8 +56,24 @@
   --color-chart-axis: #94a3b8;
 }
 
+html {
+  min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
+  min-height: 100%;
+  max-width: 100%;
+  margin: 0;
   font-family: var(--font-poppins);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .font-poppins {

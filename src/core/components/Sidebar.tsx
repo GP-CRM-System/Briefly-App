@@ -181,7 +181,7 @@ const Sidebar = () => {
                     border-r-[0.5px] border-gray-200
                     ${sidebarOpen
                         ? 'w-[75vw] sm:w-[280px] md:w-[240px] lg:w-[14.72vw] xl:w-[212px] 2xl:w-[240px]'
-                        : 'w-0 lg:w-[60px] xl:w-[70px] 2xl:w-[80px]'}
+                        : 'w-[75vw] sm:w-[280px] md:w-[240px] lg:w-[60px] xl:w-[70px] 2xl:w-[80px]'}
                     ${sidebarOpen
                         ? 'translate-x-0'
                         : '-translate-x-full lg:translate-x-0'}

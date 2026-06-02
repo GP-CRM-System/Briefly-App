@@ -22,3 +22,4 @@ export { default as play_blue } from "./play_blue.svg?react";
 
 export { default as maki_arrow_ri } from "./maki_arrow_white.svg?react";
 export { default as maki_arrow_le } from "./maki_arrow_blue.svg?react";
+export { default as check } from "./check.svg?react";
