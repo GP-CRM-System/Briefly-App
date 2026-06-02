@@ -22,7 +22,7 @@ export const columns: Column<Customer>[] = [
                 </div>
                 <div>
                     <p className="text-sm font-medium text-gray-900 leading-tight">{row.name}</p>
-                    <p className="text-xs text-gray-400">{row.email}</p>
+                    <p className="text-xs text-gray-400">{row.address || "—"}</p>
                 </div>
             </div>
         ),

@@ -150,7 +150,7 @@ function DataTable<T extends Record<string, any>>({
                             <tr className="border-b border-gray-100">
                                 {selectable && <th className="w-[52px] p-4" />}
                                 {columns.map((col) => (
-                                    <th key={col.key} className={`p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${col.width || ""}`}>
+                                    <th key={col.key} className={`p-4 text-left text-xs font-semibold text-gray-500 tracking-wider ${col.width || ""}`}>
                                         {col.header}
                                     </th>
                                 ))}
@@ -196,7 +196,7 @@ function DataTable<T extends Record<string, any>>({
                 <table className="w-full">
                     {/* Header */}
                     <thead>
-                        <tr className="border-b border-gray-100 bg-gray-50/50">
+                        <tr className="border-b border-gray-100 bg-[#4A90E214]">
                             {selectable && (
                                 <th className="w-[52px] px-4 py-3">
                                     <input
@@ -210,7 +210,7 @@ function DataTable<T extends Record<string, any>>({
                             {columns.map((col) => (
                                 <th
                                     key={col.key}
-                                    className={`px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${col.width || ""} ${
+                                    className={`px-4 py-3 text-xs font-semibold text-gray-500 tracking-wider ${col.width || ""} ${
                                         col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
                                     }`}
                                 >
@@ -218,7 +218,7 @@ function DataTable<T extends Record<string, any>>({
                                 </th>
                             ))}
                             {(onRowAction || renderRowAction) && (
-                                <th className="w-[60px] px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                                <th className="w-[60px] px-4 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
                                     Action
                                 </th>
                             )}
@@ -239,7 +239,7 @@ function DataTable<T extends Record<string, any>>({
                                     }`}
                                 >
                                     {selectable && (
-                                        <td className="px-4 py-3">
+                                        <td className="pl-4 py-3">
                                             <input
                                                 type="checkbox"
                                                 checked={isSelected}
@@ -251,7 +251,7 @@ function DataTable<T extends Record<string, any>>({
                                     {columns.map((col) => (
                                         <td
                                             key={col.key}
-                                            className={`px-4 py-3 text-sm text-gray-700 ${col.width || ""} ${
+                                            className={`pr-4 py-3 text-sm text-gray-700 ${col.width || ""} ${
                                                 col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
                                             }`}
                                         >
