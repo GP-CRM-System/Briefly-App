@@ -1,69 +1,124 @@
-# Briefly CRM - Client
+<p align="center">
+  <img src="public/favicon.svg" alt="Briefly Logo" width="120" height="120" />
+</p>
 
-Briefly is a modern, high-performance Customer Relationship Management (CRM) dashboard designed to streamline business operations and centralize company data. This repository contains the React-based frontend client.
+<h1 align="center">Briefly CRM</h1>
+
+<p align="center">
+  <strong>A Scaleable, Multi-Tenant E-Commerce CRM Platform</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.2.4-blue?logo=react&logoColor=white" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white" alt="TypeScript 6" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4.2.2-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License MIT" />
+</p>
+
+---
+
+Briefly is a high-performance Customer Relationship Management (CRM) platform designed specifically for modern e-commerce merchants. The system aggregates transaction details, tracks customer behavioral metrics (such as RFM categories, lifetime value, and churn risk), manages customer support ticketing workflows, and streamlines third-party integrations (such as Shopify) into a single workspace.
+
+This repository contains the single-page application (SPA) frontend client.
+
+---
+
+## ⚡ Key Features
+
+*   **Customer Intelligence Dashboard**: Detailed customer profiles featuring advanced telemetry (Recency, Frequency, Monetary segmentation), activity logs, and chronological support histories.
+*   **Multi-Tenant Organization Management**: Isolated workflows allowing administrators to manage organization profiles, customize active roles, and delete tenant resources safely.
+*   **Support Ticket Center**: Integrated conversation threads and status tracking for handling client inquiries.
+*   **Shopify Integration Controls**: Simplified connection flows for external Shopify stores using custom credentials, automatic conflict resolution policies, and live sync progress reports.
+*   **Granular Role-Based Access Control (RBAC)**: Custom role definitions mapped to explicit Resource-Action scopes (Read, Write, Delete).
+
+---
 
 ## 🚀 Tech Stack
 
-We use a modern, robust tech stack designed for scalability and developer experience:
+Briefly leverages a modern, unified technology stack optimized for high runtime efficiency and type-safe scaling:
 
-- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Routing**: [React Router v7](https://reactrouter.com/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **State Management**: 
-  - Server State: [TanStack Query v5](https://tanstack.com/query/latest) (Caching, fetching, synchronization)
-  - Client State: [Zustand v5](https://zustand-demo.pmnd.rs/) (Lightweight UI state)
-- **Forms & Validation**: [Formik](https://formik.org/) + [Yup](https://github.com/jquense/yup)
-- **API Client**: [Axios](https://axios-http.com/)
-- **UI Notifications**: [React Hot Toast](https://react-hot-toast.com/)
+*   **Core Framework**: [React 19.2.4](https://react.dev/) + [Vite 8.0.4](https://vitejs.dev/)
+*   **Routing**: [React Router v7](https://reactrouter.com/) (Declarative nested layout routing)
+*   **State Management**:
+    *   *Server State*: [TanStack Query v5](https://tanstack.com/query) (Automatic stale-while-revalidate caching and invalidation cascades)
+    *   *Client State*: [Zustand v5](https://github.com/pmndrs/zustand) (Lightweight, locally persisted app session storage)
+*   **Forms & Validation**: [Formik](https://formik.org/) & [Yup](https://github.com/jquense/yup)
+*   **Network Client**: [Axios](https://axios-http.com/) (Equipped with centralized request token injection and automatic 401 handling interceptors)
+*   **Visual System**: [Tailwind CSS v4](https://tailwindcss.com/) + Custom CSS custom properties
+*   **UI Animations**: [Framer Motion](https://www.framer.com/motion/)
 
-## 📂 Folder Structure
+---
 
-The project follows a feature-sliced architectural pattern to keep domains separated as the CRM scales:
+## 📂 Project Structure
+
+Briefly follows a **Feature-Isolated Layered Pattern** to prevent cross-domain coupling and visual clutter as modules expand:
 
 ```text
 src/
-├── api/                  # API client setup and endpoint definitions
-│   ├── client.ts         # Axios instance and interceptors (planned)
-│   └── endpoints/        # API route constants and typed fetch functions
-├── app/                  # Application entry point and global wrappers
-│   ├── App.tsx           # Main component rendering providers and router
-│   ├── providers.tsx     # Global context providers (React Query, Toaster, etc.)
-│   └── router.tsx        # Centralized route definitions
-├── core/                 # Shared, feature-agnostic code
-│   ├── components/       # Reusable UI components (Buttons, Inputs, Icons)
-│   ├── hooks/            # Global custom hooks
-│   ├── layouts/          # Layout shells (Dashboard, Auth)
-│   ├── types/            # Shared TypeScript interfaces
-│   └── utils/            # Helper functions and formatters
-├── features/             # Business domain modules (e.g., Contacts, Deals)
-│   └── Analytics/        # Example feature module
-├── pages/                # Public/unauthenticated routes
-│   ├── auth/             # Login, Signup
-│   └── landing/          # Landing page sections
-├── index.css             # Global CSS and Tailwind entry
-└── main.tsx              # React DOM render entry
+├── api/                   # Global network client and interceptors configuration
+│   ├── client.ts          # Central Axios client instance
+│   └── endpoints/         # Centralized API path dictionary mapping
+├── app/                   # Top-level shell bootstrap
+│   ├── App.tsx            # Main application component
+│   ├── providers.tsx      # Global context providers (React Query, UI, Toast)
+│   └── router.tsx         # Consolidated client router mapping
+├── assets/                # Graphic assets (SVGs, logos, custom iconography)
+├── core/                  # Shared, feature-agnostic infrastructure
+│   ├── components/        # Generic UI widgets (DataTable, PageLayout, Modal, etc.)
+│   ├── layouts/           # Dashboard shell layout structure (Sidebar + Navbar)
+│   ├── types/             # Shared TypeScript interface definitions
+│   └── hooks/             # Shared custom hooks (e.g., useAuth session manager)
+├── features/              # Self-contained business domain feature modules
+│   ├── customers/         # Customer profiles, notes, list page, hooks, services
+│   ├── orders/            # Transaction listing, status updates, detail view
+│   ├── segments/          # Customer cohort filtering and rule definition
+│   └── settings/          # Multi-tenant settings, RBAC profiles, integrations
+├── store/                 # Zustand global client-side state engines
+└── pages/                 # Public entry views (landing, signup, login)
 ```
+
+---
 
 ## 🛠️ Development Setup
 
-1. **Install Dependencies**
-   Make sure you are using Node.js v20+.
-   ```bash
-   npm install
-   ```
+Ensure you have [Node.js](https://nodejs.org/) v20+ and `npm` installed.
 
-2. **Run Development Server**
-   ```bash
-   npm run dev
-   ```
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-3. **Build for Production**
-   ```bash
-   npm run build
-   ```
+### 2. Configure Environment Variables
+Create a `.env` file in the root directory:
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+```
 
-## 🏗️ Architecture Guidelines
+### 3. Start the Development Server
+```bash
+npm run dev
+```
+The client dashboard will launch at `http://localhost:5173`.
 
-- **Server State vs Client State**: Do not sync API data into Zustand. Use React Query (`useQuery`, `useMutation`) for all server interactions. Use Zustand only for global UI coordination (e.g., sidebar state, theme).
-- **Feature Slices**: When creating a new CRM module (like Tickets), create a new folder under `features/Tickets/`. Keep all components, hooks, and types specific to that domain inside that folder.
-- **Routing**: All new routes should be registered in `src/app/router.tsx`.
+### 4. Build for Production
+Generate optimized, production-ready static assets:
+```bash
+npm run build
+```
+
+---
+
+## 🏗️ Core Architecture Guidelines
+
+Before writing code in this repository, please review these key guidelines:
+
+1.  **Feature Isolation**: Keep all domain-specific UI, hooks, service files, and types within their respective feature folder under `src/features/`. Never import files directly from one feature folder into another. If logic must be shared, promote it to `src/core/`.
+2.  **Server State vs. Client State**: Do not copy server responses into Zustand stores. Rely entirely on TanStack Query cache mechanisms for data storage and dynamic invalidations.
+3.  **Strict Token Injection**: Avoid invoking `apiClient` or raw Axios requests inside view components. Delegate all network operations to feature-level services, wrap them in custom React Query hooks, and call the hooks in components.
+4.  **TypeScript Standards**: Enable type verification at compile time. Always use type-only imports (`import type { ... }`) for typescript declarations to allow optimized bundler compilation.
+
+---
+
+## 📄 License
+
+This project is licensed under the terms of the [MIT License](LICENSE).

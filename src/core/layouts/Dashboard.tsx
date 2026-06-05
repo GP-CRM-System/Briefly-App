@@ -16,6 +16,7 @@ import Tickets from "@/features/tickets";
 import TicketDetails from "@/features/tickets/components/TicketDetails";
 import Employees from "@/features/employees";
 import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
+import Settings from "@/features/settings";
 
 const Dashboard = () => {
   return (
@@ -41,6 +42,7 @@ const Dashboard = () => {
             <Route path="tickets/:id" element={<TicketDetails />} />
             <Route path="employees" element={<Employees />} />
             <Route path="employees/:id" element={<EmployeeProfile />} />
+            <Route path="settings" element={<Settings />} />
           </Routes>
         </main>
       </div>

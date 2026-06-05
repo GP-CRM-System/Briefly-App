@@ -210,6 +210,18 @@ export const ENDPOINTS = {
     SYNC_LOGS: (id: string) => `/integrations/${id}/sync/logs`,
   },
 
+  // ─── Uploads ───
+  UPLOAD: "/uploads",
+
+  // ─── Subscriptions ───
+  SUBSCRIPTION: {
+    LIST_PLANS: "/subscriptions/plans",
+    CURRENT: "/subscriptions/current",
+    SUBSCRIBE: "/subscriptions",
+    CANCEL: "/subscriptions/cancel",
+    INITIALIZE: "/subscriptions/initialize",
+  },
+
   // ─── Payments ───
   PAYMENT: {
     INITIALIZE: (orderId: string) => `/payments/initialize/${orderId}`,
