@@ -1,11 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-interface TicketData {
-  name: string;
-  value: number;
-  color: string;
-}
-
 import { useTickets } from "../../tickets/ticket.hooks";
 
 interface SupportTicketsChartProps {
@@ -15,13 +9,31 @@ interface SupportTicketsChartProps {
 export default function SupportTicketsChart(props: SupportTicketsChartProps) {
   const { data: ticketsData, isLoading } = useTickets();
 
-  // If we fetch successfully, we'll build the stats from ticketsData.
-  // We consider both "closed" and "resolved" as Closed.
   const data = ticketsData
     ? [
-        { name: "Open", value: ticketsData.filter((t: any) => t.status?.toUpperCase() === "OPEN").length, color: "#A7CAF1" },
-        { name: "Pending", value: ticketsData.filter((t: any) => t.status?.toUpperCase() === "PENDING").length, color: "#0E3158" },
-        { name: "Closed", value: ticketsData.filter((t: any) => t.status?.toUpperCase() === "CLOSED" || t.status?.toUpperCase() === "RESOLVED").length, color: "#4B91E2" },
+        {
+          name: "Open",
+          value: ticketsData.filter(
+            (t: any) => t.status?.toUpperCase() === "OPEN",
+          ).length,
+          color: "#A7CAF1",
+        },
+        {
+          name: "Pending",
+          value: ticketsData.filter(
+            (t: any) => t.status?.toUpperCase() === "PENDING",
+          ).length,
+          color: "#0E3158",
+        },
+        {
+          name: "Closed",
+          value: ticketsData.filter(
+            (t: any) =>
+              t.status?.toUpperCase() === "CLOSED" ||
+              t.status?.toUpperCase() === "RESOLVED",
+          ).length,
+          color: "#4B91E2",
+        },
       ]
     : props.data || [];
 
