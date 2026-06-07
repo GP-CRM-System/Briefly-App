@@ -1,0 +1,62 @@
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+/**
+ * Auth Store — single source of truth for authentication.
+ *
+ * Stores the Bearer token, user object, and onboarding status.
+ * Persisted to localStorage so it survives page refreshes.
+ *
+ * Flow:
+ *   Signup  → token + user saved, onboardingComplete = false → /onboarding
+ *   Login   → token + user saved, onboardingComplete = true  → /dashboard
+ *   Logout  → everything cleared → /login
+ */
+
+export type AuthUser = {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image: string | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+type AuthState = {
+    token: string | null;
+    user: AuthUser | null;
+    role: string | null;
+    permissions: Record<string, string[]> | null;
+    onboardingComplete: boolean;
+
+    // Actions
+    setSession: (token: string, user: AuthUser, role: string, permissions: Record<string, string[]>, onboardingComplete?: boolean) => void;
+    completeOnboarding: () => void;
+    clearSession: () => void;
+};
+
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set) => ({
+            token: null,
+            user: null,
+            role: null,
+            permissions: null,
+            onboardingComplete: false,
+
+            setSession: (token, user, role, permissions, onboardingComplete = false) =>
+                set({ token, user, role, permissions, onboardingComplete }),
+
+            completeOnboarding: () =>
+                set({ onboardingComplete: true }),
+
+            clearSession: () =>
+                set({ token: null, user: null, role: null, permissions: null, onboardingComplete: false }),
+        }),
+        {
+            name: "briefly-auth",
+            storage: createJSONStorage(() => localStorage),
+        }
+    )
+);

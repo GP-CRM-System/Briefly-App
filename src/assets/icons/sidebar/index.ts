@@ -1,0 +1,9 @@
+export { default as home } from "./home.svg?react";
+export { default as contact } from "./contact.svg?react";
+export { default as companies } from "./company.svg?react";
+export { default as deals } from "./deal.svg?react";
+export { default as tickets } from "./ticket.svg?react";
+export { default as order } from "./order.svg?react";
+export { default as employee } from "./employee.svg?react";
+export { default as logout } from "./logout.svg?react";
+export { default as analytics } from './analytics.svg?react'

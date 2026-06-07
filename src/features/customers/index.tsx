@@ -1,0 +1,92 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import PageLayout from "@/core/components/PageLayout";
+import DataTable from "@/core/components/DataTable";
+
+import type { Customer, FilterState } from "./types";
+import { useCustomers, useDeleteCustomer } from "./customer.hooks";
+import { freshFilters, filterCustomers, countActiveFilters, MOCK_CUSTOMERS } from "./utils";
+
+import { columns } from "./components/CustomerColumns";
+import ActionMenu from "./components/ActionMenu";
+import FilterPanel from "./components/FilterPanel";
+import CustomerFormModal from "./components/CustomerFormModal";
+
+const Customers = () => {
+    const navigate = useNavigate();
+
+    const [search, setSearch] = useState("");
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<FilterState>(freshFilters());
+
+    /* Modal state */
+    const [modalOpen, setModalOpen] = useState(false);
+    const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
+
+    /* ── Data ── */
+    const { data: customers = MOCK_CUSTOMERS, isLoading } = useCustomers();
+    const deleteMutation = useDeleteCustomer();
+
+    /* ── Row actions ── */
+    const handleView   = (c: Customer) => navigate(`/dashboard/customers/${c.id}`);
+    const handleEdit   = (c: Customer) => { setCustomerToEdit(c); setModalOpen(true); };
+    const handleCreate = ()            => { setCustomerToEdit(null); setModalOpen(true); };
+
+    const handleDelete = (c: Customer) => {
+        if (!window.confirm(`Delete "${c.name}"?`)) return;
+        deleteMutation.mutate(c.id);
+    };
+
+    /* ── Derived data ── */
+    const filtered = filterCustomers(customers, search, activeFilters);
+
+    return (
+        <>
+            <PageLayout
+                searchValue={search}
+                searchPlaceholder="Search"
+                onSearch={setSearch}
+                filterCount={countActiveFilters(activeFilters)}
+                onFilter={() => setFilterOpen((p) => !p)}
+                onExport={() => {}}
+                onImport={() => {}}
+                onCreate={handleCreate}
+                createLabel="Create Customer"
+                filterContent={
+                    <FilterPanel
+                        open={filterOpen}
+                        onClose={() => setFilterOpen(false)}
+                        onApply={setActiveFilters}
+                    />
+                }
+            >
+                <DataTable<Customer>
+                    columns={columns}
+                    data={filtered}
+                    pageSize={9}
+                    selectable
+                    loading={isLoading}
+                    rowKey="id"
+                    renderRowAction={(row) => (
+                        <ActionMenu
+                            row={row}
+                            onView={handleView}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
+                    )}
+                    emptyMessage="No customers found"
+                />
+            </PageLayout>
+
+            <CustomerFormModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                customer={customerToEdit}
+            />
+        </>
+    );
+};
+
+export default Customers;
