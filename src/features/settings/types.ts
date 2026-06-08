@@ -31,6 +31,7 @@ export interface Role {
 
 export interface ConnectionDetails {
     id: string;
+    provider: string;
     name: string;
     status: "active" | "inactive";
     url: string;
@@ -42,6 +43,7 @@ export interface ConnectionDetails {
     conflictHandling: string;
     lastSyncAt: string;
     lastSyncStatus: "success" | "failed";
+    metadata?: Record<string, string>;
 }
 
 export interface SyncLog {

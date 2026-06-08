@@ -266,7 +266,8 @@ export const settingsService = {
             if (Array.isArray(integrations) && integrations.length > 0) {
                 return integrations.map((i: any) => ({
                     id: i.id,
-                    name: i.name || i.provider || "Shopify",
+                    provider: i.provider,
+                    name: i.name || i.provider || "Connection",
                     status: i.isActive ? "active" as const : "inactive" as const,
                     url: i.shopDomain || "",
                     connectedAt: i.createdAt ? new Date(i.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Unknown",
@@ -277,6 +278,7 @@ export const settingsService = {
                     conflictHandling: "Shopify wins",
                     lastSyncAt: i.lastSyncedAt ? new Date(i.lastSyncedAt).toLocaleString() : "Never",
                     lastSyncStatus: i.syncStatus === "completed" ? "success" as const : "success" as const,
+                    metadata: i.metadata || {},
                 }));
             }
         } catch (err) {
@@ -284,6 +286,11 @@ export const settingsService = {
         }
 
         return [];
+    },
+
+    async connectMeta(payload: { channel: string; accessToken: string; name?: string; metadata: Record<string, string> }): Promise<any> {
+        const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.CONNECT_META, payload);
+        return data?.data || data;
     },
 
     async connectShopify(payload: { shopDomain: string; accessToken: string; name?: string }): Promise<any> {
@@ -298,6 +305,11 @@ export const settingsService = {
 
     async syncConnection(id: string): Promise<any> {
         const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.FULL_SYNC(id));
+        return data?.data || data;
+    },
+
+    async updateIntegration(id: string, payload: Record<string, unknown>): Promise<any> {
+        const { data } = await apiClient.patch(ENDPOINTS.INTEGRATION.UPDATE(id), payload);
         return data?.data || data;
     },
 

@@ -15,3 +15,5 @@ export { default as filterIcon } from "./filter.svg?react";
 export { default as dots } from "./dots.svg?react";
 
 export { default as orderIcon } from "./order.svg?react";
+
+export { default as conversationsIcon } from "./conversations.svg?react";

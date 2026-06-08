@@ -15,7 +15,8 @@ import {
     employeesIcon, 
     analyticsIcon,
     settingsIcon,
-    closeIcon
+    closeIcon,
+    conversationsIcon
 } from "@/assets/new";
 
 interface NavItem {
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
     { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products.read" },
     { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders.read" },
     { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets.read" },
+    { to: "/dashboard/conversations", label: "Conversations", icon: conversationsIcon, permission: "conversations.read" },
     { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member.read" },
     { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports.read" },
 ];
