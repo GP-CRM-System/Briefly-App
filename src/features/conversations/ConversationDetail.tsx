@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useConversationMessages, useSendMessage, useConversations } from "./conversation.hooks";
-import { MOCK_MESSAGES } from "./utils";
 import MessageThread from "./components/MessageThread";
 import MessageComposer from "./components/MessageComposer";
 import { getProviderBadge, getStatusBadge } from "./utils";
@@ -20,7 +19,7 @@ const ConversationDetail = () => {
     const conversation: Conversation | undefined = conversations?.find((c: Conversation) => c.id === id);
     const customerName = conversation?.customer?.name || "Unknown";
     const customerEmail = conversation?.customer?.email || "—";
-    const messages = messagesData?.data || MOCK_MESSAGES;
+    const messages = messagesData?.data ?? [];
 
     const handleSend = (content: string) => {
         sendMutation.mutate({ content, type: "text" });

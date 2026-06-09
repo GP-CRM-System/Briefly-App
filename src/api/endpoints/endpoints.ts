@@ -195,6 +195,7 @@ export const ENDPOINTS = {
     GET_ALL: "/messaging/conversations",
     GET_MESSAGES: (id: string) => `/messaging/conversations/${id}/messages`,
     SEND_MESSAGE: (id: string) => `/messaging/conversations/${id}/messages`,
+    START: "/messaging/conversations",
   },
 
   // ─── Integrations ───

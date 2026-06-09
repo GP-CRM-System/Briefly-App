@@ -3,7 +3,7 @@ export interface Conversation {
     organizationId: string;
     customerId: string;
     externalId: string;
-    provider: "facebook" | "whatsapp" | "instagram";
+    provider: "facebook" | "messenger" | "whatsapp" | "instagram";
     status: "OPEN" | "PENDING" | "CLOSED";
     lastMessageAt: string | null;
     createdAt: string;
@@ -30,6 +30,21 @@ export interface SendMessagePayload {
     content: string;
     type?: "text" | "image" | "document" | "template";
     metadata?: Record<string, unknown>;
+}
+
+export interface StartConversationPayload {
+    provider: "whatsapp" | "facebook" | "messenger" | "instagram";
+    recipientId: string;
+    content: string;
+    type?: "text" | "image" | "document" | "template";
+    customerPhone?: string;
+    customerName?: string;
+    metadata?: Record<string, unknown>;
+}
+
+export interface StartConversationResult {
+    conversation: Conversation;
+    message: Message;
 }
 
 export interface PaginatedResponse<T> {

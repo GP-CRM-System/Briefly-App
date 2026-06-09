@@ -33,6 +33,7 @@ export const formatMessageTime = (d: string): string => {
 const PROVIDER_BADGES: Record<string, { label: string; classes: string }> = {
     whatsapp:  { label: "WhatsApp",  classes: "bg-green-100 text-green-700 border-green-200" },
     facebook:  { label: "Messenger", classes: "bg-blue-100 text-blue-700 border-blue-200" },
+    messenger: { label: "Messenger", classes: "bg-blue-100 text-blue-700 border-blue-200" },
     instagram: { label: "Instagram", classes: "bg-pink-100 text-pink-700 border-pink-200" },
 };
 
