@@ -250,6 +250,21 @@ export const useConnections = () => {
     });
 };
 
+export const useConnectMeta = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: { channel: string; accessToken: string; name?: string; metadata: Record<string, string> }) =>
+            settingsService.connectMeta(payload),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: settingsKeys.connections() });
+            toast.success("Meta channel connected successfully!");
+        },
+        onError: (err: any) => {
+            toast.error(err?.response?.data?.message || "Failed to connect Meta channel");
+        },
+    });
+};
+
 export const useConnectShopify = () => {
     const qc = useQueryClient();
     return useMutation({
@@ -287,6 +302,21 @@ export const useSyncConnection = () => {
         },
         onError: (err: any) => {
             toast.error(err?.response?.data?.message || "Failed to sync connection");
+        },
+    });
+};
+
+export const useUpdateIntegration = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...payload }: { id: string } & Record<string, unknown>) =>
+            settingsService.updateIntegration(id, payload),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: settingsKeys.connections() });
+            toast.success("Integration updated successfully!");
+        },
+        onError: (err: any) => {
+            toast.error(err?.response?.data?.message || "Failed to update integration");
         },
     });
 };

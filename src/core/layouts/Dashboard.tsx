@@ -15,6 +15,8 @@ import Orders from "@/features/orders";
 import OrderDetails from "@/features/orders/components/OrderDetails";
 import Tickets from "@/features/tickets";
 import TicketDetails from "@/features/tickets/components/TicketDetails";
+import Conversations from "@/features/conversations";
+import ConversationDetail from "@/features/conversations/ConversationDetail";
 import Employees from "@/features/employees";
 import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 import Settings from "@/features/settings";
@@ -42,6 +44,8 @@ const Dashboard = () => {
             <Route path="orders/:id" element={<OrderDetails />} />
             <Route path="tickets" element={<Tickets />} />
             <Route path="tickets/:id" element={<TicketDetails />} />
+            <Route path="conversations" element={<Conversations />} />
+            <Route path="conversations/:id" element={<ConversationDetail />} />
             <Route path="employees" element={<Employees />} />
             <Route path="employees/:id" element={<EmployeeProfile />} />
             <Route path="settings" element={<Settings />} />

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useConnections, useConnectShopify, useDeleteIntegration, useTestConnection, useSyncConnection, useSyncLogs } from "../settings.hooks";
 import { inputClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
-import { ShopifyIcon, Settings01Icon, Unlink01Icon, ArrowDown01Icon, ArrowUp01Icon, InformationCircleIcon, Shield01Icon, ArrowReloadHorizontalIcon, Cancel01Icon } from "hugeicons-react";
+import { ShopifyIcon, Settings01Icon, Unlink01Icon, ArrowDown01Icon, ArrowUp01Icon, InformationCircleIcon, Shield01Icon, ArrowReloadHorizontalIcon, Cancel01Icon, Facebook02Icon } from "hugeicons-react";
+import MetaConnections from "./MetaConnections";
 
 const ConnectionsTab = () => {
     const { data: connections = [], isLoading } = useConnections();
@@ -11,10 +12,14 @@ const ConnectionsTab = () => {
     const testConnectionMutation = useTestConnection();
     const syncConnectionMutation = useSyncConnection();
 
+    const [providerTab, setProviderTab] = useState<"shopify" | "meta">("shopify");
+
     // UI states
     const [detailsOpen, setDetailsOpen] = useState(true);
     const [logsModalOpen, setLogsModalOpen] = useState(false);
     const [syncing, setSyncing] = useState(false);
+
+    const shopifyConnections = connections.filter((c) => c.provider === "shopify");
 
     // Connect form states
     const [shopDomain, setShopDomain] = useState("");
@@ -32,7 +37,7 @@ const ConnectionsTab = () => {
         refunds: false
     });
 
-    const activeConn = connections[0];
+    const activeConn = shopifyConnections[0];
     const { data: logs = [] } = useSyncLogs(activeConn?.id || "", logsModalOpen && !!activeConn);
 
     const handleSyncNow = () => {
@@ -80,83 +85,78 @@ const ConnectionsTab = () => {
         return <div className="text-center py-12 text-gray-400 animate-pulse font-semibold">Loading integration details...</div>;
     }
 
-    // ─── No Connection: Show Connect Form ───
-    if (!activeConn) {
-        return (
-            <div className="space-y-6">
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center space-y-6">
-                    <div className="flex justify-center">
-                        <span className="p-5 bg-green-50 text-green-600 rounded-2xl">
-                            <ShopifyIcon size={48} />
-                        </span>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold text-gray-900">Connect Your Shopify Store</h3>
-                        <p className="text-sm text-gray-400 mt-2 max-w-md mx-auto">
-                            Link your Shopify store to automatically sync customers, orders, and products into your CRM.
-                        </p>
-                    </div>
-
-                    <div className="max-w-md mx-auto space-y-4 text-left">
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-600 mb-1.5">Store Name (optional)</label>
-                            <input
-                                type="text"
-                                placeholder="My Awesome Store"
-                                value={storeName}
-                                onChange={(e) => setStoreName(e.target.value)}
-                                className={inputClasses}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-600 mb-1.5">Shop Domain</label>
-                            <input
-                                type="text"
-                                placeholder="my-store.myshopify.com"
-                                value={shopDomain}
-                                onChange={(e) => setShopDomain(e.target.value)}
-                                className={inputClasses}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-600 mb-1.5">Access Token</label>
-                            <input
-                                type="password"
-                                placeholder="shpat_xxxxxxxxxxxxxxxxxxxxxxxx"
-                                value={accessToken}
-                                onChange={(e) => setAccessToken(e.target.value)}
-                                className={inputClasses}
-                            />
-                        </div>
-                        <button
-                            onClick={handleConnect}
-                            disabled={connectShopifyMutation.isPending}
-                            className="w-full py-3 rounded-lg bg-green-600 text-white text-sm font-bold hover:bg-green-700 shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                            <ShopifyIcon size={16} />
-                            {connectShopifyMutation.isPending ? "Connecting..." : "Connect Shopify Store"}
-                        </button>
-                    </div>
+    // ─── Shopify Content ───
+    const shopifyContent = !activeConn ? (
+        <div className="space-y-6">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center space-y-6">
+                <div className="flex justify-center">
+                    <span className="p-5 bg-green-50 text-green-600 rounded-2xl">
+                        <ShopifyIcon size={48} />
+                    </span>
+                </div>
+                <div>
+                    <h3 className="text-xl font-bold text-gray-900">Connect Your Shopify Store</h3>
+                    <p className="text-sm text-gray-400 mt-2 max-w-md mx-auto">
+                        Link your Shopify store to automatically sync customers, orders, and products into your CRM.
+                    </p>
                 </div>
 
-                {/* Encrypted Data Transfer Card */}
-                <div className="bg-slate-50/50 rounded-xl border border-gray-100/60 p-5 flex items-start gap-4">
-                    <span className="p-3 bg-blue-50 text-blue-500 rounded-xl flex-shrink-0">
-                        <Shield01Icon size={18} />
-                    </span>
+                <div className="max-w-md mx-auto space-y-4 text-left">
                     <div>
-                        <h4 className="text-sm font-bold text-gray-800">Encrypted Data Transfer</h4>
-                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                            All connections are secured using 256-bit AES encryption. We do not store your third-party account credentials; we use secure OAuth tokens for all authorized communications.
-                        </p>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Store Name (optional)</label>
+                        <input
+                            type="text"
+                            placeholder="My Awesome Store"
+                            value={storeName}
+                            onChange={(e) => setStoreName(e.target.value)}
+                            className={inputClasses}
+                        />
                     </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Shop Domain</label>
+                        <input
+                            type="text"
+                            placeholder="my-store.myshopify.com"
+                            value={shopDomain}
+                            onChange={(e) => setShopDomain(e.target.value)}
+                            className={inputClasses}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1.5">Access Token</label>
+                        <input
+                            type="password"
+                            placeholder="shpat_xxxxxxxxxxxxxxxxxxxxxxxx"
+                            value={accessToken}
+                            onChange={(e) => setAccessToken(e.target.value)}
+                            className={inputClasses}
+                        />
+                    </div>
+                    <button
+                        onClick={handleConnect}
+                        disabled={connectShopifyMutation.isPending}
+                        className="w-full py-3 rounded-lg bg-green-600 text-white text-sm font-bold hover:bg-green-700 shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                        <ShopifyIcon size={16} />
+                        {connectShopifyMutation.isPending ? "Connecting..." : "Connect Shopify Store"}
+                    </button>
                 </div>
             </div>
-        );
-    }
 
-    // ─── Active Connection View ───
-    return (
+            {/* Encrypted Data Transfer Card */}
+            <div className="bg-slate-50/50 rounded-xl border border-gray-100/60 p-5 flex items-start gap-4">
+                <span className="p-3 bg-blue-50 text-blue-500 rounded-xl flex-shrink-0">
+                    <Shield01Icon size={18} />
+                </span>
+                <div>
+                    <h4 className="text-sm font-bold text-gray-800">Encrypted Data Transfer</h4>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                        All connections are secured using 256-bit AES encryption. We do not store your third-party account credentials; we use secure OAuth tokens for all authorized communications.
+                    </p>
+                </div>
+            </div>
+        </div>
+    ) : (
         <div className="space-y-6">
             {/* Top Shopify Connection Info */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -418,6 +418,38 @@ const ConnectionsTab = () => {
                     </div>
                 </div>
             )}
+        </div>
+    );
+
+    return (
+        <div className="space-y-6">
+            {/* Provider Sub-Tabs */}
+            <div className="flex gap-1 bg-white rounded-xl border border-gray-100 shadow-sm p-1.5 w-fit">
+                <button
+                    onClick={() => setProviderTab("shopify")}
+                    className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                        providerTab === "shopify"
+                            ? "bg-green-600 text-white shadow-sm"
+                            : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                    }`}
+                >
+                    <ShopifyIcon size={16} />
+                    Shopify
+                </button>
+                <button
+                    onClick={() => setProviderTab("meta")}
+                    className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                        providerTab === "meta"
+                            ? "bg-blue-600 text-white shadow-sm"
+                            : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                    }`}
+                >
+                    <Facebook02Icon size={16} />
+                    Meta
+                </button>
+            </div>
+
+            {providerTab === "shopify" ? shopifyContent : <MetaConnections />}
         </div>
     );
 };

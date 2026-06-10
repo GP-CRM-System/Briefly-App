@@ -192,13 +192,15 @@ export const ENDPOINTS = {
 
   // ─── Conversations / Messaging ───
   CONVERSATION: {
-    GET_ALL: "/conversations",
-    GET_MESSAGES: (id: string) => `/conversations/${id}/messages`,
-    SEND_MESSAGE: (id: string) => `/conversations/${id}/messages`,
+    GET_ALL: "/messaging/conversations",
+    GET_MESSAGES: (id: string) => `/messaging/conversations/${id}/messages`,
+    SEND_MESSAGE: (id: string) => `/messaging/conversations/${id}/messages`,
+    START: "/messaging/conversations",
   },
 
-  // ─── Integrations (Shopify) ───
+  // ─── Integrations ───
   INTEGRATION: {
+    CONNECT_META: "/integrations/meta/connect",
     CONNECT_SHOPIFY: "/integrations/shopify/connect",
     GET_ALL: "/integrations",
     GET_ONE: (id: string) => `/integrations/${id}`,
