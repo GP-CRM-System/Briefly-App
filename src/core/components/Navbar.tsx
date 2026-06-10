@@ -1,9 +1,11 @@
+import { useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { Icon } from "@/core/components";
 import { useAuthStore } from "@/store/auth.store";
 import { notification } from "@/assets/icons/navbar/navbar";
-
 import { useUIStore } from "@/store/ui.store";
+import { useUnreadCount } from "@/features/notifications/notification.hooks";
+import NotificationPanel from "@/features/notifications/components/NotificationPanel";
 
 /* ── Route → Page title mapping ── */
 const pageTitles: Record<string, string> = {
@@ -24,6 +26,12 @@ const Navbar = () => {
     const user = useAuthStore((s) => s.user);
     const role = useAuthStore((s) => s.role);
     const { setSidebarOpen } = useUIStore();
+
+    /* ── Notification state ── */
+    const [notifOpen, setNotifOpen] = useState(false);
+    const toggleNotif = useCallback(() => setNotifOpen((v) => !v), []);
+    const closeNotif = useCallback(() => setNotifOpen(false), []);
+    const { data: unreadCount = 0 } = useUnreadCount();
 
     const pageTitle = pageTitles[pathname]
         || (pathname.includes("/customers/") ? "Customer Profile"
@@ -53,11 +61,29 @@ const Navbar = () => {
                 {/* Right */}
                 <div className="flex items-center gap-4">
                     {/* Notification Bell */}
-                    <button className="relative w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[var(--color-primary-500)] hover:border-blue-200 transition-all">
-                        <Icon icon={notification} className="h-5 w-5" />
-                        {/* Notification dot */}
-                        <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-                    </button>
+                    <div className="relative">
+                        <button
+                            id="notification-bell"
+                            onClick={toggleNotif}
+                            className={`relative w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+                                notifOpen
+                                    ? "border-[var(--color-primary-300)] text-[var(--color-primary-500)] bg-[var(--color-primary-50)]"
+                                    : "border-gray-200 text-gray-500 hover:text-[var(--color-primary-500)] hover:border-blue-200"
+                            }`}
+                            aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
+                        >
+                            <Icon icon={notification} className="h-5 w-5" />
+                            {/* Unread badge */}
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white shadow-sm">
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* Notification dropdown panel */}
+                        <NotificationPanel open={notifOpen} onClose={closeNotif} />
+                    </div>
 
                     {/* User Avatar + Info */}
                     <div className="flex items-center gap-3 cursor-pointer group">

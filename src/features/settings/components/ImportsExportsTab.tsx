@@ -27,11 +27,11 @@ const ImportsExportsTab = () => {
     const [isExportOpen, setIsExportOpen] = useState(false);
 
     // Import Form states
-    const [importEntityType, setImportEntityType] = useState("contacts");
+    const [importEntityType, setImportEntityType] = useState("customer");
     const [importFile, setImportFile] = useState<File | null>(null);
 
     // Export Form states
-    const [exportEntityType, setExportEntityType] = useState("contacts");
+    const [exportEntityType, setExportEntityType] = useState("customer");
     const [exportFormat, setExportFormat] = useState("csv");
 
     const handleRefresh = () => {
@@ -290,10 +290,9 @@ const ImportsExportsTab = () => {
                             onChange={(e) => setImportEntityType(e.target.value)}
                             className={selectClasses}
                         >
-                            <option value="contacts">Contacts / Customers</option>
-                            <option value="deals">Deals / Opportunities</option>
-                            <option value="tickets">Support Tickets</option>
-                            <option value="products">Products</option>
+                            <option value="customer">Customers</option>
+                            <option value="product">Products</option>
+                            <option value="order">Orders</option>
                         </select>
                     </FormField>
 
@@ -344,10 +343,9 @@ const ImportsExportsTab = () => {
                             onChange={(e) => setExportEntityType(e.target.value)}
                             className={selectClasses}
                         >
-                            <option value="contacts">Contacts / Customers</option>
-                            <option value="deals">Deals / Opportunities</option>
-                            <option value="tickets">Support Tickets</option>
-                            <option value="products">Products</option>
+                            <option value="customer">Customers</option>
+                            <option value="product">Products</option>
+                            <option value="order">Orders</option>
                         </select>
                     </FormField>
 

@@ -107,7 +107,7 @@ const PaymentBillingTab = () => {
                             </span>
                             <div className="flex items-baseline gap-1 text-gray-900">
                                 <span className="text-3xl font-extrabold">
-                                    ${activePlan.price?.toFixed(2)}
+                                    ${Number(activePlan.price ?? 0).toFixed(2)}
                                 </span>
                                 <span className="text-sm font-semibold text-gray-400">/ month</span>
                             </div>
@@ -291,7 +291,7 @@ const PaymentBillingTab = () => {
                                                 {plan.name === "professional" && "Ideal for growing teams. Up to 10,000 contacts."}
                                                 {plan.name === "enterprise" && "For large scale operations. Unlimited contacts."}
                                             </p>
-                                            <p className="text-lg font-black text-gray-900">${plan.price?.toFixed(2)} / month</p>
+                                            <p className="text-lg font-black text-gray-900">${Number(plan.price ?? 0).toFixed(2)} / month</p>
                                         </div>
                                         {isCurrent ? (
                                             <span className="px-4 py-2 text-xs font-bold text-blue-500">Active</span>
