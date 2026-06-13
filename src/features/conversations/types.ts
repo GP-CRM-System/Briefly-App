@@ -8,27 +8,40 @@ export interface Conversation {
     lastMessageAt: string | null;
     createdAt: string;
     updatedAt: string;
+    assignedAgentId?: string | null;
+    unreadCount?: number;
     customer: {
         name: string;
         email: string;
     } | null;
 }
 
+export interface MessageMetadata {
+    fileName?: string;
+    mimeType?: string;
+    size?: number;
+    originalName?: string;
+    storageKey?: string;
+    uploadProgress?: number;
+    localPreviewUrl?: string;
+    [key: string]: any;
+}
+
 export interface Message {
     id: string;
     conversationId: string;
     content: string;
-    type: "text" | "image" | "document" | "template";
+    type: "text" | "image" | "document" | "template" | "audio" | "video";
     direction: "INBOUND" | "OUTBOUND";
-    status: "SENT" | "DELIVERED" | "READ" | "FAILED";
+    status: "SENT" | "DELIVERED" | "READ" | "FAILED" | "PENDING" | "PROCESSING" | "UPLOADING";
     errorMessage?: string | null;
-    metadata?: Record<string, unknown> | null;
+    metadata?: MessageMetadata | null;
     createdAt: string;
 }
 
 export interface SendMessagePayload {
     content: string;
-    type?: "text" | "image" | "document" | "template";
+    type?: "text" | "image" | "document" | "template" | "audio" | "video";
     metadata?: Record<string, unknown>;
 }
 
@@ -36,7 +49,7 @@ export interface StartConversationPayload {
     provider: "whatsapp" | "facebook" | "messenger" | "instagram";
     recipientId: string;
     content: string;
-    type?: "text" | "image" | "document" | "template";
+    type?: "text" | "image" | "document" | "template" | "audio" | "video";
     customerPhone?: string;
     customerName?: string;
     metadata?: Record<string, unknown>;
