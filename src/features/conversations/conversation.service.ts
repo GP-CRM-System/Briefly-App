@@ -29,4 +29,9 @@ export const conversationService = {
         const { data } = await apiClient.post(ENDPOINTS.CONVERSATION.START, payload);
         return data?.data || data;
     },
+
+    async assignConversation(id: string, assignedAgentId: string | null): Promise<Conversation> {
+        const { data } = await apiClient.post(`/messaging/conversations/${id}/assign`, { assignedAgentId });
+        return data?.data || data;
+    },
 };
