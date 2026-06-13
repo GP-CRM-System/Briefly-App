@@ -16,6 +16,7 @@ const pageTitles: Record<string, string> = {
     "/dashboard/products": "Products",
     "/dashboard/orders": "Orders",
     "/dashboard/tickets": "Support Tickets",
+    "/dashboard/conversations": "Conversations",
     "/dashboard/employees": "Employees",
     "/dashboard/analytics": "Analytics",
     "/dashboard/settings": "Settings",
@@ -38,6 +39,7 @@ const Navbar = () => {
         : pathname.includes("/segments/") ? "Segment Details"
         : pathname.includes("/campaigns/") ? "Campaign Details"
         : pathname.includes("/products/") ? "Product Details"
+        : pathname.includes("/conversations/") ? "Conversations"
         : "Dashboard");
 
     return (

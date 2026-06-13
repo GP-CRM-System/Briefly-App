@@ -96,8 +96,8 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 };
 
 /* ══════════════════════════════════════════════════════
-   Donut center label renderer
-   ══════════════════════════════════════════════════════ */
+   Donut center label renderer (Commented out because it is unused)
+   ══════════════════════════════════════════════════════ 
 const renderCenterLabel = (data: { name: string; value: number }[]) => {
     const total = data.reduce((s, d) => s + d.value, 0);
     return ({ cx, cy }: any) => (
@@ -107,6 +107,7 @@ const renderCenterLabel = (data: { name: string; value: number }[]) => {
         </text>
     );
 };
+*/
 
 /* ══════════════════════════════════════════════════════
    Pie label with percentage
@@ -134,7 +135,30 @@ const icons = {
     ),
     products: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v    const ticketStatus = useMemo(() => {
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25" />
+        </svg>
+    ),
+    orders: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+    ),
+    tickets: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
+        </svg>
+    ),
+};
+
+/* ══════════════════════════════════════════════════════
+   Main Page
+   ══════════════════════════════════════════════════════ */
+const AnalyticsPage = () => {
+    const { data: dashboard, isLoading } = useDashboardData();
+
+    const stats = dashboard?.stats;
+
+    const ticketStatus = useMemo(() => {
         const bk = dashboard?.ticketBreakdown;
         if (!bk) return TICKET_STATUS;
         const total = bk.open + bk.pending + bk.closed;
@@ -211,30 +235,6 @@ const icons = {
                     </div>
                     <div className="flex justify-center gap-5 mt-1">
                         {ticketStatus.map((t) => (
-                            <div key={t.name} className="flex items-center gap-1.5 text-xs text-gray-500">
-                                <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: t.color }} />
-                                {t.name}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>   <div className="flex-1 flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height={220}>
-                            <PieChart>
-                                <Pie data={TICKET_STATUS} cx="50%" cy="50%" innerRadius={55} outerRadius={80}
-                                    paddingAngle={3} dataKey="value" strokeWidth={0}
-                                    label={renderPercentLabel} labelLine={false}>
-                                    {TICKET_STATUS.map((entry, i) => (
-                                        <Cell key={i} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip formatter={(v: number, n: string) => [`${v}%`, n]}
-                                    contentStyle={{ borderRadius: 8, border: "1px solid #f1f5f9", fontSize: 13 }} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className="flex justify-center gap-5 mt-1">
-                        {TICKET_STATUS.map((t) => (
                             <div key={t.name} className="flex items-center gap-1.5 text-xs text-gray-500">
                                 <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: t.color }} />
                                 {t.name}

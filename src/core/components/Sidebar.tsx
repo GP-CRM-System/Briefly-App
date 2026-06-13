@@ -15,9 +15,10 @@ import {
     employeesIcon, 
     analyticsIcon,
     settingsIcon,
-    closeIcon,
-    conversationsIcon
+    closeIcon
 } from "@/assets/new";
+
+import { Chatting01Icon } from "hugeicons-react";
 
 interface NavItem {
     to: string;
@@ -35,7 +36,7 @@ const navItems: NavItem[] = [
     { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products.read" },
     { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders.read" },
     { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets.read" },
-    { to: "/dashboard/conversations", label: "Conversations", icon: conversationsIcon, permission: "conversations.read" },
+    { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations.read" },
     { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member.read" },
     { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports.read" },
 ];
@@ -58,14 +59,16 @@ const SidebarItem = ({
     onClick?: () => void;
     isLogout?: boolean;
 }) => {
-    const baseClasses = `flex items-center transition-all group h-[44px] p-3 ${
-        sidebarOpen ? "w-full" : "w-full justify-center"
+    const baseClasses = `flex items-center transition-all group ${
+        sidebarOpen ? "h-[38px] px-3 py-2 w-full" : "h-[34px] p-1.5 w-full justify-center"
     }`;
 
-    const activeClasses = "bg-[var(--color-primary-500)] text-white rounded-[16px] shadow-sm";
+    const activeClasses = `bg-[var(--color-primary-500)] text-white shadow-sm ${
+        sidebarOpen ? "rounded-[12px]" : "rounded-[10px]"
+    }`;
     const inactiveClasses = isLogout 
-        ? "text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-[16px]" 
-        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-[16px]";
+        ? `text-gray-500 hover:bg-red-50 hover:text-red-600 ${sidebarOpen ? "rounded-[12px]" : "rounded-[10px]"}` 
+        : `text-gray-500 hover:bg-gray-50 hover:text-gray-900 ${sidebarOpen ? "rounded-[12px]" : "rounded-[10px]"}`;
 
     const content = (
         <div className={`flex items-center gap-3 ${sidebarOpen ? 'w-full' : 'justify-center'}`}>
@@ -90,6 +93,7 @@ const SidebarItem = ({
                     to={to}
                     end={end}
                     onClick={onClick}
+                    title={!sidebarOpen ? label : undefined}
                     className={({ isActive }) =>
                         `${baseClasses} ${isActive && !isLogout ? activeClasses : inactiveClasses}`
                     }
@@ -111,7 +115,11 @@ const SidebarItem = ({
                     )}
                 </NavLink>
             ) : (
-                <button onClick={onClick} className={`${baseClasses} ${inactiveClasses}`}>
+                <button 
+                    onClick={onClick} 
+                    title={!sidebarOpen ? label : undefined}
+                    className={`${baseClasses} ${inactiveClasses}`}
+                >
                     {content}
                 </button>
             )}
@@ -132,25 +140,25 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
 
     if (!sidebarOpen || dismissed) return null;
     return (
-        <div className="w-full h-auto mb-4 p-4 border border-gray-100 rounded-[12px] bg-white shadow-sm flex flex-col gap-2">
-            <div className="flex items-center justify-between mb-1">
-                <span className="text-base text-gray-900 leading-none font-bold">5 Days left !</span>
+        <div className="w-full h-auto mb-3 p-3 border border-gray-100 rounded-[12px] bg-white shadow-sm flex flex-col gap-1.5">
+            <div className="flex items-center justify-between mb-0.5">
+                <span className="text-sm text-gray-900 leading-none font-bold">5 Days left !</span>
                 <div
                     onClick={() => setDismissed(true)}
-                    className="bg-[#B3B3B3] rounded-full p-1 cursor-pointer hover:bg-gray-500 transition-colors flex items-center justify-center"
+                    className="bg-[#B3B3B3] rounded-full p-0.5 cursor-pointer hover:bg-gray-500 transition-colors flex items-center justify-center"
                 >
-                    <Icon icon={closeIcon} className="h-2.5 w-2.5 text-white" />
+                    <Icon icon={closeIcon} className="h-2 w-2 text-white" />
                 </div>
             </div>
-            <div className="flex flex-col gap-2">
-                <div className="w-full bg-gray-100 rounded-full h-[6px]">
-                    <div className="bg-[var(--color-primary-500)] h-[6px] rounded-full" style={{ width: '60%' }}></div>
+            <div className="flex flex-col gap-1.5">
+                <div className="w-full bg-gray-100 rounded-full h-[5px]">
+                    <div className="bg-[var(--color-primary-500)] h-[5px] rounded-full" style={{ width: '60%' }}></div>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed font-normal">
+                <p className="text-[11px] text-gray-500 leading-normal font-normal">
                     Select best plan now and unlock all special features
                 </p>
             </div>
-            <button className="text-sm font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] transition-colors flex items-center gap-1 mt-1">
+            <button className="text-xs font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] transition-colors flex items-center gap-1 mt-0.5 cursor-pointer">
                 Select plan <span>›</span>
             </button>
         </div>
@@ -195,7 +203,7 @@ const Sidebar = () => {
                     relative flex items-center transition-all duration-300
                     ${sidebarOpen
                         ? 'pt-7 px-4 pb-5'
-                        : 'pt-7 px-3 pb-5 justify-center'}
+                        : 'pt-5 px-3 pb-3 justify-center'}
                 `}>
                     <div className="flex items-center gap-3 w-full justify-start">
                         {sidebarOpen ? (
@@ -239,8 +247,8 @@ const Sidebar = () => {
                 {/* Nav + Card + Footer — flex-1 so it fills remaining height */}
                 <div className="flex-1 flex flex-col min-h-0">
                     <nav className={`
-                        flex-1 px-4 pb-7 flex flex-col custom-scrollbar
-                        ${sidebarOpen ? 'overflow-y-auto' : 'overflow-visible'}
+                        flex-1 flex flex-col custom-scrollbar
+                        ${sidebarOpen ? 'px-4 overflow-y-auto' : 'px-2 overflow-visible'}
                     `}>
                         {/* Primary Nav */}
                         <ul className="space-y-0.5">
@@ -269,14 +277,19 @@ const Sidebar = () => {
                             })}
                         </ul>
 
-                        {/* Spacer — pushes card & footer to bottom */}
-                        <div className="flex-1 min-h-[20px]" />
+                        {/* Spacer — pushes card to bottom */}
+                        <div className="flex-1 min-h-[10px]" />
 
                         {/* Plan Card */}
                         <UpgradeCard sidebarOpen={sidebarOpen} />
+                    </nav>
 
-                        {/* Settings & Logout */}
-                        <ul className="space-y-0.5 border-t border-gray-100 pt-3">
+                    {/* Settings & Logout - Fixed at bottom */}
+                    <div className={`
+                        border-t border-gray-100 bg-white transition-all duration-300
+                        ${sidebarOpen ? 'px-4 py-3' : 'px-2 py-2'}
+                    `}>
+                        <ul className="space-y-0.5">
                             <SidebarItem
                                 to="/dashboard/settings"
                                 label="Settings"
@@ -292,7 +305,7 @@ const Sidebar = () => {
                                 isLogout
                             />
                         </ul>
-                    </nav>
+                    </div>
                 </div>
             </aside>
 

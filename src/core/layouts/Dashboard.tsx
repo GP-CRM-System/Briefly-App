@@ -1,5 +1,5 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar.tsx";
 import Navbar from "../components/Navbar.tsx";
 import DashboardHome from "@/features/dashboard/components/DashboardHome";
@@ -16,20 +16,24 @@ import OrderDetails from "@/features/orders/components/OrderDetails";
 import Tickets from "@/features/tickets";
 import TicketDetails from "@/features/tickets/components/TicketDetails";
 import Conversations from "@/features/conversations";
-import ConversationDetail from "@/features/conversations/ConversationDetail";
 import Employees from "@/features/employees";
 import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 import Settings from "@/features/settings";
 import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
+import { useSocketEvents } from "@/core/hooks";
 
 const Dashboard = () => {
+  useSocketEvents();
+  const { pathname } = useLocation();
+  const isConversations = pathname.includes("/conversations");
+
   return (
     <div className="flex h-screen overflow-hidden bg-white">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
         <Navbar />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <main className={`flex-grow flex flex-col min-h-0 p-4 md:p-6 lg:p-8 ${isConversations ? "overflow-hidden" : "overflow-y-auto"}`}>
           <Routes>
             <Route path="/" element={<DashboardHome />} />
             <Route path="customers" element={<Customers />} />
@@ -45,7 +49,7 @@ const Dashboard = () => {
             <Route path="tickets" element={<Tickets />} />
             <Route path="tickets/:id" element={<TicketDetails />} />
             <Route path="conversations" element={<Conversations />} />
-            <Route path="conversations/:id" element={<ConversationDetail />} />
+            <Route path="conversations/:id" element={<Conversations />} />
             <Route path="employees" element={<Employees />} />
             <Route path="employees/:id" element={<EmployeeProfile />} />
             <Route path="settings" element={<Settings />} />

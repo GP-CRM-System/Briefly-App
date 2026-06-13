@@ -21,8 +21,8 @@ const ConversationDetail = () => {
     const customerEmail = conversation?.customer?.email || "—";
     const messages = messagesData?.data ?? [];
 
-    const handleSend = (content: string) => {
-        sendMutation.mutate({ content, type: "text" });
+    const handleSend = (content: string, type: "text" | "image" | "document" | "template" | "audio" | "video" = "text", metadata?: any) => {
+        sendMutation.mutate({ content, type, metadata });
     };
 
     const providerBadge = conversation ? getProviderBadge(conversation.provider || "") : null;
