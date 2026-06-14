@@ -4,9 +4,7 @@ import { Icon } from "@/core/components";
 import { PermissionGuard } from "@/core/components/PermissionGuard";
 import { useUIStore } from "@/store/ui.store";
 import { useAuth } from "@/core/hooks";
-import { logout, logoSvg, letterLogo, tickets } from "@/assets/icons";
-import { 
-    dashboardIcon, 
+import { logout, logoSvg, letterLogo, tickets } from "@/assets/icons";import { dashboardIcon, 
     customersIcon, 
     segmentsIcon, 
     campaignsIcon, 
@@ -17,6 +15,7 @@ import {
     settingsIcon,
     closeIcon
 } from "@/assets/new";
+import { AiIdeaIcon } from "hugeicons-react";
 
 import { Chatting01Icon } from "hugeicons-react";
 
@@ -39,6 +38,7 @@ const navItems: NavItem[] = [
     { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations.read" },
     { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member.read" },
     { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports.read" },
+    { to: "/dashboard/ai", label: "AI Intelligence", icon: AiIdeaIcon, permission: "ai.read" },
 ];
 
 /* ───────────────────────── SidebarItem ───────────────────────── */

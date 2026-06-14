@@ -5,7 +5,9 @@ import type { Customer } from "@/features/customers/types";
 
 export const segmentService = {
     async getAll(): Promise<Segment[]> {
-        const { data } = await apiClient.get(ENDPOINTS.SEGMENT.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.SEGMENT.GET_ALL, {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 
@@ -29,7 +31,9 @@ export const segmentService = {
     },
 
     async getCustomers(id: string): Promise<Customer[]> {
-        const { data } = await apiClient.get(ENDPOINTS.SEGMENT.GET_CUSTOMERS(id));
+        const { data } = await apiClient.get(ENDPOINTS.SEGMENT.GET_CUSTOMERS(id), {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 

@@ -6,7 +6,9 @@ import type { Product } from "./types";
 export const productService = {
 
     async getAll(): Promise<Product[]> {
-        const { data } = await apiClient.get(ENDPOINTS.PRODUCT.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.PRODUCT.GET_ALL, {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 

@@ -20,6 +20,7 @@ import Employees from "@/features/employees";
 import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 import Settings from "@/features/settings";
 import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
+import AiDashboard from "@/features/ai";
 import { useSocketEvents } from "@/core/hooks";
 
 const Dashboard = () => {
@@ -54,6 +55,7 @@ const Dashboard = () => {
             <Route path="employees/:id" element={<EmployeeProfile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="ai" element={<AiDashboard />} />
           </Routes>
         </main>
       </div>

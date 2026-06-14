@@ -112,9 +112,10 @@ const SegmentDetails = () => {
                     return Number(customerValue) <= Number(value);
                 case "contains":
                     return valStr.includes(filterValStr);
-                case "in":
+                case "in": {
                     const valuesList = filterValStr.split(",").map(v => v.trim());
                     return valuesList.includes(valStr);
+                }
                 default:
                     return false;
             }

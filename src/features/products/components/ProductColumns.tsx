@@ -56,11 +56,11 @@ export const columns: Column<Product>[] = [
         ),
     },
     {
-        key: "quantity",
+        key: "inventory",
         header: "Stock",
         align: "center",
         render: (row) => {
-            const qty = row.quantity ?? 0;
+            const qty = row.inventory ?? 0;
             const isLow = qty > 0 && qty <= 10;
             const isOut = qty === 0;
             return (

@@ -9,7 +9,9 @@ export const dashboardService = {
     },
 
     async getAuditLogs(): Promise<AuditLogEntry[]> {
-        const { data } = await apiClient.get(ENDPOINTS.AUDIT_LOG.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.AUDIT_LOG.GET_ALL, {
+            params: { limit: 1000 }
+        });
         const list = data?.data ?? data;
         return Array.isArray(list) ? list : [];
     },

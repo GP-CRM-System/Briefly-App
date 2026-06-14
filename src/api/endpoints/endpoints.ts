@@ -249,6 +249,17 @@ export const ENDPOINTS = {
     CLEANUP_IDEMPOTENCY: "/cron/cleanup/idempotency",
   },
 
+  // ─── AI Intelligence ───
+  AI: {
+    COMPUTE_CHURN: "/ai/churn",
+    GET_CHURN: "/ai/churn",
+    COMPUTE_SEGMENTS: "/ai/segment",
+    GET_SEGMENTS: "/ai/segment",
+    COMPUTE_RECOMMENDATIONS: "/ai/recommend",
+    GET_RECOMMENDATIONS: (productId: string) => `/ai/recommend/${productId}`,
+    GET_HEALTH: "/ai/health",
+  },
+
   // ─── Health ───
   HEALTH: "/health",
 };

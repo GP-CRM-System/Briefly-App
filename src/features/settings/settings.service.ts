@@ -84,7 +84,9 @@ export const settingsService = {
     // ─── Roles & Permissions ───
     async listRoles(): Promise<Role[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.ROLE.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.ROLE.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const rolesData = data?.data || data;
             const rolesList = Array.isArray(rolesData)
                 ? rolesData
@@ -261,7 +263,9 @@ export const settingsService = {
     // ─── Connections (Integrations) ───
     async getConnections(): Promise<ConnectionDetails[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const integrations = data?.data || data;
             if (Array.isArray(integrations) && integrations.length > 0) {
                 return integrations.map((i: any) => ({
@@ -320,7 +324,9 @@ export const settingsService = {
 
     async getSyncLogs(id: string): Promise<SyncLog[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id));
+            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id), {
+                params: { limit: 1000 }
+            });
             const logs = data?.data || data;
             if (Array.isArray(logs)) {
                 return logs.map((l: any) => ({
@@ -344,7 +350,9 @@ export const settingsService = {
     // ─── Imports & Exports ───
     async getImportJobs(): Promise<ImportExportJob[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.IMPORT.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.IMPORT.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
                 return jobs.map((j: any) => ({
@@ -365,7 +373,9 @@ export const settingsService = {
 
     async getExportJobs(): Promise<ImportExportJob[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
                 return jobs.map((j: any) => ({
@@ -418,7 +428,9 @@ export const settingsService = {
     // ─── Subscriptions & Billing ───
     async getPlans(): Promise<any[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS);
+            const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS, {
+                params: { limit: 1000 }
+            });
             return data?.data || data || [];
         } catch {
             return [
