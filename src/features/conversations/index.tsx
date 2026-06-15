@@ -50,7 +50,13 @@ const Conversations = () => {
     const { data: employees = [] } = useEmployees();
 
     // Fetch messages for the active conversation
-    const { data: messagesData, isLoading: messagesLoading } = useConversationMessages(activeId);
+    const { 
+        data: messagesData, 
+        isLoading: messagesLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useConversationMessages(activeId);
     const sendMutation = useSendMessage(activeId);
     const assignMutation = useAssignConversation();
 
@@ -59,7 +65,10 @@ const Conversations = () => {
         [conversations, activeId]
     );
 
-    const messages = messagesData?.data ?? [];
+    const messages = useMemo(() => {
+        if (!messagesData?.pages) return [];
+        return [...messagesData.pages].reverse().flatMap((page) => page.data);
+    }, [messagesData?.pages]);
 
     // Socket Room Joining
     useEffect(() => {
@@ -153,12 +162,15 @@ const Conversations = () => {
     const typingText = useMemo(() => {
         if (otherTypingUsers.length === 0) return "";
         const names = otherTypingUsers.map((uid) => {
+            if (uid === "customer") {
+                return activeConversation?.customer?.name || "Customer";
+            }
             const emp = employees.find((e: any) => e.userId === uid);
             return emp ? (emp.name || emp.email) : "Someone";
         });
         if (names.length === 1) return `${names[0]} is typing...`;
         return `${names.join(", ")} are typing...`;
-    }, [otherTypingUsers, employees]);
+    }, [otherTypingUsers, employees, activeConversation]);
 
     return (
         <div className="flex-1 flex min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden -mx-4 md:mx-0">
@@ -241,6 +253,7 @@ const Conversations = () => {
                                     className={`p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors ${
                                         isSelected ? "bg-blue-50/50 hover:bg-blue-50/50" : ""
                                     }`}
+                                    style={{ contentVisibility: "auto" } as React.CSSProperties}
                                 >
                                     {/* Avatar */}
                                     <div className="relative flex-shrink-0">
@@ -419,7 +432,14 @@ const Conversations = () => {
                             backgroundImage: "radial-gradient(#dfdcd6 10%, transparent 10%)",
                             backgroundSize: "20px 20px"
                         }}>
-                            <MessageThread messages={messages} loading={messagesLoading} onRetry={handleRetry} />
+                            <MessageThread 
+                                messages={messages} 
+                                loading={messagesLoading} 
+                                onRetry={handleRetry} 
+                                fetchNextPage={fetchNextPage}
+                                hasNextPage={hasNextPage}
+                                isFetchingNextPage={isFetchingNextPage}
+                            />
                         </div>
 
                         {/* Typing indicators */}

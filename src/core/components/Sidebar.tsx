@@ -73,12 +73,14 @@ const SidebarItem = ({
 
     const content = (
         <div className={`flex items-center gap-3 ${sidebarOpen ? 'w-full' : 'justify-center'}`}>
-            <Icon
-                icon={icon}
-                className={`h-[20px] w-[20px] flex-shrink-0 transition-all ${
-                    isLogout ? "opacity-60 group-hover:opacity-100 group-hover:text-red-600" : ""
-                }`}
-            />
+            <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                <Icon
+                    icon={icon}
+                    className={`h-[20px] w-[20px] transition-all ${
+                        isLogout ? "opacity-60 group-hover:opacity-100 group-hover:text-red-600" : ""
+                    }`}
+                />
+            </div>
             {sidebarOpen && (
                 <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                     {label}
@@ -101,12 +103,14 @@ const SidebarItem = ({
                 >
                     {({ isActive }) => (
                         <div className={`flex items-center gap-3 ${sidebarOpen ? 'w-full' : 'justify-center'}`}>
-                            <Icon
-                                icon={icon}
-                                className={`h-[20px] w-[20px] flex-shrink-0 transition-all ${
-                                    isActive && !isLogout ? "brightness-0 invert" : "opacity-60 group-hover:opacity-100 group-hover:text-[var(--color-primary-500)]"
-                                }`}
-                            />
+                            <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                                <Icon
+                                    icon={icon}
+                                    className={`h-[20px] w-[20px] transition-all ${
+                                        isActive && !isLogout ? "brightness-0 invert" : "opacity-60 group-hover:opacity-100 group-hover:text-[var(--color-primary-500)]"
+                                    }`}
+                                />
+                            </div>
                             {sidebarOpen && (
                                 <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                                     {label}
@@ -208,6 +212,7 @@ const Sidebar = () => {
     const { sidebarOpen, setSidebarOpen, toggleSidebar } = useUIStore();
     const { logout: signOut } = useAuth();
 
+    // Lock body scroll when mobile drawer is open
     useEffect(() => {
         if (sidebarOpen && window.innerWidth < 1024) {
             document.body.style.overflow = "hidden";
@@ -218,6 +223,24 @@ const Sidebar = () => {
             document.body.style.overflow = "";
         };
     }, [sidebarOpen]);
+
+    // Auto-close sidebar on mobile screens at mount
+    useEffect(() => {
+        if (window.innerWidth < 1024) {
+            setSidebarOpen(false);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Auto-close sidebar when viewport shrinks to mobile
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 1024) {
+                setSidebarOpen(false);
+            }
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [setSidebarOpen]);
 
     return (
         <>
@@ -251,10 +274,10 @@ const Sidebar = () => {
                 <div className={`
                     relative flex items-center transition-all duration-300
                     ${sidebarOpen
-                        ? 'pt-7 px-4 pb-5'
+                        ? 'pt-7 pl-7 pr-4 pb-5'
                         : 'pt-5 px-3 pb-3 justify-center'}
                 `}>
-                    <div className="flex items-center gap-3 w-full justify-start">
+                    <div className={`flex items-center gap-3 ${sidebarOpen ? 'w-full justify-start' : 'justify-center'}`}>
                         {sidebarOpen ? (
                             <Icon icon={logoSvg} className="h-7 xl:h-8 w-auto text-[var(--color-primary-500)]" />
                         ) : (

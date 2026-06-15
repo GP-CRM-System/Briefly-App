@@ -1,4 +1,4 @@
-
+import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar.tsx";
 import Navbar from "../components/Navbar.tsx";
@@ -23,11 +23,67 @@ import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
 import { useSocketEvents } from "@/core/hooks";
 import { PermissionGuard, AccessDenied } from "@/core/components";
 import NotFoundPage from "@/pages/NotFoundPage";
+import apiClient from "@/api/client";
+import { ENDPOINTS } from "@/api/endpoints";
+import { useAuthStore } from "@/store/auth.store";
 
 const Dashboard = () => {
   useSocketEvents();
   const { pathname } = useLocation();
   const isConversations = pathname.includes("/conversations");
+
+  useEffect(() => {
+    const checkAndFixSession = async () => {
+      const currentSession = useAuthStore.getState();
+      const hasPermissions = currentSession.permissions && Object.keys(currentSession.permissions).length > 0;
+      
+      if (!currentSession.role || !hasPermissions) {
+        try {
+          // Re-fetch user details using /me
+          const { data: meResponse } = await apiClient.get("/me");
+          const meData = meResponse.data;
+          let activeOrgId = meData?.activeOrganizationId;
+          
+          if (!activeOrgId) {
+            // Fetch organizations the user belongs to
+            const { data: orgs } = await apiClient.get(ENDPOINTS.ORGANIZATION.LIST);
+            const orgList = Array.isArray(orgs) ? orgs : (orgs?.organizations || []);
+            
+            if (orgList.length > 0) {
+              const firstOrg = orgList[0];
+              activeOrgId = firstOrg.id;
+              
+              // Set the active organization on the backend
+              await apiClient.post(ENDPOINTS.ORGANIZATION.SET_ACTIVE, {
+                organizationId: activeOrgId
+              });
+            }
+          }
+          
+          if (activeOrgId) {
+            // Re-fetch user details now that we have an active organization
+            const { data: updatedMeResponse } = await apiClient.get("/me");
+            const updatedMeData = updatedMeResponse.data;
+            const token = useAuthStore.getState().token;
+            
+            if (updatedMeData && token) {
+              const { role, permissions, activeOrganizationId, ...user } = updatedMeData;
+              useAuthStore.getState().setSession(
+                token,
+                user as any,
+                role ?? null,
+                permissions ?? {},
+                true
+              );
+            }
+          }
+        } catch (err) {
+          console.error("[Dashboard] Auto-heal session failed:", err);
+        }
+      }
+    };
+    checkAndFixSession();
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">

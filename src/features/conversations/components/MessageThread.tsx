@@ -9,6 +9,9 @@ interface MessageThreadProps {
     messages: Message[];
     loading?: boolean;
     onRetry?: (message: Message) => void;
+    fetchNextPage?: () => void;
+    hasNextPage?: boolean;
+    isFetchingNextPage?: boolean;
 }
 
 const formatBytes = (bytes: number | undefined, decimals = 1) => {
@@ -39,7 +42,14 @@ const getFriendlyDateHeader = (dateStr: string) => {
     return dateStr;
 };
 
-const MessageThread = ({ messages, loading, onRetry }: MessageThreadProps) => {
+const MessageThread = ({ 
+    messages, 
+    loading, 
+    onRetry,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+}: MessageThreadProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const queryClient = useQueryClient();
     const { id: conversationId } = useParams<{ id: string }>();
@@ -47,9 +57,27 @@ const MessageThread = ({ messages, loading, onRetry }: MessageThreadProps) => {
     const cancelUpload = useUploadStore((state) => state.cancelUpload);
     const retryUpload = useUploadStore((state) => state.retryUpload);
 
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        if (target.scrollTop === 0 && hasNextPage && !isFetchingNextPage && fetchNextPage) {
+            const previousScrollHeight = target.scrollHeight;
+            containerRef.current?.setAttribute("data-prev-scroll-height", String(previousScrollHeight));
+            fetchNextPage();
+        }
+    };
+
     useEffect(() => {
-        if (containerRef.current) {
-            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        const container = containerRef.current;
+        if (!container) return;
+
+        const prevScrollHeightStr = container.getAttribute("data-prev-scroll-height");
+        if (prevScrollHeightStr) {
+            const prevScrollHeight = parseInt(prevScrollHeightStr, 10);
+            const newScrollHeight = container.scrollHeight;
+            container.scrollTop = newScrollHeight - prevScrollHeight;
+            container.removeAttribute("data-prev-scroll-height");
+        } else {
+            container.scrollTop = container.scrollHeight;
         }
     }, [messages]);
 
@@ -244,7 +272,16 @@ const MessageThread = ({ messages, loading, onRetry }: MessageThreadProps) => {
     };
 
     return (
-        <div ref={containerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+        <div 
+            ref={containerRef} 
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto px-6 py-4 space-y-6"
+        >
+            {isFetchingNextPage && (
+                <div className="flex justify-center py-2 animate-pulse">
+                    <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+            )}
             {Object.entries(groupedMessages).map(([dateStr, dayMessages]) => (
                 <div key={dateStr} className="space-y-3">
                     {/* Date Divider */}
@@ -263,6 +300,7 @@ const MessageThread = ({ messages, loading, onRetry }: MessageThreadProps) => {
                             <div
                                 key={msg.id}
                                 className={`flex ${isInbound ? "justify-start" : "justify-end"}`}
+                                style={{ contentVisibility: "auto" } as React.CSSProperties}
                             >
                                 <div className="flex flex-col max-w-[70%] group">
                                     <div

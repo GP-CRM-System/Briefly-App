@@ -31,7 +31,7 @@ type AuthState = {
     onboardingComplete: boolean;
 
     // Actions
-    setSession: (token: string, user: AuthUser, role: string, permissions: Record<string, string[]>, onboardingComplete?: boolean) => void;
+    setSession: (token: string, user: AuthUser, role: string | null, permissions: Record<string, string[]> | null, onboardingComplete?: boolean) => void;
     completeOnboarding: () => void;
     clearSession: () => void;
 };

@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '@/store/auth.store';
 
 type CreateOrganizationProps = {
     onNext: () => void;
@@ -42,12 +43,33 @@ export default function CreateOrganization({ onNext }: CreateOrganizationProps) 
     const handleSubmit = async (values: typeof initialValues) => {
         setIsSubmitting(true);
         try {
-            await apiClient.post(ENDPOINTS.ORGANIZATION.CREATE, {
+            const { data: org } = await apiClient.post(ENDPOINTS.ORGANIZATION.CREATE, {
                 name: values.name,
                 slug: values.slug,
-                // logo: logoFile — handle separately if backend supports it
             });
-            
+
+            const orgId = org?.organization?.id || org?.id;
+            if (orgId) {
+                await apiClient.post(ENDPOINTS.ORGANIZATION.SET_ACTIVE, {
+                    organizationId: orgId,
+                });
+
+                // Fetch updated user & session information via /me so we have role and permissions loaded
+                const { data: meResponse } = await apiClient.get("/me");
+                const meData = meResponse.data;
+                const token = useAuthStore.getState().token;
+                if (meData && token) {
+                    const { role, permissions, activeOrganizationId, ...user } = meData;
+                    useAuthStore.getState().setSession(
+                        token,
+                        user as any,
+                        role ?? null,
+                        permissions ?? {},
+                        false
+                    );
+                }
+            }
+
             toast.success("Organization created!");
             onNext();
         } catch (error: any) {

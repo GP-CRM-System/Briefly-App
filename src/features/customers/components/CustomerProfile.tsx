@@ -41,14 +41,14 @@ const fmtCreatedDate = (d: string | null | undefined) => {
 };
 
 const scoreLabel = (score: number | null | undefined): string => {
-    if (score == null) return "N/A";
+    if (score == null) return "—";
     if (score >= 0.7) return "High";
     if (score >= 0.4) return "Medium";
     return "Low";
 };
 
 const frequencyLabel = (f: string | null | undefined): string => {
-    if (!f) return "N/A";
+    if (!f) return "—";
     const n = Number(f);
     if (n >= 10 || f.toLowerCase() === "frequent") return "Frequent";
     if (n >= 5 || f.toLowerCase() === "regular") return "Regular";
@@ -323,7 +323,7 @@ const CustomerProfile = () => {
                             <span className="text-xs text-gray-400 font-medium">Engagement Score</span>
                         </div>
                         <div>
-                            <p className="text-lg font-bold text-gray-900">{c.engagementScore != null ? scoreLabel(c.engagementScore / 100) : "N/A"}</p>
+                            <p className="text-lg font-bold text-gray-900">{c.engagementScore != null ? scoreLabel(c.engagementScore / 100) : "—"}</p>
                             {c.engagementScore != null && (
                                 <div className="mt-3">
                                     <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -345,7 +345,7 @@ const CustomerProfile = () => {
                         </div>
                         <div>
                             <p className="text-lg font-bold text-gray-900">
-                                {c.satisfactionScore != null ? (c.satisfactionScore >= 70 ? "Positive" : c.satisfactionScore >= 40 ? "Neutral" : "Negative") : "N/A"}
+                                {c.satisfactionScore != null ? (c.satisfactionScore >= 70 ? "Positive" : c.satisfactionScore >= 40 ? "Neutral" : "Negative") : "—"}
                             </p>
                             {c.satisfactionScore != null && (
                                 <div className="mt-3">
@@ -381,7 +381,7 @@ const CustomerProfile = () => {
                             <span className="text-xs text-gray-400 font-medium">Cart Abandonment</span>
                         </div>
                         <div>
-                            <p className="text-lg font-bold text-gray-900">{c.cartAbandonmentRate != null ? (c.cartAbandonmentRate >= 0.6 ? "High" : c.cartAbandonmentRate >= 0.3 ? "Medium" : "Low") : "N/A"}</p>
+                            <p className="text-lg font-bold text-gray-900">{c.cartAbandonmentRate != null ? (c.cartAbandonmentRate >= 0.6 ? "High" : c.cartAbandonmentRate >= 0.3 ? "Medium" : "Low") : "—"}</p>
                             {c.cartAbandonmentRate != null && (
                                 <div className="mt-3">
                                     <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -402,7 +402,7 @@ const CustomerProfile = () => {
                             <span className="text-xs text-gray-400 font-medium">Price Sensitivity</span>
                         </div>
                         <div className="mt-2">
-                            <p className="text-lg font-bold text-gray-900">{c.priceSensitivityIndex != null ? scoreLabel(c.priceSensitivityIndex) : "N/A"}</p>
+                            <p className="text-lg font-bold text-gray-900">{c.priceSensitivityIndex != null ? scoreLabel(c.priceSensitivityIndex) : "—"}</p>
                             <p className="text-xs text-gray-400 mt-2">Index: {c.priceSensitivityIndex != null ? c.priceSensitivityIndex.toFixed(2) : "0.00"}</p>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { conversationService } from "./conversation.service";
 import type { SendMessagePayload, StartConversationPayload } from "./types";
 import toast from "react-hot-toast";
@@ -15,10 +15,15 @@ export const useConversations = () =>
         queryFn: conversationService.getAll,
     });
 
-export const useConversationMessages = (id: string | undefined, page = 1) =>
-    useQuery({
+export const useConversationMessages = (id: string | undefined) =>
+    useInfiniteQuery({
         queryKey: conversationKeys.messages(id!),
-        queryFn: () => conversationService.getMessages(id!, page),
+        queryFn: ({ pageParam = 1 }) => conversationService.getMessages(id!, pageParam as number),
+        getNextPageParam: (lastPage) => {
+            const totalLoaded = lastPage.page * lastPage.pageSize;
+            return totalLoaded < lastPage.total ? lastPage.page + 1 : undefined;
+        },
+        initialPageParam: 1,
         enabled: !!id,
     });
 
@@ -69,15 +74,30 @@ export const useSendMessage = (conversationId: string | undefined) => {
 
                     if (!oldData) {
                         return {
-                            data: [tempMessage],
-                            total: 1
+                            pages: [
+                                {
+                                    data: [tempMessage],
+                                    total: 1,
+                                    page: 1,
+                                    pageSize: 50
+                                }
+                            ],
+                            pageParams: [1]
+                        };
+                    }
+
+                    const newPages = [...oldData.pages];
+                    if (newPages[0]) {
+                        newPages[0] = {
+                            ...newPages[0],
+                            data: [...newPages[0].data, tempMessage],
+                            total: (newPages[0].total || 0) + 1
                         };
                     }
 
                     return {
                         ...oldData,
-                        data: [...oldData.data, tempMessage],
-                        total: (oldData.total || 0) + 1
+                        pages: newPages
                     };
                 }
             );

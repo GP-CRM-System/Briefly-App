@@ -1,0 +1,22 @@
+1. critical functional: i signed up and all working fine
+- but when i enterd in the crm i only found the dashboard page menawhile i am an organization root user now -
+- but after the signup the roles i guess not saved so maybe check on calling /me endpoint to get the users roles -
+- check on the integttion of backnedn and rfrontend of better auth and how things is handdlend betweeen them
+- also dont display this N/A it looks weird
+- better show a good welcome toast from the center top with the app's colors saying wecloms and strt use your CRM or whatever
+
+
+
+2. ui bug: when i minimize the screen the sidebard goes up of evrythign and makes weird popcatiy which is not cool at ll it must tend to be the humburger insted of acting open
+
+3.ui bug: the icons in sidebar are not aligned !
+
+
+/// NEW ///
+
+4. sockets are being called even with the user didnt even signup !
+
+
+5. check images 5 6 7 -> sined up done 
+- organization creation done
+- but invite user saying organization is not created !!

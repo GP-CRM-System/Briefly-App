@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
+import toast from "react-hot-toast";
 import { useDashboardData, useAuditLogs } from "../dashboard.hooks";
 import type { TicketBreakdown, AuditLogEntry } from "../types";
 
@@ -102,7 +103,60 @@ const DashboardHome = () => {
     const { data: dashboard, isLoading } = useDashboardData();
     const { data: auditRaw = [] } = useAuditLogs();
 
-    /* Safely extract sub-objects — no fake data, show real values or "N/A" */
+    useEffect(() => {
+        const showWelcome = sessionStorage.getItem("briefly_show_welcome");
+        if (showWelcome === "1") {
+            sessionStorage.removeItem("briefly_show_welcome");
+            
+            toast.custom(
+                (t) => (
+                    <div
+                        className={`${
+                            t.visible ? "animate-enter" : "animate-leave"
+                        } max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 border border-gray-100 overflow-hidden transition-all duration-300`}
+                        style={{
+                            transform: t.visible ? "translateY(0)" : "translateY(-20px)",
+                            opacity: t.visible ? 1 : 0,
+                        }}
+                    >
+                        <div className="flex-1 w-0 p-4">
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0 pt-0.5">
+                                    <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[var(--color-primary-500)] to-[#8B5CF6] flex items-center justify-center text-white shadow-md shadow-purple-200">
+                                        <svg className="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div className="ml-3 flex-1">
+                                    <p className="text-sm font-semibold text-gray-900 font-['Poppins']">
+                                        Welcome to Briefly CRM!
+                                    </p>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Your organization is ready. Let's start managing your customers, campaigns, and orders.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex border-l border-gray-100">
+                            <button
+                                onClick={() => toast.dismiss(t.id)}
+                                className="w-full border border-transparent rounded-none rounded-r-2xl p-4 flex items-center justify-center text-xs font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] focus:outline-none transition-colors"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                ),
+                {
+                    position: "top-center",
+                    duration: 5000,
+                }
+            );
+        }
+    }, []);
+
+    /* Safely extract sub-objects — no fake data, show real values or 0 */
     const stats = dashboard?.stats;
     const hasSalesData = (dashboard?.salesOverview?.length ?? 0) > 0;
     const salesData = hasSalesData && dashboard?.salesOverview ? dashboard.salesOverview : [];
@@ -131,10 +185,10 @@ const DashboardHome = () => {
         <div className="space-y-6">
             {/* ── Stats Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total Customers" value={stats?.totalCustomers ?? "N/A"} change={stats?.customerChange} />
-                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? "N/A"} change={stats?.campaignChange} />
-                <StatCard label="Total Products" value={stats?.totalProducts ?? "N/A"} change={stats?.productChange} />
-                <StatCard label="Total Orders" value={stats?.totalOrders ?? "N/A"} change={stats?.orderChange} />
+                <StatCard label="Total Customers" value={stats?.totalCustomers ?? 0} change={stats?.customerChange} />
+                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? 0} change={stats?.campaignChange} />
+                <StatCard label="Total Products" value={stats?.totalProducts ?? 0} change={stats?.productChange} />
+                <StatCard label="Total Orders" value={stats?.totalOrders ?? 0} change={stats?.orderChange} />
             </div>
 
             {/* ── Charts Row ── */}

@@ -13,13 +13,21 @@ const ConversationDetail = () => {
     const navigate = useNavigate();
 
     const { data: conversations } = useConversations();
-    const { data: messagesData, isLoading } = useConversationMessages(id);
+    const { 
+        data: messagesData, 
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useConversationMessages(id);
     const sendMutation = useSendMessage(id);
 
     const conversation: Conversation | undefined = conversations?.find((c: Conversation) => c.id === id);
     const customerName = conversation?.customer?.name || "Unknown";
     const customerEmail = conversation?.customer?.email || "—";
-    const messages = messagesData?.data ?? [];
+    const messages = messagesData?.pages 
+        ? [...messagesData.pages].reverse().flatMap((page) => page.data)
+        : [];
 
     const handleSend = (content: string, type: "text" | "image" | "document" | "template" | "audio" | "video" = "text", metadata?: any) => {
         sendMutation.mutate({ content, type, metadata });
@@ -65,7 +73,13 @@ const ConversationDetail = () => {
                     </div>
                 )}
 
-                <MessageThread messages={messages} loading={isLoading} />
+                <MessageThread 
+                    messages={messages} 
+                    loading={isLoading} 
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
+                />
 
                 <MessageComposer
                     onSend={handleSend}

@@ -25,17 +25,16 @@ export function useAuth() {
                 password: values.password,
             });
             
-            // Now fetch the full session with permissions
-            const { data: sessionData } = await apiClient.get("/auth/get-session", {
+            // Now fetch the user details and role/permissions using /me
+            const { data: meResponse } = await apiClient.get("/me", {
                 headers: { Authorization: `Bearer ${authData.token}` }
             });
-
-            const session = sessionData?.session;
-            const user = sessionData?.user;
-            const role = session?.role;
-            const permissions = session?.permissions;
+            const meData = meResponse.data;
+            const user = meData;
+            const role = meData?.role ?? null;
+            const permissions = meData?.permissions ?? null;
             const token = authData.token;
-            const onboardingComplete = !!session?.activeOrganizationId;
+            const onboardingComplete = !!meData?.activeOrganizationId;
 
             setSession(token, user, role, permissions, onboardingComplete);
             toast.success("Welcome back!");
@@ -61,15 +60,14 @@ export function useAuth() {
                 name: values.name,
             });
 
-            // Now fetch the full session with permissions
-            const { data: sessionData } = await apiClient.get("/auth/get-session", {
+            // Now fetch the user details using /me
+            const { data: meResponse } = await apiClient.get("/me", {
                 headers: { Authorization: `Bearer ${authData.token}` }
             });
-
-            const session = sessionData?.session;
-            const user = sessionData?.user;
-            const role = session?.role;
-            const permissions = session?.permissions;
+            const meData = meResponse.data;
+            const user = meData;
+            const role = meData?.role ?? null;
+            const permissions = meData?.permissions ?? null;
             const token = authData.token;
 
             // New user — must complete onboarding first

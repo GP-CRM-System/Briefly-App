@@ -41,6 +41,9 @@ export const useSocketEvents = () => {
     }, [token]);
 
     useEffect(() => {
+        // Do not register event listeners when there is no auth token
+        if (!token) return;
+
         const syncOnlineList = () => {
             socket.emit("presence:get_online", (users: string[]) => {
                 usePresenceStore.getState().setOnlineUsers(users);
@@ -94,48 +97,66 @@ export const useSocketEvents = () => {
                     messagesQueryKey,
                     (oldData: any) => {
                         console.log("[Socket] Current messages cache state:", oldData);
-                        if (!oldData) return oldData;
-                        if (oldData.data.some((m: any) => m.id === message.id)) {
+                        if (!oldData || !oldData.pages) return oldData;
+
+                        // Check if message already exists in any page
+                        const alreadyExists = oldData.pages.some((page: any) =>
+                            page.data.some((m: any) => m.id === message.id)
+                        );
+                        if (alreadyExists) {
                             console.log("[Socket] Message already exists in cache, skipping duplicate append.");
                             return oldData;
                         }
 
+                        const newPages = [...oldData.pages];
+
                         // Match and replace any pending optimistic message to prevent duplication
-                        if (message.direction === "OUTBOUND") {
-                            // 1. Try exact content match first
-                            let pendingIndex = oldData.data.findIndex(
+                        if (message.direction === "OUTBOUND" && newPages[0]) {
+                            // 1. Try exact content match first in the first page
+                            let pendingIndex = newPages[0].data.findIndex(
                                 (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND" && m.content === message.content
                             );
                             
                             // 2. Fallback to trimmed content match
                             if (pendingIndex === -1) {
-                                pendingIndex = oldData.data.findIndex(
+                                pendingIndex = newPages[0].data.findIndex(
                                     (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND" && m.content.trim() === message.content.trim()
                                 );
                             }
 
                             // 3. Fallback to matching the first pending outbound message
                             if (pendingIndex === -1) {
-                                pendingIndex = oldData.data.findIndex(
+                                pendingIndex = newPages[0].data.findIndex(
                                     (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND"
                                 );
                             }
 
                             if (pendingIndex > -1) {
-                                console.log("[Socket] Found matching pending optimistic message, replacing it.");
-                                const newData = [...oldData.data];
-                                newData[pendingIndex] = message;
+                                console.log("[Socket] Found matching pending optimistic message in first page, replacing it.");
+                                const newPageData = [...newPages[0].data];
+                                newPageData[pendingIndex] = message;
+                                newPages[0] = {
+                                    ...newPages[0],
+                                    data: newPageData
+                                };
                                 return {
                                     ...oldData,
-                                    data: newData
+                                    pages: newPages
                                 };
                             }
                         }
 
+                        // Append to the first page (newest page)
+                        if (newPages[0]) {
+                            newPages[0] = {
+                                ...newPages[0],
+                                data: [...newPages[0].data, message],
+                                total: (newPages[0].total || 0) + 1
+                            };
+                        }
                         const updated = {
                             ...oldData,
-                            data: [...oldData.data, message],
-                            total: (oldData.total || 0) + 1
+                            pages: newPages
                         };
                         console.log("[Socket] Updated messages cache state:", updated);
                         return updated;
@@ -168,20 +189,23 @@ export const useSocketEvents = () => {
         }) => {
             const { conversationId, messageId, status, errorMessage, message } = data;
 
-            // Update message status in the thread cache
+            // Update message status in the thread cache (map over pages)
             queryClient.setQueryData(
                 conversationKeys.messages(conversationId),
                 (oldData: any) => {
-                    if (!oldData) return oldData;
+                    if (!oldData || !oldData.pages) return oldData;
                     return {
                         ...oldData,
-                        data: oldData.data.map((m: any) =>
-                            m.id === messageId
-                                ? message
-                                    ? { ...m, ...message, status, errorMessage }
-                                    : { ...m, status, errorMessage }
-                                : m
-                        )
+                        pages: oldData.pages.map((page: any) => ({
+                            ...page,
+                            data: page.data.map((m: any) =>
+                                m.id === messageId
+                                    ? message
+                                        ? { ...m, ...message, status, errorMessage }
+                                        : { ...m, status, errorMessage }
+                                    : m
+                            )
+                        }))
                     };
                 }
             );
@@ -197,21 +221,56 @@ export const useSocketEvents = () => {
             queryClient.setQueryData(
                 conversationKeys.messages(conversationId),
                 (oldData: any) => {
-                    if (!oldData) return oldData;
+                    if (!oldData || !oldData.pages) return oldData;
                     return {
                         ...oldData,
-                        data: oldData.data.map((m: any) =>
-                            m.id === messageId
-                                ? {
-                                      ...m,
-                                      status: progress === 100 ? 'PROCESSING' : 'UPLOADING',
-                                      metadata: {
-                                          ...(m.metadata || {}),
-                                          uploadProgress: progress
+                        pages: oldData.pages.map((page: any) => ({
+                            ...page,
+                            data: page.data.map((m: any) =>
+                                m.id === messageId
+                                    ? {
+                                          ...m,
+                                          status: progress === 100 ? 'PROCESSING' : 'UPLOADING',
+                                          metadata: {
+                                              ...(m.metadata || {}),
+                                              uploadProgress: progress
+                                          }
                                       }
-                                  }
-                                : m
-                        )
+                                    : m
+                            )
+                        }))
+                    };
+                }
+            );
+        };
+
+        const handleConversationReadReceipt = (data: {
+            conversationId: string;
+            status: "DELIVERED" | "READ";
+        }) => {
+            const { conversationId, status } = data;
+            console.log(`[Socket] Received conversation:read_receipt event for conversation: ${conversationId} with status: ${status}`);
+
+            queryClient.setQueryData(
+                conversationKeys.messages(conversationId),
+                (oldData: any) => {
+                    if (!oldData || !oldData.pages) return oldData;
+                    return {
+                        ...oldData,
+                        pages: oldData.pages.map((page: any) => ({
+                            ...page,
+                            data: page.data.map((m: any) => {
+                                if (m.direction === 'OUTBOUND') {
+                                    if (status === 'READ' && (m.status === 'SENT' || m.status === 'DELIVERED' || m.status === 'PENDING')) {
+                                        return { ...m, status: 'READ' };
+                                    }
+                                    if (status === 'DELIVERED' && (m.status === 'SENT' || m.status === 'PENDING')) {
+                                        return { ...m, status: 'DELIVERED' };
+                                    }
+                                }
+                                return m;
+                            })
+                        }))
                     };
                 }
             );
@@ -243,8 +302,21 @@ export const useSocketEvents = () => {
             );
         };
 
+        const handleConnectError = (err: any) => {
+            console.error("[Socket] Connection error:", err.message);
+            if (
+                err.message === "Authentication failed" ||
+                err.message === "No active organization selected" ||
+                err.message === "Authentication error"
+            ) {
+                console.warn("[Socket] Unauthenticated connection attempt, disconnecting to prevent retry loop.");
+                disconnectSocket();
+            }
+        };
+
         // Hook up event listeners
         socket.on("connect", handleConnect);
+        socket.on("connect_error", handleConnectError);
         socket.on("presence:update", handlePresenceUpdate);
         socket.on("typing:status", handleTypingStatus);
         socket.on("message:created", handleMessageCreated);
@@ -252,6 +324,7 @@ export const useSocketEvents = () => {
         socket.on("upload:progress", handleUploadProgress);
         socket.on("conversation:assigned", handleConversationAssigned);
         socket.on("inbox:updated", handleInboxUpdated);
+        socket.on("conversation:read_receipt", handleConversationReadReceipt);
 
         // If socket is already connected when hook mounts, trigger sync
         if (socket.connected) {
@@ -260,6 +333,7 @@ export const useSocketEvents = () => {
 
         return () => {
             socket.off("connect", handleConnect);
+            socket.off("connect_error", handleConnectError);
             socket.off("presence:update", handlePresenceUpdate);
             socket.off("typing:status", handleTypingStatus);
             socket.off("message:created", handleMessageCreated);
@@ -267,7 +341,8 @@ export const useSocketEvents = () => {
             socket.off("upload:progress", handleUploadProgress);
             socket.off("conversation:assigned", handleConversationAssigned);
             socket.off("inbox:updated", handleInboxUpdated);
+            socket.off("conversation:read_receipt", handleConversationReadReceipt);
         };
-    }, [queryClient]);
+    }, [queryClient, token]);
 };
 

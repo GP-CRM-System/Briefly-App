@@ -229,7 +229,7 @@ const ProductDetails = () => {
 
                             <div>
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">SKU</p>
-                                <p className="text-sm font-bold text-gray-800 mt-1.5 font-mono truncate">{p.sku || "N/A"}</p>
+                                <p className="text-sm font-bold text-gray-800 mt-1.5 font-mono truncate">{p.sku || "—"}</p>
                             </div>
 
                             <div>
