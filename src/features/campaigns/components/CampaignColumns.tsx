@@ -7,7 +7,7 @@ export const columns: Column<Campaign>[] = [
         header: "Name",
         width: "min-w-[180px]",
         render: (row) => (
-            <span className="text-sm font-semibold text-gray-900 leading-tight">
+            <span className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins']">
                 {row.name}
             </span>
         ),
@@ -16,9 +16,14 @@ export const columns: Column<Campaign>[] = [
         key: "type",
         header: "Type",
         width: "w-[100px]",
+        align: "center",
         render: (row) => {
             const typeLabel = row.type?.toLowerCase() === "email" ? "E-mail" : (row.type || "E-mail");
-            return <span className="text-sm text-gray-700 font-medium">{typeLabel}</span>;
+            return (
+                <span className="text-[14px] text-[#1a1a1a] font-medium leading-[20px] font-['Poppins']">
+                    {typeLabel}
+                </span>
+            );
         },
     },
     {
@@ -26,7 +31,7 @@ export const columns: Column<Campaign>[] = [
         header: "Segments",
         width: "min-w-[160px]",
         render: (row) => (
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-[14px] text-[#1a1a1a] font-medium leading-[20px] font-['Poppins']">
                 {row.segment?.name || row.segmentName || "Returning Customers"}
             </span>
         ),
@@ -35,21 +40,57 @@ export const columns: Column<Campaign>[] = [
         key: "status",
         header: "Status",
         width: "w-[120px]",
+        align: "center",
         render: (row) => {
-            const statusMap: Record<string, { bg: string; text: string; label: string }> = {
-                draft: { bg: "bg-gray-50 border-gray-200", text: "text-gray-500", label: "Draft" },
-                scheduled: { bg: "bg-blue-50 border-blue-100", text: "text-blue-600", label: "Scheduled" },
-                sending: { bg: "bg-amber-50 border-amber-100", text: "text-amber-600", label: "Sending" },
-                sent: { bg: "bg-green-50 border-green-200", text: "text-green-600", label: "Completed" },
-                completed: { bg: "bg-green-50 border-green-200", text: "text-green-600", label: "Completed" },
-                failed: { bg: "bg-red-50 border-red-200", text: "text-red-600", label: "Failed" },
+            const statusMap: Record<string, { bg: string; border: string; text: string; label: string }> = {
+                draft: {
+                    bg: "bg-[rgba(107,114,128,0.13)]",
+                    border: "border-gray-500",
+                    text: "text-gray-500",
+                    label: "Draft",
+                },
+                scheduled: {
+                    bg: "bg-[rgba(74,144,226,0.13)]",
+                    border: "border-[#4a90e2]",
+                    text: "text-[#4a90e2]",
+                    label: "Scheduled",
+                },
+                sending: {
+                    bg: "bg-[rgba(245,158,11,0.13)]",
+                    border: "border-amber-500",
+                    text: "text-amber-500",
+                    label: "Sending",
+                },
+                sent: {
+                    bg: "bg-[rgba(34,197,94,0.13)]",
+                    border: "border-[#22c55e]",
+                    text: "text-[#22c55e]",
+                    label: "Completed",
+                },
+                completed: {
+                    bg: "bg-[rgba(34,197,94,0.13)]",
+                    border: "border-[#22c55e]",
+                    text: "text-[#22c55e]",
+                    label: "Completed",
+                },
+                failed: {
+                    bg: "bg-[rgba(239,68,68,0.13)]",
+                    border: "border-red-500",
+                    text: "text-red-500",
+                    label: "Failed",
+                },
             };
 
             const statusVal = row.status?.toLowerCase() || "draft";
-            const conf = statusMap[statusVal] || { bg: "bg-gray-50 border-gray-200", text: "text-gray-500", label: statusVal };
+            const conf = statusMap[statusVal] || {
+                bg: "bg-[rgba(107,114,128,0.13)]",
+                border: "border-gray-500",
+                text: "text-gray-500",
+                label: statusVal,
+            };
 
             return (
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${conf.bg} ${conf.text}`}>
+                <span className={`inline-flex items-center justify-center px-[10px] py-[4px] rounded-full text-[14px] font-medium border ${conf.bg} ${conf.border} ${conf.text} leading-[16px] whitespace-nowrap h-[24px]`}>
                     {conf.label}
                 </span>
             );
@@ -63,24 +104,23 @@ export const columns: Column<Campaign>[] = [
             const dateStr = row.scheduledAt || row.createdAt || "2026-03-10T20:00:00.000Z";
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return <span className="text-gray-400 font-medium">—</span>;
-            
+
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            
+
             let hours = date.getHours();
             const minutes = date.getMinutes();
             const ampm = hours >= 12 ? "PM" : "AM";
             hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
+            hours = hours ? hours : 12;
             const strMinutes = minutes < 10 ? "0" + minutes : minutes;
-            
+            const strHours = hours < 10 ? "0" + hours : hours;
+
+            const datePart = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+            const timePart = `${strHours}:${strMinutes} ${ampm}`;
+
             return (
-                <div className="text-xs font-semibold text-gray-700">
-                    <p className="leading-tight">
-                        {months[date.getMonth()]} {date.getDate()}, {date.getFullYear()}
-                    </p>
-                    <p className="text-gray-400 font-medium mt-0.5">
-                        {hours < 10 ? "0" + hours : hours}:{strMinutes} {ampm}
-                    </p>
+                <div className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins'] whitespace-pre-wrap">
+                    {datePart}  {timePart}
                 </div>
             );
         },
@@ -91,7 +131,7 @@ export const columns: Column<Campaign>[] = [
         align: "center",
         width: "w-[80px]",
         render: (row) => (
-            <span className="text-sm font-bold text-gray-800">
+            <span className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins']">
                 {row.metrics?.sent ?? 3000}
             </span>
         ),
@@ -102,7 +142,7 @@ export const columns: Column<Campaign>[] = [
         align: "center",
         width: "w-[80px]",
         render: (row) => (
-            <span className="text-sm font-semibold text-gray-600">
+            <span className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins']">
                 {row.metrics?.opened ?? 1800}
             </span>
         ),
@@ -113,7 +153,7 @@ export const columns: Column<Campaign>[] = [
         align: "center",
         width: "w-[80px]",
         render: (row) => (
-            <span className="text-sm font-semibold text-gray-600">
+            <span className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins']">
                 {row.metrics?.clicked ?? 700}
             </span>
         ),
@@ -124,7 +164,7 @@ export const columns: Column<Campaign>[] = [
         align: "center",
         width: "w-[80px]",
         render: (row) => (
-            <span className="text-sm font-semibold text-gray-600">
+            <span className="text-[14px] font-medium text-[#1a1a1a] leading-[20px] font-['Poppins']">
                 {row.metrics?.converted ?? 210}
             </span>
         ),

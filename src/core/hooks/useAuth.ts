@@ -30,12 +30,20 @@ export function useAuth() {
                 headers: { Authorization: `Bearer ${authData.token}` }
             });
 
-            // console.log("test", sessionData);
+            const session = sessionData?.session;
+            const user = sessionData?.user;
+            const role = session?.role;
+            const permissions = session?.permissions;
+            const token = authData.token;
+            const onboardingComplete = !!session?.activeOrganizationId;
 
-            // Returning user — onboarding already done
-            setSession(sessionData.token, sessionData.user, sessionData.role, sessionData.permissions, true);
+            setSession(token, user, role, permissions, onboardingComplete);
             toast.success("Welcome back!");
-            navigate("/dashboard");
+            if (onboardingComplete) {
+                navigate("/dashboard");
+            } else {
+                navigate("/onboarding");
+            }
             return { error: null };
         } catch (err: any) {
             const message = err?.response?.data?.message || "Login failed. Please try again.";
@@ -58,8 +66,14 @@ export function useAuth() {
                 headers: { Authorization: `Bearer ${authData.token}` }
             });
 
+            const session = sessionData?.session;
+            const user = sessionData?.user;
+            const role = session?.role;
+            const permissions = session?.permissions;
+            const token = authData.token;
+
             // New user — must complete onboarding first
-            setSession(sessionData.token, sessionData.user, sessionData.role, sessionData.permissions, false);
+            setSession(token, user, role, permissions, false);
             toast.success("Account created!");
             navigate("/onboarding");
             return { error: null };

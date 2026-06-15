@@ -116,6 +116,7 @@ export const ENDPOINTS = {
     GET_ALL: "/tickets",
     GET_ONE: (id: string) => `/tickets/${id}`,
     UPDATE: (id: string) => `/tickets/${id}`,
+    DELETE: (id: string) => `/tickets/${id}`,
     ADD_NOTE: (id: string) => `/tickets/${id}/notes`,
   },
 

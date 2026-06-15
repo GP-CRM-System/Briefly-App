@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useConnections, useConnectShopify, useDeleteIntegration, useTestConnection, useSyncConnection, useSyncLogs } from "../settings.hooks";
+import { useState, useEffect } from "react";
+import { useConnections, useConnectShopify, useDeleteIntegration, useTestConnection, useSyncConnection, useSyncLogs, useUpdateIntegration } from "../settings.hooks";
 import { inputClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
 import { ShopifyIcon, Settings01Icon, Unlink01Icon, ArrowDown01Icon, ArrowUp01Icon, InformationCircleIcon, Shield01Icon, ArrowReloadHorizontalIcon, Cancel01Icon, Facebook02Icon } from "hugeicons-react";
@@ -14,10 +14,13 @@ const ConnectionsTab = () => {
 
     const [providerTab, setProviderTab] = useState<"shopify" | "meta">("shopify");
 
+    const updateIntegrationMutation = useUpdateIntegration();
+
     // UI states
     const [detailsOpen, setDetailsOpen] = useState(true);
     const [logsModalOpen, setLogsModalOpen] = useState(false);
     const [syncing, setSyncing] = useState(false);
+    const [visibleLogsCount, setVisibleLogsCount] = useState(10);
 
     const shopifyConnections = connections.filter((c) => c.provider === "shopify");
 
@@ -39,6 +42,65 @@ const ConnectionsTab = () => {
 
     const activeConn = shopifyConnections[0];
     const { data: logs = [] } = useSyncLogs(activeConn?.id || "", logsModalOpen && !!activeConn);
+
+    const [initializedId, setInitializedId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (activeConn && activeConn.id !== initializedId) {
+            setInitializedId(activeConn.id);
+            setAutoSync(activeConn.autoSync);
+            if (activeConn.metadata?.syncDirection) {
+                setSyncDirection(activeConn.metadata.syncDirection);
+            }
+            if (activeConn.metadata?.selectedData) {
+                setSelectedData({
+                    customers: activeConn.metadata.selectedData.customers ?? true,
+                    orders: activeConn.metadata.selectedData.orders ?? true,
+                    products: activeConn.metadata.selectedData.products ?? true,
+                    revenue: activeConn.metadata.selectedData.revenue ?? true,
+                    refunds: activeConn.metadata.selectedData.refunds ?? false,
+                });
+            }
+        }
+    }, [activeConn, initializedId]);
+
+    const updateIntegrationSettings = (fields: { autoSync?: boolean; syncDirection?: string; selectedData?: any }) => {
+        if (!activeConn) return;
+
+        const nextAutoSync = fields.autoSync !== undefined ? fields.autoSync : autoSync;
+        const nextSyncDirection = fields.syncDirection !== undefined ? fields.syncDirection : syncDirection;
+        const nextSelectedData = fields.selectedData !== undefined ? fields.selectedData : selectedData;
+
+        updateIntegrationMutation.mutate({
+            id: activeConn.id,
+            syncMode: nextAutoSync ? "webhook" : "manual",
+            metadata: {
+                ...activeConn.metadata,
+                syncDirection: nextSyncDirection,
+                selectedData: nextSelectedData,
+            }
+        });
+    };
+
+    const handleToggleAutoSync = () => {
+        const nextValue = !autoSync;
+        setAutoSync(nextValue);
+        updateIntegrationSettings({ autoSync: nextValue });
+    };
+
+    const handleToggleData = (key: string, checked: boolean) => {
+        const nextSelectedData = {
+            ...selectedData,
+            [key]: checked
+        };
+        setSelectedData(nextSelectedData);
+        updateIntegrationSettings({ selectedData: nextSelectedData });
+    };
+
+    const handleDirectionChange = (val: string) => {
+        setSyncDirection(val);
+        updateIntegrationSettings({ syncDirection: val });
+    };
 
     const handleSyncNow = () => {
         if (!activeConn) return;
@@ -151,7 +213,7 @@ const ConnectionsTab = () => {
                 <div>
                     <h4 className="text-sm font-bold text-gray-800">Encrypted Data Transfer</h4>
                     <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                        All connections are secured using 256-bit AES encryption. We do not store your third-party account credentials; we use secure OAuth tokens for all authorized communications.
+                        All connections are secured using 256-bit AES encryption. Your API access tokens are stored in an encrypted format to perform authorized sync operations. We do not store your account password.
                     </p>
                 </div>
             </div>
@@ -232,7 +294,10 @@ const ConnectionsTab = () => {
                     </div>
                 </div>
                 <button
-                    onClick={() => setLogsModalOpen(true)}
+                    onClick={() => {
+                        setVisibleLogsCount(10);
+                        setLogsModalOpen(true);
+                    }}
                     className="px-4.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                 >
                     View Sync Logs
@@ -258,7 +323,7 @@ const ConnectionsTab = () => {
                                 <div>
                                     <label className="text-sm font-semibold text-gray-600 block mb-1">Auto Sync</label>
                                     <button
-                                        onClick={() => setAutoSync(!autoSync)}
+                                        onClick={handleToggleAutoSync}
                                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                                             autoSync ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"
                                         }`}
@@ -267,8 +332,12 @@ const ConnectionsTab = () => {
                                     </button>
                                 </div>
                                 <div>
+                                    <label className="text-sm font-semibold text-gray-600 block mb-1">Access Token</label>
+                                    <span className="text-xs font-mono font-bold text-gray-500 bg-slate-50 px-2 py-1 rounded border border-slate-100">shpat_••••••••••••</span>
+                                </div>
+                                <div>
                                     <label className="text-sm font-semibold text-gray-600 block mb-1">Sync Frequency</label>
-                                    <span className="text-sm font-bold text-gray-800">{activeConn.syncFrequency || "Real-time (Instant)"}</span>
+                                    <span className="text-sm font-bold text-gray-800">{autoSync ? "Real-time (Instant)" : "Manual"}</span>
                                 </div>
                             </div>
                         </div>
@@ -284,12 +353,7 @@ const ConnectionsTab = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={value}
-                                                onChange={(e) =>
-                                                    setSelectedData(prev => ({
-                                                        ...prev,
-                                                        [key]: e.target.checked
-                                                    }))
-                                                }
+                                                onChange={(e) => handleToggleData(key, e.target.checked)}
                                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                                             />
                                             <span className="capitalize">{key}</span>
@@ -307,7 +371,7 @@ const ConnectionsTab = () => {
                                     <label className="text-sm font-semibold text-gray-600 block mb-1.5">Direction</label>
                                     <select
                                         value={syncDirection}
-                                        onChange={(e) => setSyncDirection(e.target.value)}
+                                        onChange={(e) => handleDirectionChange(e.target.value)}
                                         className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg focus:outline-none cursor-pointer"
                                     >
                                         <option value="Import only">Import only</option>
@@ -354,7 +418,7 @@ const ConnectionsTab = () => {
                 <div>
                     <h4 className="text-sm font-bold text-gray-800">Encrypted Data Transfer</h4>
                     <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                        All connections are secured using 256-bit AES encryption. We do not store your third-party account credentials; we use secure OAuth tokens for all authorized communications.
+                        All connections are secured using 256-bit AES encryption. Your API access tokens are stored in an encrypted format to perform authorized sync operations. We do not store your account password.
                     </p>
                 </div>
             </div>
@@ -383,26 +447,36 @@ const ConnectionsTab = () => {
                             {logs.length === 0 ? (
                                 <div className="text-center py-8 text-gray-400 text-sm">No sync logs available yet.</div>
                             ) : (
-                                logs.map((log) => {
-                                    const levelColor =
-                                        log.level === "error" ? "text-red-500 bg-red-50" :
-                                        log.level === "warning" ? "text-orange-500 bg-orange-50" :
-                                        "text-blue-500 bg-blue-50";
+                                <>
+                                    {logs.slice(0, visibleLogsCount).map((log) => {
+                                        const levelColor =
+                                            log.level === "error" ? "text-red-500 bg-red-50" :
+                                            log.level === "warning" ? "text-orange-500 bg-orange-50" :
+                                            "text-blue-500 bg-blue-50";
 
-                                    return (
-                                        <div key={log.id} className="p-3 bg-slate-50 border border-slate-100 rounded-lg flex items-start gap-3 text-xs">
-                                            <span className={`px-2 py-0.5 rounded font-bold uppercase ${levelColor}`}>
-                                                {log.level}
-                                            </span>
-                                            <div className="flex-1">
-                                                <p className="text-gray-700 leading-relaxed">{log.message}</p>
-                                                <span className="text-[10px] text-gray-400 mt-1 block">
-                                                    {new Date(log.timestamp).toLocaleString()}
+                                        return (
+                                            <div key={log.id} className="p-3 bg-slate-50 border border-slate-100 rounded-lg flex items-start gap-3 text-xs">
+                                                <span className={`px-2 py-0.5 rounded font-bold uppercase ${levelColor}`}>
+                                                    {log.level}
                                                 </span>
+                                                <div className="flex-1">
+                                                    <p className="text-gray-700 leading-relaxed">{log.message}</p>
+                                                    <span className="text-[10px] text-gray-400 mt-1 block">
+                                                        {new Date(log.timestamp).toLocaleString()}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })
+                                        );
+                                    })}
+                                    {logs.length > visibleLogsCount && (
+                                        <button
+                                            onClick={() => setVisibleLogsCount(prev => prev + 10)}
+                                            className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-blue-600 text-xs font-semibold rounded-lg border border-slate-100 transition-colors cursor-pointer mt-2 animate-fadeIn"
+                                        >
+                                            Show More Logs
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
 

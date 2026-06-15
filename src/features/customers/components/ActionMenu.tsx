@@ -1,8 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { ActionMenu as SharedActionMenu, type ActionMenuItem } from "@/core/components";
 import type { Customer } from "../types";
-import { Icon } from "@/core/components";
-import { dots } from "@/assets";
 
 const ActionMenu = ({ 
     row,
@@ -15,117 +12,48 @@ const ActionMenu = ({
     onEdit?: (row: Customer) => void;
     onDelete?: (row: Customer) => void;
 }) => {
-    const [open, setOpen] = useState(false);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    const menuRef = useRef<HTMLDivElement>(null);
-    const [position, setPosition] = useState({ top: 0, left: 0 });
-
-    useEffect(() => {
-        if (open && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setPosition({
-                top: rect.bottom + window.scrollY + 4,
-                left: rect.right + window.scrollX - 176, // 176px is w-44
-            });
+    const items: ActionMenuItem[] = [
+        {
+            label: "View Profile",
+            onClick: () => onView?.(row),
+            visible: !!onView,
+            icon: (
+                <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            )
+        },
+        {
+            label: "Edit",
+            onClick: () => onEdit?.(row),
+            visible: !!onEdit,
+            icon: (
+                <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+            )
+        },
+        {
+            separator: true,
+            visible: !!onDelete && (!!onView || !!onEdit)
+        },
+        {
+            label: "Delete",
+            onClick: () => onDelete?.(row),
+            visible: !!onDelete,
+            variant: "danger",
+            icon: (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+            )
         }
-    }, [open]);
+    ];
 
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (
-                open &&
-                menuRef.current &&
-                !menuRef.current.contains(e.target as Node) &&
-                buttonRef.current &&
-                !buttonRef.current.contains(e.target as Node)
-            ) {
-                setOpen(false);
-            }
-        };
-        
-        const handleScroll = () => {
-            if (open) setOpen(false);
-        };
-
-        document.addEventListener("mousedown", handleClick);
-        window.addEventListener("scroll", handleScroll, true);
-        
-        return () => {
-            document.removeEventListener("mousedown", handleClick);
-            window.removeEventListener("scroll", handleScroll, true);
-        };
-    }, [open]);
-
-    return (
-        <>
-            <button
-                ref={buttonRef}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setOpen(!open);
-                }}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all"
-            >
-               <Icon icon={dots} className="h-5 w-5" />
-            </button>
-            {open && createPortal(
-                <div 
-                    ref={menuRef}
-                    style={{ position: "absolute", top: position.top, left: position.left }}
-                    className="w-44 rounded-xl shadow-lg bg-white ring-1 ring-gray-200 z-[9999] overflow-hidden py-1"
-                >
-                    {/* View Profile */}
-                    <button
-                        onClick={() => {
-                            setOpen(false);
-                            onView?.(row);
-                        }}
-                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        View Profile
-                    </button>
-
-                    {/* Edit */}
-                    <button
-                        onClick={() => {
-                            setOpen(false);
-                            onEdit?.(row);
-                        }}
-                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                        Edit
-                    </button>
-
-                    {/* Separator */}
-                    <div className="my-1 border-t border-gray-100" />
-
-                    {/* Delete */}
-                    <button
-                        onClick={() => {
-                            setOpen(false);
-                            onDelete?.(row);
-                        }}
-                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
-                        Delete
-                    </button>
-                </div>,
-                document.body
-            )}
-        </>
-    );
+    return <SharedActionMenu items={items} />;
 };
 
 export default ActionMenu;

@@ -60,15 +60,15 @@ const Modal = ({
     return (
         <div
             ref={overlayRef}
-            className="fixed inset-0 z-50 flex justify-center items-start pt-[50px]"
+            className="fixed inset-0 z-50 flex justify-center items-center p-4 md:p-6 lg:p-8"
             onClick={(e) => e.target === overlayRef.current && onClose()}
         >
             {/* Backdrop — very subtle blur */}
-            <div className="absolute inset-0 bg-black/15" />
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1.5px]" />
 
-            {/* Dialog — top-right aligned */}
+            {/* Dialog — centered */}
             <div
-                className={`relative bg-[#F8FAFC] rounded-2xl shadow-2xl w-full ${width} max-h-[calc(100vh-70px)] flex flex-col`}
+                className={`relative bg-[#F8FAFC] rounded-2xl shadow-2xl w-full ${width} max-h-[90vh] flex flex-col`}
                 style={{ animation: "modalSlideIn 0.2s ease-out" }}
             >
                 {/* Header */}

@@ -67,7 +67,7 @@ const PageLayout = ({
             {/* ── Action Bar ── */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 {/* Search */}
-                <div className="relative w-full sm:w-auto sm:min-w-[280px]">
+                <div className="relative w-full sm:w-auto sm:min-w-[299px]">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
                         viewBox="0 0 24 24"
@@ -85,7 +85,7 @@ const PageLayout = ({
                         value={searchValue}
                         onChange={(e) => onSearch?.(e.target.value)}
                         placeholder={searchPlaceholder}
-                        className="w-full h-[40px] pl-10 pr-4 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[var(--color-primary-400)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all"
+                        className="w-full h-[49px] pl-10 pr-4 rounded-[10px] border border-[rgba(179,179,179,0.27)] bg-white text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[var(--color-primary-400)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all"
                     />
                 </div>
 
@@ -96,9 +96,9 @@ const PageLayout = ({
                         <div className="relative">
                             <button
                                 onClick={onFilter}
-                                className="inline-flex items-center gap-2 h-[40px] px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                                className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all"
                             >
-                                <Icon icon={filterIcon} className="w-4 h-4" />
+                                <Icon icon={filterIcon} className="w-5 h-5" />
                                 Filter
                                 {filterCount !== undefined && filterCount > 0 && (
                                     <span className="ml-0.5 min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--color-primary-500)] text-white text-xs font-semibold flex items-center justify-center">
@@ -114,7 +114,7 @@ const PageLayout = ({
                     {onExport && (
                         <button
                             onClick={onExport}
-                            className="inline-flex items-center gap-2 h-[40px] px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                            className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all"
                         >
                             <Icon icon={exportIcon}/>
                             Export
@@ -125,7 +125,7 @@ const PageLayout = ({
                     {onImport && (
                         <button
                             onClick={onImport}
-                            className="inline-flex items-center gap-2 h-[40px] px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                            className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all"
                         >
                             <Icon icon={importIcon}/>
                             Import
@@ -139,7 +139,7 @@ const PageLayout = ({
                     {onCreate && (
                         <button
                             onClick={onCreate}
-                            className="inline-flex items-center gap-2 h-[40px] px-5 rounded-lg bg-[var(--color-primary-500)] text-white text-sm font-semibold hover:bg-[var(--color-primary-600)] shadow-sm hover:shadow transition-all"
+                            className="inline-flex items-center gap-2 h-[49px] px-5 rounded-[9px] bg-[var(--color-primary-500)] text-white text-sm font-semibold hover:bg-[var(--color-primary-600)] shadow-sm hover:shadow transition-all"
                         >
                             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19" />

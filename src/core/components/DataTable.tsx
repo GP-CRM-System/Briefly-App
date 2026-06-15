@@ -1,4 +1,4 @@
-import { useState, useMemo, type ReactNode } from "react";
+import { useState, useMemo, useEffect, type ReactNode } from "react";
 
 /* ─────────────────────────────────────────────────────────────
    DataTable — generic, reusable table for all dashboard pages.
@@ -91,6 +91,11 @@ function DataTable<T extends Record<string, any>>({
         if (onPageChange) onPageChange(p);
         else setInternalPage(p);
     };
+
+    // Reset pagination to page 1 whenever data or search/filters change the list
+    useEffect(() => {
+        setInternalPage(1);
+    }, [data.length]);
 
     const totalItems = controlledTotal ?? data.length;
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
@@ -191,12 +196,12 @@ function DataTable<T extends Record<string, any>>({
 
     /* ── Table ── */
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex flex-col">
+        <div className="bg-white rounded-[14px] border border-gray-200 overflow-hidden shadow-sm flex flex-col">
             <div className="overflow-x-auto flex-1">
                 <table className="w-full">
                     {/* Header */}
                     <thead>
-                        <tr className="border-b border-gray-100 bg-[#4A90E214]">
+                        <tr className="border-b border-gray-100 bg-[#4A90E214] h-[67px]">
                             {selectable && (
                                 <th className="w-[52px] px-4 py-3">
                                     <input
@@ -210,7 +215,7 @@ function DataTable<T extends Record<string, any>>({
                             {columns.map((col) => (
                                 <th
                                     key={col.key}
-                                    className={`px-4 py-3 text-xs font-semibold text-gray-500 tracking-wider ${col.width || ""} ${
+                                    className={`px-4 py-3 text-sm font-semibold text-[#1a1a1a]/50 tracking-wider ${col.width || ""} ${
                                         col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
                                     }`}
                                 >
@@ -218,7 +223,7 @@ function DataTable<T extends Record<string, any>>({
                                 </th>
                             ))}
                             {(onRowAction || renderRowAction) && (
-                                <th className="w-[60px] px-4 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
+                                <th className="w-[60px] px-4 py-3 text-sm font-semibold text-[#1a1a1a]/50 tracking-wider text-center">
                                     Action
                                 </th>
                             )}
@@ -239,7 +244,7 @@ function DataTable<T extends Record<string, any>>({
                                     }`}
                                 >
                                     {selectable && (
-                                        <td className="pl-4 py-3">
+                                        <td className="px-4 py-[22px]">
                                             <input
                                                 type="checkbox"
                                                 checked={isSelected}
@@ -251,7 +256,7 @@ function DataTable<T extends Record<string, any>>({
                                     {columns.map((col) => (
                                         <td
                                             key={col.key}
-                                            className={`pr-4 py-3 text-sm text-gray-700 ${col.width || ""} ${
+                                            className={`px-4 py-[22px] text-sm text-gray-700 ${col.width || ""} ${
                                                 col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
                                             }`}
                                         >
@@ -259,7 +264,7 @@ function DataTable<T extends Record<string, any>>({
                                         </td>
                                     ))}
                                     {(onRowAction || renderRowAction) && (
-                                        <td className="px-4 py-3 text-center">
+                                        <td className="px-4 py-[22px] text-center">
                                             {renderRowAction ? (
                                                 renderRowAction(row)
                                             ) : (
@@ -284,39 +289,37 @@ function DataTable<T extends Record<string, any>>({
             </div>
 
             {/* ── Footer: Info + Pagination ── */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
-                <p className="text-xs text-gray-400">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 md:px-[40px] py-[32px] border-t border-gray-100 bg-white">
+                <p className="text-[14px] text-[rgba(138,138,138,0.7)] font-medium tracking-[-0.14px] font-['Poppins']">
                     Showing data {Math.min((page - 1) * pageSize + 1, totalItems)} to{" "}
                     {Math.min(page * pageSize, totalItems)} of{" "}
                     <span className="font-semibold text-gray-600">{totalItems}</span> entries
                 </p>
 
                 {/* Page numbers */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-[10px]">
                     {/* Prev */}
                     <button
                         onClick={() => page > 1 && setPage(page - 1)}
                         disabled={page <= 1}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        className="w-[26px] h-[28px] rounded-[4px] bg-[rgba(179,179,179,0.2)] border border-[rgba(179,179,179,0.27)] flex items-center justify-center text-[rgba(26,26,26,0.74)] hover:bg-[rgba(179,179,179,0.3)] disabled:opacity-30 disabled:cursor-not-allowed transition-all font-medium text-[12px]"
                     >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="15 18 9 12 15 6" />
-                        </svg>
+                        <span className="font-['Poppins'] font-medium">&lt;</span>
                     </button>
 
                     {paginationRange.map((item, i) =>
                         item === "dots" ? (
-                            <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-xs text-gray-400">
-                                …
+                            <span key={`dots-${i}`} className="w-[26px] h-[28px] flex items-center justify-center text-[12px] font-medium text-[rgba(26,26,26,0.74)] font-['Poppins']">
+                                ...
                             </span>
                         ) : (
                             <button
                                 key={item}
                                 onClick={() => setPage(item as number)}
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all ${
+                                className={`w-[26px] h-[28px] rounded-[4px] border flex items-center justify-center text-[12px] font-medium transition-all font-['Poppins'] ${
                                     page === item
-                                        ? "bg-[var(--color-primary-500)] text-white shadow-sm"
-                                        : "text-gray-600 hover:bg-gray-100"
+                                        ? "bg-[#4a90e2] border-[#4a90e2] text-white shadow-sm"
+                                        : "bg-[rgba(179,179,179,0.2)] border-[rgba(179,179,179,0.27)] text-[rgba(26,26,26,0.74)] hover:bg-[rgba(179,179,179,0.3)]"
                                 }`}
                             >
                                 {item}
@@ -328,14 +331,13 @@ function DataTable<T extends Record<string, any>>({
                     <button
                         onClick={() => page < totalPages && setPage(page + 1)}
                         disabled={page >= totalPages}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        className="w-[26px] h-[28px] rounded-[4px] bg-[rgba(179,179,179,0.2)] border border-[rgba(179,179,179,0.27)] flex items-center justify-center text-[rgba(26,26,26,0.74)] hover:bg-[rgba(179,179,179,0.3)] disabled:opacity-30 disabled:cursor-not-allowed transition-all font-medium text-[12px]"
                     >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="9 18 15 12 9 6" />
-                        </svg>
+                        <span className="font-['Poppins'] font-medium">&gt;</span>
                     </button>
                 </div>
             </div>
+
         </div>
     );
 }

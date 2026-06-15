@@ -10,6 +10,7 @@ const LIFECYCLE_COLORS: Record<string, { base: string; text: string; border: str
     loyal:     { base: "blue",    text: "text-blue-600",    border: "border-blue-200" },
     new:       { base: "green",   text: "text-green-600",   border: "border-green-200" },
     "at-risk": { base: "orange",  text: "text-orange-500",  border: "border-orange-200" },
+    at_risk:   { base: "orange",  text: "text-orange-500",  border: "border-orange-200" },
     churned:   { base: "red",     text: "text-red-500",     border: "border-red-200" },
     active:    { base: "emerald", text: "text-emerald-600", border: "border-emerald-200" },
     prospect:  { base: "purple",  text: "text-purple-600",  border: "border-purple-200" },
@@ -17,6 +18,7 @@ const LIFECYCLE_COLORS: Record<string, { base: string; text: string; border: str
     returning: { base: "blue",    text: "text-blue-600",    border: "border-blue-200" },
     vip:       { base: "amber",   text: "text-amber-600",   border: "border-amber-200" },
     winback:   { base: "teal",    text: "text-teal-600",    border: "border-teal-200" },
+    lead:      { base: "gray",    text: "text-gray-600",    border: "border-gray-200" },
 };
 
 const FALLBACK_LIFECYCLE = { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-200" };
@@ -110,7 +112,13 @@ export const filterCustomers = (
     }
 
     if (filters.lifecycles.size > 0) {
-        result = result.filter((c) => filters.lifecycles.has(c.lifecycleStage || ""));
+        const uppercaseSelected = new Set(
+            Array.from(filters.lifecycles).map((l) => l.toUpperCase().replace("-", "_"))
+        );
+        result = result.filter((c) => {
+            const stage = (c.lifecycleStage || "").toUpperCase().replace("-", "_");
+            return uppercaseSelected.has(stage);
+        });
     }
 
     return result;

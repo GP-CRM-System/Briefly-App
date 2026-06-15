@@ -48,7 +48,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 8,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "Omar Ali",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -64,7 +64,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 12,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "Sarah Smith",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -80,7 +80,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 28,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "John Doe",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -112,7 +112,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 22,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "Omar Ali",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -128,7 +128,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 7,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "Sarah Smith",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -144,7 +144,7 @@ export const MOCK_SEGMENTS: Segment[] = [
         customerCount: 4,
         type: "Dynamic",
         status: "Active",
-        creator: "Menna Fathy",
+        creator: "John Doe",
         createdAt: "2026-04-12T00:00:00Z",
         updatedAt: "2026-04-12T00:00:00Z",
     },
@@ -162,8 +162,22 @@ const Segments = () => {
     const [typeFilter, setTypeFilter] = useState("");
 
     // Queries & Mutations
-    const { data: segments = MOCK_SEGMENTS, isLoading } = useSegments();
+    const { data: segments = [], isLoading, isError } = useSegments();
     const deleteMutation = useDeleteSegment();
+
+    if (isError) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-white border border-red-100 rounded-2xl shadow-sm space-y-4 my-6 max-w-2xl mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div className="text-center space-y-1">
+                    <h3 className="text-lg font-bold text-gray-900">Failed to load segments</h3>
+                    <p className="text-sm text-gray-500 max-w-md">There was an error communicating with the API. Please check your connection or contact support.</p>
+                </div>
+            </div>
+        );
+    }
 
     // Handlers
     const handleView = (s: Segment) => navigate(`/dashboard/segments/${s.id}`);
@@ -187,7 +201,7 @@ const Segments = () => {
         const matchesSearch = s.name.toLowerCase().includes(query) || 
                               (s.description && s.description.toLowerCase().includes(query));
         const matchesCreator = !creatorFilter || s.creator === creatorFilter;
-        const matchesType = !typeFilter || s.status === typeFilter;
+        const matchesType = !typeFilter || s.type === typeFilter;
         return matchesSearch && matchesCreator && matchesType;
     });
 
@@ -205,39 +219,89 @@ const Segments = () => {
                 createLabel="Create Segment"
                 filterContent={
                     filterOpen && (
-                        <div className="bg-white border border-gray-100 rounded-xl p-5 mb-5 flex flex-wrap gap-4 shadow-sm">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Creator</label>
-                                <select
-                                    value={creatorFilter}
-                                    onChange={(e) => setCreatorFilter(e.target.value)}
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-700 outline-none"
-                                >
-                                    <option value="">All Creators</option>
-                                    <option value="Menna Fathy">Menna Fathy</option>
-                                    <option value="Omar Ali">Omar Ali</option>
-                                </select>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            {/* Backdrop */}
+                            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1.5px]" onClick={() => setFilterOpen(false)} />
+
+                            {/* Dialog */}
+                            <div 
+                                className="relative w-[380px] max-w-full bg-[#f6f8fa] rounded-2xl shadow-2xl border border-gray-200/50 z-10 p-5 flex flex-col gap-4"
+                                style={{ animation: "modalSlideIn 0.2s ease-out" }}
+                            >
+                                {/* Header */}
+                                <div className="flex items-center justify-between w-full">
+                                    <p className="font-['Poppins'] font-semibold text-[18px] text-[#1a1a1a]">
+                                        Filter
+                                    </p>
+                                    <button 
+                                        onClick={() => setFilterOpen(false)}
+                                        className="bg-[#b3b3b3]/80 hover:bg-gray-400 rounded-full p-1 cursor-pointer transition-colors flex items-center justify-center size-[24px]"
+                                    >
+                                        <svg className="w-[12px] h-[12px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Divider */}
+                                <div className="bg-gray-200 h-px w-full" />
+
+                                {/* Filter inputs */}
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">
+                                            Creator
+                                        </p>
+                                        <select
+                                            value={creatorFilter}
+                                            onChange={(e) => setCreatorFilter(e.target.value)}
+                                            className="border border-gray-300 bg-white h-[40px] rounded-[6px] px-3 text-sm text-gray-700 outline-none cursor-pointer hover:border-gray-400 transition-colors"
+                                        >
+                                            <option value="">All Creators</option>
+                                            <option value="Menna Fathy">Menna Fathy</option>
+                                            <option value="Omar Ali">Omar Ali</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">
+                                            Type
+                                        </p>
+                                        <select
+                                            value={typeFilter}
+                                            onChange={(e) => setTypeFilter(e.target.value)}
+                                            className="border border-gray-300 bg-white h-[40px] rounded-[6px] px-3 text-sm text-gray-700 outline-none cursor-pointer hover:border-gray-400 transition-colors"
+                                        >
+                                            <option value="">All Types</option>
+                                            <option value="Dynamic">Dynamic</option>
+                                            <option value="Static">Static</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Footer Buttons */}
+                                <div className="flex gap-[16px] h-[40px] items-center w-full mt-1">
+                                    <button 
+                                        onClick={() => { setCreatorFilter(""); setTypeFilter(""); }}
+                                        className="border border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-400 transition-all h-[40px] flex items-center justify-center rounded-[6px] flex-1 font-['Poppins'] font-semibold text-[14px] cursor-pointer"
+                                    >
+                                        Clear
+                                    </button>
+                                    <button 
+                                        onClick={() => setFilterOpen(false)}
+                                        className="bg-[#4a90e2] text-white hover:bg-blue-600 hover:shadow-sm transition-all h-[40px] flex items-center justify-center rounded-[6px] flex-1 font-['Poppins'] font-semibold text-[14px] cursor-pointer"
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status/Type</label>
-                                <select
-                                    value={typeFilter}
-                                    onChange={(e) => setTypeFilter(e.target.value)}
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-700 outline-none"
-                                >
-                                    <option value="">All States</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                            <div className="flex items-end">
-                                <button
-                                    onClick={() => { setCreatorFilter(""); setTypeFilter(""); }}
-                                    className="h-10 px-4 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors"
-                                >
-                                    Clear Filters
-                                </button>
-                            </div>
+
+                            <style>{`
+                                @keyframes modalSlideIn {
+                                    from { opacity: 0; transform: translateY(-8px); }
+                                    to { opacity: 1; transform: translateY(0); }
+                                }
+                            `}</style>
                         </div>
                     )
                 }

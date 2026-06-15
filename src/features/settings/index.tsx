@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import MyProfileTab from "./components/MyProfileTab";
 import OrganizationProfileTab from "./components/OrganizationProfileTab";
 import RolesPermissionsTab from "./components/RolesPermissionsTab";
@@ -8,7 +9,28 @@ import PaymentBillingTab from "./components/PaymentBillingTab";
 import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon } from "hugeicons-react";
 
 const Settings = () => {
-    const [activeTab, setActiveTab] = useState<"profile" | "org" | "roles" | "connections" | "imports" | "billing">("profile");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
+    
+    const validTabs = ["profile", "org", "roles", "connections", "imports", "billing"] as const;
+    const queryTab = searchParams.get("tab") || (location.state as any)?.tab;
+    const initialTab = (queryTab && validTabs.includes(queryTab as any)) 
+        ? (queryTab as typeof validTabs[number]) 
+        : "profile";
+
+    const [activeTab, setActiveTab] = useState<typeof validTabs[number]>(initialTab);
+
+    useEffect(() => {
+        const currentTab = searchParams.get("tab") || (location.state as any)?.tab;
+        if (currentTab && validTabs.includes(currentTab as any)) {
+            setActiveTab(currentTab as any);
+        }
+    }, [searchParams, location.state]);
+
+    const handleTabChange = (tabId: typeof validTabs[number]) => {
+        setActiveTab(tabId);
+        setSearchParams({ tab: tabId });
+    };
 
     const menuItems = [
         { id: "profile" as const, label: "My Profile", icon: User02Icon },
@@ -48,7 +70,7 @@ const Settings = () => {
                     return (
                         <button
                             key={item.id}
-                            onClick={() => setActiveTab(item.id)}
+                            onClick={() => handleTabChange(item.id)}
                             className={`w-full flex items-center gap-3.5 px-4.5 py-3.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${
                                 isActive
                                     ? "bg-blue-50/80 text-blue-500"

@@ -7,124 +7,38 @@ import { useCampaigns, useDeleteCampaign, useSendCampaign } from "./campaign.hoo
 import { columns } from "./components/CampaignColumns";
 import ActionMenu from "./components/ActionMenu";
 import CampaignFormModal from "./components/CampaignFormModal";
+import FilterPanel from "./components/FilterPanel";
+import { freshCampaignFilters, filterCampaigns, countActiveCampaignFilters, type CampaignFilterState } from "./utils";
 import toast from "react-hot-toast";
-
-// MOCK_CAMPAIGNS fallback data
-export const MOCK_CAMPAIGNS: Campaign[] = [
-    {
-        id: "camp-1",
-        name: "Welcome Onboarding Sequence",
-        subject: "Welcome to Briefly! Here's how to get started",
-        templateId: "tmpl-1",
-        segmentId: "seg-1",
-        segmentName: "Loyal Customers",
-        templateName: "Welcome Email Template",
-        status: "sent",
-        sentAt: "2026-05-15T08:00:00Z",
-        createdAt: "2026-05-14T10:00:00Z",
-        updatedAt: "2026-05-15T08:00:00Z",
-    },
-    {
-        id: "camp-2",
-        name: "VIP Special Promo",
-        subject: "Exclusive 25% discount for VIP members!",
-        templateId: "tmpl-3",
-        segmentId: "seg-3",
-        segmentName: "VIP Members",
-        templateName: "Loyalty Discount Offer",
-        status: "sending",
-        sentAt: null,
-        createdAt: "2026-05-28T14:00:00Z",
-        updatedAt: "2026-06-02T05:00:00Z",
-    },
-    {
-        id: "camp-3",
-        name: "June Newsletter",
-        subject: "Briefly June Digest: Product Updates & Analytics Tips",
-        templateId: "tmpl-2",
-        segmentId: "all",
-        segmentName: "All Customers",
-        templateName: "Monthly Newsletter",
-        status: "scheduled",
-        scheduledAt: "2026-06-05T09:00:00Z",
-        createdAt: "2026-05-30T11:00:00Z",
-        updatedAt: "2026-05-30T11:00:00Z",
-    },
-    {
-        id: "camp-4",
-        name: "Abandoned Shopping Cart",
-        subject: "Did you forget something? Your cart is waiting!",
-        templateId: "tmpl-4",
-        segmentId: "seg-8",
-        segmentName: "Churn Risks",
-        templateName: "Abandoned Cart Reminder",
-        status: "draft",
-        createdAt: "2026-06-01T16:00:00Z",
-        updatedAt: "2026-06-01T16:00:00Z",
-    },
-    {
-        id: "camp-5",
-        name: "Shopify Sync Announcement",
-        subject: "Sync Shopify directly with Briefly starting today",
-        templateId: "tmpl-1",
-        segmentId: "seg-6",
-        segmentName: "Shopify Referrals",
-        templateName: "Welcome Email Template",
-        status: "sent",
-        sentAt: "2026-04-20T10:00:00Z",
-        createdAt: "2026-04-19T09:00:00Z",
-        updatedAt: "2026-04-20T10:00:00Z",
-    },
-    {
-        id: "camp-6",
-        name: "Egypt Customer Survey",
-        subject: "Tell us how we are doing and win 500 EGP",
-        templateId: "tmpl-2",
-        segmentId: "seg-2",
-        segmentName: "High Spenders (Egypt)",
-        templateName: "Monthly Newsletter",
-        status: "failed",
-        sentAt: "2026-05-20T12:00:00Z",
-        createdAt: "2026-05-18T15:00:00Z",
-        updatedAt: "2026-05-20T12:00:00Z",
-    },
-    {
-        id: "camp-7",
-        name: "Newsletter Re-engagement Campaign",
-        subject: "We miss you! Re-opt in to receive Briefly tips",
-        templateId: "tmpl-3",
-        segmentId: "seg-4",
-        segmentName: "Newsletter Subscribers",
-        templateName: "Loyalty Discount Offer",
-        status: "draft",
-        createdAt: "2026-05-25T11:30:00Z",
-        updatedAt: "2026-05-25T11:30:00Z",
-    },
-    {
-        id: "camp-8",
-        name: "Alexandria Branch Opening Promo",
-        subject: "Join us at the new Alexandria branch this Thursday!",
-        templateId: "tmpl-3",
-        segmentId: "seg-5",
-        segmentName: "Alexandria Leads",
-        templateName: "Loyalty Discount Offer",
-        status: "sent",
-        sentAt: "2026-04-10T08:00:00Z",
-        createdAt: "2026-04-08T10:00:00Z",
-        updatedAt: "2026-04-10T08:00:00Z",
-    },
-];
 
 const Campaigns = () => {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<CampaignFilterState>(freshCampaignFilters());
     const [modalOpen, setModalOpen] = useState(false);
     const [campaignToEdit, setCampaignToEdit] = useState<Campaign | null>(null);
 
     // Queries & Mutations
-    const { data: campaigns = MOCK_CAMPAIGNS, isLoading } = useCampaigns();
+    const { data: campaigns = [], isLoading, isError } = useCampaigns();
     const deleteMutation = useDeleteCampaign();
     const sendMutation = useSendCampaign();
+
+    if (isError) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-white border border-red-100 rounded-2xl shadow-sm space-y-4 my-6 max-w-2xl mx-auto animate-scaleUp">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div className="text-center space-y-1">
+                    <h3 className="text-lg font-bold text-gray-900">Failed to load campaigns</h3>
+                    <p className="text-sm text-gray-500 max-w-md">There was an error communicating with the API. Please check your connection or contact support.</p>
+                </div>
+            </div>
+        );
+    }
+
+    const campaignNames = Array.from(new Set(campaigns.map((c) => c.name)));
 
     // Handlers
     const handleView = (c: Campaign) => navigate(`/dashboard/campaigns/${c.id}`);
@@ -151,14 +65,8 @@ const Campaigns = () => {
         }
     };
 
-    // Client-side search filtering
-    const filteredCampaigns = campaigns.filter((c) => {
-        const query = search.toLowerCase();
-        return (
-            c.name.toLowerCase().includes(query) ||
-            c.subject.toLowerCase().includes(query)
-        );
-    });
+    // Filter campaigns using utils
+    const filteredCampaigns = filterCampaigns(campaigns, search, activeFilters);
 
     return (
         <>
@@ -166,8 +74,18 @@ const Campaigns = () => {
                 searchValue={search}
                 searchPlaceholder="Search campaigns..."
                 onSearch={setSearch}
+                filterCount={countActiveCampaignFilters(activeFilters)}
+                onFilter={() => setFilterOpen((prev) => !prev)}
                 onCreate={handleCreate}
                 createLabel="Create Campaign"
+                filterContent={
+                    <FilterPanel
+                        open={filterOpen}
+                        onClose={() => setFilterOpen(false)}
+                        onApply={setActiveFilters}
+                        campaignNames={campaignNames}
+                    />
+                }
             >
                 <DataTable<Campaign>
                     columns={columns}

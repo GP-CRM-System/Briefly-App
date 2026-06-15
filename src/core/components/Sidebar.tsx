@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Icon } from "@/core/components";
 import { PermissionGuard } from "@/core/components/PermissionGuard";
 import { useUIStore } from "@/store/ui.store";
 import { useAuth } from "@/core/hooks";
+import { useCurrentSubscription } from "@/features/settings/settings.hooks";
 import { logout, logoSvg, letterLogo, tickets } from "@/assets/icons";
 import { 
     dashboardIcon, 
@@ -137,29 +138,66 @@ const SidebarItem = ({
 /* ───────────────────────── UpgradeCard ───────────────────────── */
 const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     const [dismissed, setDismissed] = useState(false);
+    const navigate = useNavigate();
+    const { data: currentSubscription } = useCurrentSubscription();
 
-    if (!sidebarOpen || dismissed) return null;
+    const isFreeOrTrial = !currentSubscription || 
+        currentSubscription.status === "TRIALING" || 
+        currentSubscription.plan?.name === "free";
+
+    if (!sidebarOpen || dismissed || !isFreeOrTrial) return null;
+
+    const endDate = currentSubscription?.endDate ? new Date(currentSubscription.endDate) : null;
+    const today = new Date();
+    
+    let daysLeft = 5; // default fallback
+    let percentLeft = 66.67; // default fallback
+    
+    if (endDate) {
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const diffMs = endDate.getTime() - today.getTime();
+        daysLeft = Math.max(0, Math.ceil(diffMs / msPerDay));
+        
+        const startDate = currentSubscription?.startDate ? new Date(currentSubscription.startDate) : null;
+        if (startDate) {
+            const totalMs = endDate.getTime() - startDate.getTime();
+            percentLeft = totalMs > 0 ? (diffMs / totalMs) * 100 : 0;
+        } else {
+            percentLeft = (daysLeft / 14) * 100;
+        }
+        percentLeft = Math.min(100, Math.max(0, percentLeft));
+    }
+
+    const handleSelectPlan = () => {
+        navigate("/dashboard/settings", { state: { tab: "billing" } });
+    };
+
     return (
-        <div className="w-full h-auto mb-3 p-3 border border-gray-100 rounded-[12px] bg-white shadow-sm flex flex-col gap-1.5">
-            <div className="flex items-center justify-between mb-0.5">
-                <span className="text-sm text-gray-900 leading-none font-bold">5 Days left !</span>
+        <div className="w-full bg-white border border-[#f1f5f9] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex flex-col gap-[8px] items-start p-[17px] rounded-[12px] shrink-0">
+            <div className="flex items-center justify-between w-full">
+                <span className="text-[14px] text-[#1a1a1a] leading-none font-semibold font-['Poppins']">{daysLeft} Days left !</span>
                 <div
                     onClick={() => setDismissed(true)}
-                    className="bg-[#B3B3B3] rounded-full p-0.5 cursor-pointer hover:bg-gray-500 transition-colors flex items-center justify-center"
+                    className="bg-[#b3b3b3] hover:bg-gray-400 rounded-full cursor-pointer flex items-center justify-center size-[12px] transition-colors"
                 >
-                    <Icon icon={closeIcon} className="h-2 w-2 text-white" />
+                    <Icon icon={closeIcon} className="h-1.5 w-1.5 text-white" />
                 </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-                <div className="w-full bg-gray-100 rounded-full h-[5px]">
-                    <div className="bg-[var(--color-primary-500)] h-[5px] rounded-full" style={{ width: '60%' }}></div>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-normal font-normal">
-                    Select best plan now and unlock all special features
-                </p>
+            <div className="bg-[#f1f5f9] h-[6px] rounded-[9999px] w-full relative overflow-hidden">
+                <div 
+                    className="absolute bg-[#4a90e2] h-[6px] left-0 rounded-[9999px] top-0 transition-all duration-500" 
+                    style={{ width: `${percentLeft}%` }}
+                />
             </div>
-            <button className="text-xs font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] transition-colors flex items-center gap-1 mt-0.5 cursor-pointer">
-                Select plan <span>›</span>
+            <p className="text-[11px] text-[#8a8a8a] leading-[15px] font-normal font-['Poppins']">
+                Select best plan now and unlock all special features
+            </p>
+            <button 
+                onClick={handleSelectPlan}
+                className="text-[12px] font-medium text-[#4a90e2] hover:text-blue-600 transition-colors flex items-center gap-[4px] mt-[3.5px] cursor-pointer"
+            >
+                Select plan
+                <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
             </button>
         </div>
     );
@@ -169,6 +207,17 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
 const Sidebar = () => {
     const { sidebarOpen, setSidebarOpen, toggleSidebar } = useUIStore();
     const { logout: signOut } = useAuth();
+
+    useEffect(() => {
+        if (sidebarOpen && window.innerWidth < 1024) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [sidebarOpen]);
 
     return (
         <>
@@ -248,7 +297,7 @@ const Sidebar = () => {
                 <div className="flex-1 flex flex-col min-h-0">
                     <nav className={`
                         flex-1 flex flex-col custom-scrollbar
-                        ${sidebarOpen ? 'px-4 overflow-y-auto' : 'px-2 overflow-visible'}
+                        ${sidebarOpen ? 'px-4 pb-6 overflow-y-auto' : 'px-2 pb-6 overflow-visible'}
                     `}>
                         {/* Primary Nav */}
                         <ul className="space-y-0.5">

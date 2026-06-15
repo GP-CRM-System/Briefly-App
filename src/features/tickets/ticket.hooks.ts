@@ -64,3 +64,18 @@ export const useAddTicketNote = (ticketId: string | undefined) => {
         },
     });
 };
+
+export const useDeleteTicket = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => ticketService.delete(id),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ticketKeys.all });
+            toast.success("Ticket deleted successfully!");
+        },
+        onError: (err: any) => {
+            toast.error(err?.response?.data?.message || "Failed to delete ticket");
+        },
+    });
+};
+

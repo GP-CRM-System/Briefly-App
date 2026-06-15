@@ -33,17 +33,17 @@ const PaymentBillingTab = () => {
 
     // Calculate usage metrics
     const contactsLimit = activePlan.features?.customers ?? 10000;
-    const contactsUsed = currentSubscription?.usage?.customers ?? 8452;
+    const contactsUsed = currentSubscription?.usage?.customers ?? 0;
     const contactsPercent = contactsLimit === -1 ? 0 : Math.min(100, (contactsUsed / contactsLimit) * 100);
 
     const emailsLimit = activePlan.features?.emails ?? 50000;
-    const emailsUsed = currentSubscription?.usage?.emails ?? 42000;
+    const emailsUsed = currentSubscription?.usage?.emails ?? 0;
     const emailsPercent = emailsLimit === -1 ? 0 : Math.min(100, (emailsUsed / emailsLimit) * 100);
 
     const storageLimitGB = activePlan.features?.storageGB ?? 5;
     const storageUsedBytes = currentSubscription?.usage?.storageBytes;
     const storageUsedGB = currentSubscription?.usage?.storageGB ?? 
-        (storageUsedBytes ? Number((storageUsedBytes / (1024 * 1024 * 1024)).toFixed(1)) : 2.1);
+        (storageUsedBytes ? Number((storageUsedBytes / (1024 * 1024 * 1024)).toFixed(1)) : 0);
     const storagePercent = storageLimitGB === -1 ? 0 : Math.min(100, (storageUsedGB / storageLimitGB) * 100);
 
     const handleUpgrade = () => {
@@ -57,7 +57,34 @@ const PaymentBillingTab = () => {
     };
 
     const handleDownloadInvoice = (id: string) => {
-        toast.success(`Downloading invoice ${id} as PDF...`);
+        const selectedInvoice = invoices.find(inv => inv.id === id);
+        const invoiceContent = `
+==================================================
+                 BRIEFLY CRM INVOICE
+==================================================
+Invoice ID:  ${id}
+Date:        ${selectedInvoice?.date || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+Amount:      ${selectedInvoice?.amount || "$49.00"}
+Status:      ${(selectedInvoice?.status || "paid").toUpperCase()}
+Plan:        ${activePlan.displayName || activePlan.name || "Professional"}
+==================================================
+Billing address:
+Briefly CRM Organization Settings
+Active Org:  ${currentSubscription?.organization?.name || "My Organization"}
+==================================================
+Thank you for your business!
+        `.trim();
+
+        const blob = new Blob([invoiceContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `invoice-${id}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded invoice ${id} successfully!`);
     };
 
     const handleSelectPlan = (planId: string) => {

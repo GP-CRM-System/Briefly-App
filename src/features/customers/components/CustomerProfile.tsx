@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCustomer, useAddCustomerNote } from "../customer.hooks";
 import { getInitials } from "../utils";
@@ -99,6 +99,13 @@ const CustomerProfile = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [noteText, setNoteText] = useState("");
+
+    /* ── Redirect non-UUID slugs like "create" or "new" ── */
+    useEffect(() => {
+        if (id === "create" || id === "new") {
+            navigate("/dashboard/customers", { replace: true });
+        }
+    }, [id, navigate]);
 
     /* ── React Query ── */
     const { data: customer, isLoading } = useCustomer(id);

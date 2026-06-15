@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
-import { useCreateTicket } from "../ticket.hooks";
+import { useCreateTicket, useUpdateTicket } from "../ticket.hooks";
+import type { Ticket } from "../types";
 import toast from "react-hot-toast";
 
 interface TicketFormModalProps {
     open: boolean;
     onClose: () => void;
+    ticket?: Ticket | null;
 }
 
 /* Icons */
@@ -40,8 +42,9 @@ const SettingsIcon = () => (
     </svg>
 );
 
-const TicketFormModal = ({ open, onClose }: TicketFormModalProps) => {
+const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
     const createMutation = useCreateTicket();
+    const updateMutation = useUpdateTicket();
 
     const [name, setName] = useState("");
     const [customerName, setCustomerName] = useState("");
@@ -52,14 +55,23 @@ const TicketFormModal = ({ open, onClose }: TicketFormModalProps) => {
 
     useEffect(() => {
         if (open) {
-            setName("");
-            setCustomerName("");
-            setSubject("");
-            setDescription("");
-            setPriority("medium");
-            setStatus("open");
+            if (ticket) {
+                setName(ticket.name || "");
+                setCustomerName(ticket.customerName || "");
+                setSubject(ticket.subject || "");
+                setDescription(ticket.description || "");
+                setPriority(ticket.priority || "medium");
+                setStatus(ticket.status || "open");
+            } else {
+                setName("");
+                setCustomerName("");
+                setSubject("");
+                setDescription("");
+                setPriority("medium");
+                setStatus("open");
+            }
         }
-    }, [open]);
+    }, [open, ticket]);
 
     if (!open) return null;
 
@@ -78,22 +90,30 @@ const TicketFormModal = ({ open, onClose }: TicketFormModalProps) => {
             status,
         };
 
-        createMutation.mutate(payload, {
-            onSuccess: () => {
-                onClose();
-            },
-        });
+        if (ticket) {
+            updateMutation.mutate({ id: ticket.id, payload }, {
+                onSuccess: () => {
+                    onClose();
+                },
+            });
+        } else {
+            createMutation.mutate(payload, {
+                onSuccess: () => {
+                    onClose();
+                },
+            });
+        }
     };
 
     return (
         <Modal
             open={open}
             onClose={onClose}
-            title="Create New Ticket"
-            subtitle="create a new ticket to your database."
+            title={ticket ? "Edit Ticket" : "Create New Ticket"}
+            subtitle={ticket ? "Edit support ticket details." : "create a new ticket to your database."}
             onSubmit={handleSubmit}
-            submitLabel="Create"
-            loading={createMutation.isPending}
+            submitLabel={ticket ? "Save Changes" : "Create"}
+            loading={ticket ? updateMutation.isPending : createMutation.isPending}
             width="max-w-[700px]"
         >
             {/* ── Ticket Information ── */}

@@ -8,19 +8,10 @@ import { useDashboardData, useAuditLogs } from "../dashboard.hooks";
 import type { SalesDataPoint, TicketBreakdown, AuditLogEntry } from "../types";
 
 /* ═══════════════════════════════════════════════════
-   Fallback / demo data — used when the API returns
-   incomplete or empty payloads so the UI always renders.
+   Fallback ticket values — only used if the API returns
+   nothing at all. Prefer showing real zeros over fake numbers.
    ═══════════════════════════════════════════════════ */
-const FALLBACK_SALES: SalesDataPoint[] = [
-    { date: "Apr 3", orders: 40, revenue: 7800 },
-    { date: "Apr 4", orders: 52, revenue: 9200 },
-    { date: "Apr 5", orders: 48, revenue: 8600 },
-    { date: "Apr 6", orders: 61, revenue: 11200 },
-    { date: "Apr 7", orders: 55, revenue: 10100 },
-    { date: "Apr 8", orders: 67, revenue: 12400 },
-];
-
-const FALLBACK_TICKETS: TicketBreakdown = { open: 31, pending: 45, closed: 24 };
+const EMPTY_TICKETS: TicketBreakdown = { open: 0, pending: 0, closed: 0 };
 
 /* ── Donut chart palette ── */
 const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
@@ -111,10 +102,11 @@ const DashboardHome = () => {
     const { data: dashboard, isLoading } = useDashboardData();
     const { data: auditRaw = [] } = useAuditLogs();
 
-    /* Safely extract sub-objects with fallbacks */
+    /* Safely extract sub-objects — no fake data, show real values or "N/A" */
     const stats = dashboard?.stats;
-    const salesData = dashboard?.salesOverview?.length ? dashboard.salesOverview : FALLBACK_SALES;
-    const tickets = dashboard?.ticketBreakdown ?? FALLBACK_TICKETS;
+    const hasSalesData = dashboard?.salesOverview?.length > 0;
+    const salesData = hasSalesData ? dashboard.salesOverview : [];
+    const tickets = dashboard?.ticketBreakdown ?? EMPTY_TICKETS;
     const auditLogs: AuditLogEntry[] = Array.isArray(auditRaw) ? auditRaw : [];
 
     /* Donut chart data */
@@ -139,10 +131,10 @@ const DashboardHome = () => {
         <div className="space-y-6">
             {/* ── Stats Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total Customers" value={stats?.totalCustomers ?? 0} change={stats?.customerChange ?? 7} />
-                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? 0} change={stats?.campaignChange ?? 2} />
-                <StatCard label="Total Products" value={stats?.totalProducts ?? 0} change={stats?.productChange ?? 9} />
-                <StatCard label="Total Orders" value={stats?.totalOrders ?? 0} change={stats?.orderChange ?? -3} />
+                <StatCard label="Total Customers" value={stats?.totalCustomers ?? "N/A"} change={stats?.customerChange} />
+                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? "N/A"} change={stats?.campaignChange} />
+                <StatCard label="Total Products" value={stats?.totalProducts ?? "N/A"} change={stats?.productChange} />
+                <StatCard label="Total Orders" value={stats?.totalOrders ?? "N/A"} change={stats?.orderChange} />
             </div>
 
             {/* ── Charts Row ── */}
@@ -150,49 +142,61 @@ const DashboardHome = () => {
                 {/* Sales Overview — 2/3 width */}
                 <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-6">
                     <h2 className="text-base font-semibold text-gray-900 mb-4">Sales Overview</h2>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <LineChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                            <XAxis
-                                dataKey="date"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: "#94A3B8", fontSize: 12 }}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: "#94A3B8", fontSize: 12 }}
-                            />
-                            <Tooltip content={<SalesTooltip />} />
-                            <Line
-                                type="monotone"
-                                dataKey="orders"
-                                name="Orders"
-                                stroke="#4F8CFF"
-                                strokeWidth={2.5}
-                                dot={{ r: 4, fill: "#4F8CFF", strokeWidth: 2, stroke: "#fff" }}
-                                activeDot={{ r: 6 }}
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="revenue"
-                                name="Revenue ($)"
-                                stroke="#A78BFA"
-                                strokeWidth={2.5}
-                                dot={{ r: 4, fill: "#A78BFA", strokeWidth: 2, stroke: "#fff" }}
-                                activeDot={{ r: 6 }}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                    <div className="flex justify-center gap-6 mt-2">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="w-3 h-0.5 bg-[#4F8CFF] rounded-full inline-block" /> Orders
+                    {salesData.length > 0 ? (
+                        <>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <LineChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                                    <XAxis
+                                        dataKey="date"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: "#94A3B8", fontSize: 12 }}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: "#94A3B8", fontSize: 12 }}
+                                    />
+                                    <Tooltip content={<SalesTooltip />} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="orders"
+                                        name="Orders"
+                                        stroke="#4F8CFF"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: "#4F8CFF", strokeWidth: 2, stroke: "#fff" }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        name="Revenue ($)"
+                                        stroke="#A78BFA"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: "#A78BFA", strokeWidth: 2, stroke: "#fff" }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                            <div className="flex justify-center gap-6 mt-2">
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span className="w-3 h-0.5 bg-[#4F8CFF] rounded-full inline-block" /> Orders
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span className="w-3 h-0.5 bg-[#A78BFA] rounded-full inline-block" /> Revenue ($)
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-[280px] text-gray-400">
+                            <svg className="w-12 h-12 mb-3 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <p className="text-sm font-medium">No sales data available</p>
+                            <p className="text-xs mt-1">Sales data will appear here once orders are recorded</p>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="w-3 h-0.5 bg-[#A78BFA] rounded-full inline-block" /> Revenue ($)
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Support Tickets Donut — 1/3 width */}
@@ -238,7 +242,7 @@ const DashboardHome = () => {
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <h2 className="text-base font-semibold text-gray-900">Recent Activities</h2>
                     <button
-                        onClick={() => navigate("/dashboard/settings")}
+                        onClick={() => navigate("/dashboard/analytics")}
                         className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] transition-colors"
                     >
                         View all

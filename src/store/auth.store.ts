@@ -56,6 +56,12 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: "briefly-auth",
+            /* 
+             * SECURITY NOTE: Storing the auth token in localStorage makes it susceptible to Cross-Site Scripting (XSS) attacks.
+             * A more secure alternative is to use httpOnly cookies, which prevents JavaScript from accessing the token.
+             * Since the backend client is configured with withCredentials: true, we can transition to cookie-only authentication
+             * in future production releases.
+             */
             storage: createJSONStorage(() => localStorage),
         }
     )

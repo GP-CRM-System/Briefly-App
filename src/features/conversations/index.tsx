@@ -66,13 +66,15 @@ const Conversations = () => {
         if (!activeId) return;
         
         const joinRoom = () => {
-            socket.emit("join_conversation", { conversationId: activeId }, (res: any) => {
-                if (res?.success) {
-                    console.log(`Joined conversation room: ${activeId}`);
-                } else {
-                    console.warn(`Failed to join conversation room: ${activeId}`, res?.error);
-                }
-            });
+            if (socket.connected) {
+                socket.emit("join_conversation", { conversationId: activeId }, (res: any) => {
+                    if (res?.success) {
+                        console.log(`Joined conversation room: ${activeId}`);
+                    } else {
+                        console.warn(`Failed to join conversation room: ${activeId}`, res?.error);
+                    }
+                });
+            }
         };
 
         joinRoom();
@@ -82,7 +84,9 @@ const Conversations = () => {
 
         return () => {
             socket.off("connect", joinRoom);
-            socket.emit("leave_conversation", { conversationId: activeId });
+            if (socket.connected) {
+                socket.emit("leave_conversation", { conversationId: activeId });
+            }
         };
     }, [activeId]);
 

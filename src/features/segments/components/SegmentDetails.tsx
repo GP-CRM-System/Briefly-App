@@ -189,11 +189,11 @@ const SegmentDetails = () => {
 
             {/* Header row */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 className="text-2xl font-bold text-gray-900">{segment.name}</h2>
+                <h2 className="text-2xl font-bold text-gray-900 font-['Poppins']">{segment.name}</h2>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setEditModalOpen(true)}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                        className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all font-['Poppins']"
                     >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -203,7 +203,7 @@ const SegmentDetails = () => {
                     </button>
                     <button
                         onClick={handleExport}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                        className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all font-['Poppins']"
                     >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -214,7 +214,7 @@ const SegmentDetails = () => {
                     </button>
                     <button
                         onClick={handleDelete}
-                        className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-red-50 hover:bg-red-100 text-sm font-medium text-red-600 border border-red-100 transition-all"
+                        className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] bg-red-50 hover:bg-red-100 text-sm font-medium text-red-600 border border-red-100 transition-all font-['Poppins']"
                     >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6" />
@@ -228,40 +228,45 @@ const SegmentDetails = () => {
             {/* Premium 4 Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {/* Segment Owner */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <img 
-                            src={segmentOwnerImage} 
-                            alt={segmentOwnerName} 
-                            className="w-10 h-10 rounded-full object-cover border border-gray-100" 
-                        />
-                        <div>
-                            <p className="text-xs font-semibold text-gray-400">Segment Owner</p>
-                            <h4 className="text-sm font-bold text-gray-900 mt-0.5">{segmentOwnerName}</h4>
-                            <p className="text-xs text-gray-500 mt-0.5">{segmentOwnerRole}</p>
+                <div className="bg-white p-6 rounded-[12px] shadow-[0px_16px_12px_rgba(0,0,0,0.06),0px_2px_3px_rgba(0,0,0,0.04),0px_0px_1px_rgba(0,0,0,0.04)] flex items-start justify-between h-[138px]">
+                    <div className="flex flex-col justify-between h-full py-0.5">
+                        <p className="capitalize font-['Poppins'] text-[#8a8a8a] text-base leading-none">Segment Owner</p>
+                        <div className="flex items-center gap-3">
+                            <img 
+                                src={segmentOwnerImage} 
+                                alt={segmentOwnerName} 
+                                className="w-12 h-12 rounded-full object-cover border-2 border-white" 
+                            />
+                            <div className="flex flex-col font-['Poppins'] leading-none">
+                                <h4 className="text-base font-semibold text-[#191c1e]">{segmentOwnerName}</h4>
+                                <p className="text-xs text-[#45464d] font-['Inter'] mt-1">{segmentOwnerRole}</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="p-2.5 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl self-start">
+                    <div className="bg-[rgba(74,144,226,0.19)] text-[#4a90e2] rounded-[20px] shrink-0 p-2 w-9 h-9 flex items-center justify-center">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                            <circle cx="12" cy="11" r="3" />
-                            <path d="M17 17.5c0-1.93-2.24-3.5-5-3.5s-5 1.57-5 3.5" />
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
                         </svg>
                     </div>
                 </div>
 
                 {/* Segment Size */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-semibold text-gray-400">Segment Size</p>
-                        <h4 className="text-xl font-black text-gray-900 mt-0.5">{segmentSize}</h4>
+                <div className="bg-white p-6 rounded-[12px] shadow-[0px_16px_12px_rgba(0,0,0,0.06),0px_2px_3px_rgba(0,0,0,0.04),0px_0px_1px_rgba(0,0,0,0.04)] flex items-start justify-between h-[138px]">
+                    <div className="flex flex-col justify-between h-full py-0.5">
+                        <p className="capitalize font-['Poppins'] text-[#8a8a8a] text-base leading-none">Segment Size</p>
+                        <h4 className="text-[24px] font-medium text-[#1a1a1a] font-['Poppins'] mt-1 leading-none">{segmentSize}</h4>
                         {segmentSizeTrend && (
-                            <p className="text-xs text-green-600 font-semibold mt-1 flex items-center gap-1">
-                                {segmentSizeTrend}
+                            <p className="text-xs text-[#22c55e] font-medium mt-1 flex items-center gap-1 leading-none">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="12" y1="19" x2="12" y2="5" />
+                                    <polyline points="5 12 12 5 19 12" />
+                                </svg>
+                                {segmentSizeTrend.replace("↑ ", "")}
                             </p>
                         )}
                     </div>
-                    <div className="p-2.5 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl self-start">
+                    <div className="bg-[rgba(74,144,226,0.19)] text-[#4a90e2] rounded-[20px] shrink-0 p-2 w-9 h-9 flex items-center justify-center">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                             <circle cx="9" cy="7" r="4" />
@@ -272,13 +277,13 @@ const SegmentDetails = () => {
                 </div>
 
                 {/* Segment Type */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-semibold text-gray-400">Segment Type</p>
-                        <h4 className="text-xl font-bold text-gray-900 mt-0.5">{segmentType}</h4>
-                        <p className="text-xs text-gray-400 mt-1">{segmentTypeDetail}</p>
+                <div className="bg-white p-6 rounded-[12px] shadow-[0px_16px_12px_rgba(0,0,0,0.06),0px_2px_3px_rgba(0,0,0,0.04),0px_0px_1px_rgba(0,0,0,0.04)] flex items-start justify-between h-[138px]">
+                    <div className="flex flex-col justify-between h-full py-0.5">
+                        <p className="capitalize font-['Poppins'] text-[#8a8a8a] text-base leading-none">Segment Type</p>
+                        <h4 className="text-[24px] font-medium text-[#1a1a1a] font-['Poppins'] mt-1 leading-none">{segmentType}</h4>
+                        <p className="text-xs text-[#8a8a8a] font-['Poppins'] font-medium mt-1 leading-none">{segmentTypeDetail}</p>
                     </div>
-                    <div className="p-2.5 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl self-start">
+                    <div className="bg-[rgba(74,144,226,0.19)] text-[#4a90e2] rounded-[20px] shrink-0 p-2 w-9 h-9 flex items-center justify-center">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                         </svg>
@@ -286,13 +291,13 @@ const SegmentDetails = () => {
                 </div>
 
                 {/* Created On */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-semibold text-gray-400">Created On</p>
-                        <h4 className="text-xl font-bold text-gray-900 mt-0.5">{segmentCreatedOn}</h4>
-                        <p className="text-xs text-gray-400 mt-1">{segmentDaysAgo}</p>
+                <div className="bg-white p-6 rounded-[12px] shadow-[0px_16px_12px_rgba(0,0,0,0.06),0px_2px_3px_rgba(0,0,0,0.04),0px_0px_1px_rgba(0,0,0,0.04)] flex items-start justify-between h-[138px]">
+                    <div className="flex flex-col justify-between h-full py-0.5">
+                        <p className="capitalize font-['Poppins'] text-[#8a8a8a] text-base leading-none">Created On</p>
+                        <h4 className="text-[24px] font-medium text-[#1a1a1a] font-['Poppins'] mt-1 leading-none">{segmentCreatedOn}</h4>
+                        <p className="text-xs text-[#8a8a8a] font-['Poppins'] font-medium mt-1 leading-none">{segmentDaysAgo}</p>
                     </div>
-                    <div className="p-2.5 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl self-start">
+                    <div className="bg-[rgba(74,144,226,0.19)] text-[#4a90e2] rounded-[20px] shrink-0 p-2 w-9 h-9 flex items-center justify-center">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                             <line x1="16" y1="2" x2="16" y2="6" />
@@ -304,38 +309,39 @@ const SegmentDetails = () => {
             </div>
 
             {/* Description & Filter Conditions Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                 {/* Description */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 className="text-base font-bold text-gray-900 mb-4">Description</h3>
-                        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 text-sm text-gray-600 leading-relaxed font-medium">
+                <div className="bg-white p-8 rounded-[14px] border border-[#e5e7eb] shadow-sm lg:col-span-2 flex flex-col justify-between min-h-[468px]">
+                    <div className="flex flex-col gap-4">
+                        <h3 className="font-['Poppins'] font-medium text-[18px] text-[#1a1a1a] leading-none">Description</h3>
+                        <div className="bg-[#f2f4f6] rounded-[4px] border border-[#f1f5f9] p-5 text-sm text-[#45464d] leading-[26px] italic font-normal">
                             "{segment.description || "No segment description available."}"
                         </div>
                     </div>
                     
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-50">
+                    <div className="flex items-center justify-between mt-6 pt-[25px] border-t border-[#f1f5f9]">
                         {/* Overlapping small avatar group */}
                         <div className="flex items-center">
                             <div className="flex -space-x-2">
-                                <img className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50" alt="user" />
-                                <img className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50" alt="user" />
-                                <img className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50" alt="user" />
+                                <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50" alt="user" />
+                                <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50" alt="user" />
+                                <div className="h-8 w-8 rounded-full bg-[#f1f5f9] border-2 border-white flex items-center justify-center text-[10px] font-bold text-[#64748b]">
+                                    +1.2k
+                                </div>
                             </div>
-                            <span className="text-xs text-blue-600 font-semibold ml-2">+1.2k</span>
                         </div>
-                        <span className="text-xs text-gray-400 font-medium">
+                        <span className="font-['Inter'] font-semibold text-[#45464d] text-[12px] tracking-[0.6px]">
                             {segment.lastUpdated || "Last updated just now"}
                         </span>
                     </div>
                 </div>
 
                 {/* Filter Conditions */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2 relative flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-base font-bold text-gray-900">Filter Logic & Conditions</h3>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100">
+                <div className="bg-white p-8 rounded-[14px] border border-[#e5e7eb] shadow-sm lg:col-span-3 flex flex-col justify-between min-h-[468px]">
+                    <div className="flex flex-col gap-6">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-['Manrope'] font-semibold text-[20px] text-[#191c1e] leading-none">Filter Logic & Conditions</h3>
+                            <span className="inline-flex items-center px-[12px] py-[4px] rounded-[12px] text-xs font-semibold bg-[rgba(74,144,226,0.09)] text-[#4a90e2] tracking-[0.6px] leading-none">
                                 Match all ( And )
                             </span>
                         </div>
@@ -343,23 +349,23 @@ const SegmentDetails = () => {
                         <div className="space-y-3">
                             {segment.rules && segment.rules.length > 0 ? (
                                 segment.rules.map((rule, index) => (
-                                    <div key={index} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:border-gray-200 transition-all">
+                                    <div key={index} className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
                                         {rule.icon === "finance" && <FinanceIcon />}
                                         {rule.icon === "geo" && <GeoIcon />}
                                         {rule.icon === "engagement" && <EngagementIcon />}
-                                        <div>
-                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{rule.category}</p>
-                                            <p className="text-sm font-bold text-gray-800 mt-0.5">{rule.description}</p>
+                                        <div className="flex flex-col h-[39px] justify-center leading-none">
+                                            <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">{rule.category}</p>
+                                            <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">{rule.description}</p>
                                         </div>
                                     </div>
                                 ))
                             ) : (
                                 // Generic single rule format if segment rules not defined
-                                <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
+                                <div className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
                                     <FinanceIcon />
-                                    <div>
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dynamic Rule</p>
-                                        <p className="text-sm font-bold text-gray-800 mt-0.5">
+                                    <div className="flex flex-col h-[39px] justify-center leading-none">
+                                        <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">Dynamic Rule</p>
+                                        <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">
                                             {segment.filter?.field} is equal to {segment.filter?.value}
                                         </p>
                                     </div>
@@ -384,14 +390,14 @@ const SegmentDetails = () => {
                             <div className="w-6 h-6 border-2 border-[var(--color-primary-500)] border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : (
-                        <table className="w-full">
+                        <table className="w-full rounded-xl overflow-hidden border border-gray-100">
                             <thead>
-                                <tr className="border-b border-gray-100">
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Spent</th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Stage</th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Activity</th>
+                                <tr className="border-b border-gray-100 bg-[#4A90E214] h-[52px]">
+                                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#1a1a1a]/50 tracking-wider font-['Poppins']">Name</th>
+                                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#1a1a1a]/50 tracking-wider font-['Poppins']">Orders</th>
+                                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#1a1a1a]/50 tracking-wider font-['Poppins']">Total Spent</th>
+                                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#1a1a1a]/50 tracking-wider font-['Poppins']">Stage</th>
+                                    <th className="px-4 py-3 text-center text-sm font-semibold text-[#1a1a1a]/50 tracking-wider font-['Poppins']">Last Activity</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -403,7 +409,7 @@ const SegmentDetails = () => {
 
                                         return (
                                             <tr key={customer.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                                                <td className="px-4 py-3">
+                                                <td className="px-4 py-[18px]">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${avatarBg} text-white`}>
                                                             {initials}
@@ -414,20 +420,20 @@ const SegmentDetails = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-3 text-sm text-gray-600 text-center font-medium">
+                                                <td className="px-4 py-[18px] text-sm text-gray-600 text-center font-medium">
                                                     {customer.totalOrders ?? 0}
                                                 </td>
-                                                <td className="px-4 py-3 text-sm text-center">
-                                                    <span className="font-semibold text-green-600">
+                                                <td className="px-4 py-[18px] text-sm text-center">
+                                                    <span className="font-semibold text-green-600 font-['Poppins']">
                                                         ${customer.totalSpent || 0}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-4 py-[18px] text-center">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stageClasses}`}>
                                                         {customer.lifecycleStage || "—"}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-4 py-[18px] text-center">
                                                     <p className="text-sm text-gray-700 leading-tight">{customer.lastActivity || "—"}</p>
                                                     {customer.lastActivityDate && <p className="text-xs text-gray-400">{customer.lastActivityDate}</p>}
                                                 </td>

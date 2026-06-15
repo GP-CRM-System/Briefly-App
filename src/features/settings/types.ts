@@ -43,7 +43,7 @@ export interface ConnectionDetails {
     conflictHandling: string;
     lastSyncAt: string;
     lastSyncStatus: "success" | "failed";
-    metadata?: Record<string, string>;
+    metadata?: Record<string, any>;
 }
 
 export interface SyncLog {
