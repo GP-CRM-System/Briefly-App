@@ -5,7 +5,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { useDashboardData, useAuditLogs } from "../dashboard.hooks";
-import type { SalesDataPoint, TicketBreakdown, AuditLogEntry } from "../types";
+import type { TicketBreakdown, AuditLogEntry } from "../types";
 
 /* ═══════════════════════════════════════════════════
    Fallback ticket values — only used if the API returns
@@ -104,8 +104,8 @@ const DashboardHome = () => {
 
     /* Safely extract sub-objects — no fake data, show real values or "N/A" */
     const stats = dashboard?.stats;
-    const hasSalesData = dashboard?.salesOverview?.length > 0;
-    const salesData = hasSalesData ? dashboard.salesOverview : [];
+    const hasSalesData = (dashboard?.salesOverview?.length ?? 0) > 0;
+    const salesData = hasSalesData && dashboard?.salesOverview ? dashboard.salesOverview : [];
     const tickets = dashboard?.ticketBreakdown ?? EMPTY_TICKETS;
     const auditLogs: AuditLogEntry[] = Array.isArray(auditRaw) ? auditRaw : [];
 

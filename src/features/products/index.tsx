@@ -42,7 +42,7 @@ const Products = () => {
             Name: p.name,
             SKU: p.sku || "",
             Price: p.price || 0,
-            Stock: p.stock ?? 0,
+            Stock: p.quantity ?? 0,
             Status: p.status || "",
             CreatedAt: p.createdAt
         }));

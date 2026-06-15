@@ -45,7 +45,7 @@ const Customers = () => {
             City: c.city || "",
             LifecycleStage: c.lifecycleStage || "",
             TotalSpent: c.totalSpent || 0,
-            OrderCount: c.orderCount || 0,
+            OrderCount: c.totalOrders || 0,
             CreatedAt: c.createdAt
         }));
 
