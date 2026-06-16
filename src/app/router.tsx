@@ -5,6 +5,7 @@ import Login from "@/pages/auth/Login";
 import Signup from "@/pages/auth/Signup";
 import LandingPage from "@/pages/landing/Landing";
 import Onboarding from "@/pages/onboarding/Onboarding";
+import AuthCallback from "@/pages/auth/AuthCallback";
 
 export default function AppRouter() {
     return (
@@ -16,6 +17,7 @@ export default function AppRouter() {
                 {/* Guest only — logged-in users get redirected to /dashboard */}
                 <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
                 <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
 
                 {/* Protected — unauthenticated users get redirected to /login */}
                 <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

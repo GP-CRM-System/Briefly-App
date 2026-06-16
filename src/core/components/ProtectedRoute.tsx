@@ -9,11 +9,13 @@ import { useAuthStore } from "@/store/auth.store";
  * - Has token and onboarding complete → render children
  */
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const user = useAuthStore((s) => s.user);
     const token = useAuthStore((s) => s.token);
     const onboardingComplete = useAuthStore((s) => s.onboardingComplete);
     const location = useLocation();
+    const isAuthenticated = Boolean(user || token);
 
-    if (!token) {
+    if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

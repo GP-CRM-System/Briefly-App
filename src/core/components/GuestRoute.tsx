@@ -9,14 +9,16 @@ import { useAuthStore } from "@/store/auth.store";
  * - No token → render children (show login/signup)
  */
 export function GuestRoute({ children }: { children: React.ReactNode }) {
+    const user = useAuthStore((s) => s.user);
     const token = useAuthStore((s) => s.token);
     const onboardingComplete = useAuthStore((s) => s.onboardingComplete);
+    const isAuthenticated = Boolean(user || token);
 
-    if (token && onboardingComplete) {
+    if (isAuthenticated && onboardingComplete) {
         return <Navigate to="/dashboard" replace />;
     }
 
-    if (token && !onboardingComplete) {
+    if (isAuthenticated && !onboardingComplete) {
         return <Navigate to="/onboarding" replace />;
     }
 

@@ -29,16 +29,16 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { to: "/dashboard", label: "Dashboard", icon: dashboardIcon, end: true },
-    { to: "/dashboard/customers", label: "Customers", icon: customersIcon, permission: "customers.read" },
-    { to: "/dashboard/segments", label: "Segments", icon: segmentsIcon, permission: "segments.read" },
-    { to: "/dashboard/campaigns", label: "Campaigns", icon: campaignsIcon, permission: "campaigns.read" },
-    { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products.read" },
-    { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders.read" },
-    { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets.read" },
-    { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations.read" },
-    { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member.read" },
-    { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports.read" },
-    { to: "/dashboard/ai", label: "AI Intelligence", icon: AiIdeaIcon, permission: "ai.read" },
+    { to: "/dashboard/customers", label: "Customers", icon: customersIcon, permission: "customers:read" },
+    { to: "/dashboard/segments", label: "Segments", icon: segmentsIcon, permission: "segments:read" },
+    { to: "/dashboard/campaigns", label: "Campaigns", icon: campaignsIcon, permission: "campaigns:read" },
+    { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products:read" },
+    { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders:read" },
+    { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets:read" },
+    { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations:read" },
+    { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member:read" },
+    { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports:read" },
+    { to: "/dashboard/ai", label: "AI Intelligence", icon: AiIdeaIcon, permission: "ai:read" },
 ];
 
 /* ───────────────────────── SidebarItem ───────────────────────── */
