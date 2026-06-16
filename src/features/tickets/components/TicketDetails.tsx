@@ -166,10 +166,10 @@ const TicketDetails = () => {
                                 {ticket.notes.map((note) => (
                                     <div key={note.id} className="border border-gray-50 bg-gray-50/20 rounded-2xl p-4 flex flex-col gap-1">
                                         <p className="text-xs text-gray-600 font-medium leading-relaxed">
-                                            {note.content}
+                                            {note.body}
                                         </p>
                                         <span className="text-[10px] text-blue-500 font-bold self-end mt-1">
-                                            — {note.author || "Sarah Ahmed"} at {fmtTicketDate(note.createdAt)}
+                                            — {note.author?.name || "Unknown"} at {fmtTicketDate(note.createdAt)}
                                         </span>
                                     </div>
                                 ))}

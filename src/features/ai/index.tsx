@@ -19,7 +19,7 @@ const AiDashboard = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl font-bold text-gray-900">AI Intelligence</h1>
+                    <h1 className="text-xl font-bold text-gray-900">Insights Engine</h1>
                     <p className="text-sm text-gray-400 mt-1">Machine learning-powered CRM insights</p>
                 </div>
             </div>

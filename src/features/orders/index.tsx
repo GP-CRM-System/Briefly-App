@@ -12,6 +12,7 @@ import { columns } from "./components/OrderColumns";
 import ActionMenu from "./components/ActionMenu";
 import FilterPanel from "./components/FilterPanel";
 import OrderFormModal from "./components/OrderFormModal";
+import ImportExportModal from "@/features/imports/ImportExportModal";
 
 const Orders = () => {
     const navigate = useNavigate();
@@ -22,6 +23,8 @@ const Orders = () => {
 
     /* Modal state */
     const [modalOpen, setModalOpen] = useState(false);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
 
     /* ── Data ── */
     const { data: orders = MOCK_ORDERS, isLoading } = useOrders();
@@ -45,8 +48,8 @@ const Orders = () => {
                 onSearch={setSearch}
                 filterCount={countActiveFilters(activeFilters)}
                 onFilter={() => setFilterOpen((p) => !p)}
-                onExport={() => {}}
-                onImport={() => {}}
+                onExport={() => setExportOpen(true)}
+                onImport={() => setImportOpen(true)}
                 onCreate={() => setModalOpen(true)}
                 createLabel="Create Order"
                 filterContent={
@@ -78,6 +81,19 @@ const Orders = () => {
             <OrderFormModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
+            />
+
+            <ImportExportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                mode="import"
+                entityType="order"
+            />
+            <ImportExportModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                mode="export"
+                entityType="order"
             />
         </>
     );

@@ -1,33 +1,32 @@
-export interface Template {
-    id: string;
-    name: string;
-    subject?: string;
-    content?: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
+export type { Template } from "@/features/templates/types";
 
 export type CampaignStatus = "draft" | "scheduled" | "sending" | "sent" | "failed";
 
 export interface Campaign {
     id: string;
     name: string;
-    subject: string;
-    templateId: string;
-    segmentId: string;
+    subject?: string | null;
+    description?: string | null;
+    templateId?: string | null;
+    segmentId?: string | null;
     status: CampaignStatus;
     scheduledAt?: string | null;
     sentAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
-    segmentName?: string;
-    templateName?: string;
-    type?: string;
+    recipientCount?: number;
+    type?: string | null;
     segment?: {
         id: string;
         name: string;
         description?: string;
         size?: number;
+    } | null;
+    template?: {
+        id: string;
+        name: string;
+        subject?: string;
+        htmlBody?: string;
     } | null;
     metrics?: {
         sent: number;

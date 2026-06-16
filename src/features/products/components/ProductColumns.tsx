@@ -12,8 +12,8 @@ export const columns: Column<Product>[] = [
                 <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-semibold flex-shrink-0 ${getProductColor(row.name)}`}
                 >
-                    {row.image ? (
-                        <img src={row.image} alt={row.name} className="w-full h-full rounded-xl object-cover" />
+                    {(row.imageUrl || row.image) ? (
+                        <img src={row.imageUrl || row.image} alt={row.name} className="w-full h-full rounded-xl object-cover" />
                     ) : (
                         getProductInitials(row.name)
                     )}

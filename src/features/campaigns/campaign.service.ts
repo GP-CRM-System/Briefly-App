@@ -8,11 +8,13 @@ export const campaignService = {
         const { data } = await apiClient.get(ENDPOINTS.CAMPAIGN.GET_ALL, {
             params: { limit: 1000 }
         });
-        return data?.data || data || [];
+        // Backend returns { success, data: [...], pagination } via ResponseHandler.paginated
+        return data?.data || [];
     },
 
     async getOne(id: string): Promise<Campaign> {
         const { data } = await apiClient.get(ENDPOINTS.CAMPAIGN.GET_ONE(id));
+        // Backend returns { success, data: campaign } via ResponseHandler.success
         return data?.data || data;
     },
 

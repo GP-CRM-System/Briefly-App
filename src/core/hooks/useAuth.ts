@@ -78,14 +78,15 @@ export function useAuth() {
                 return { error: error.message };
             }
             
-            const hydrated = await hydrateAuthState(data, true);
+            const hydrated = await hydrateAuthState(data, Boolean(data?.session?.activeOrganizationId ?? data?.activeOrganizationId));
             if (!hydrated.ok) {
                 toast.error(hydrated.error);
                 return { error: hydrated.error };
             }
 
+            const { onboardingComplete } = useAuthStore.getState();
             toast.success("Welcome back!");
-            navigate("/dashboard");
+            navigate(onboardingComplete ? "/dashboard" : "/onboarding");
             return { error: null };
         } catch (err: any) {
             const message = err?.message || "Login failed. Please try again.";

@@ -9,111 +9,20 @@ import ActionMenu from "./components/ActionMenu";
 import CampaignFormModal from "./components/CampaignFormModal";
 import toast from "react-hot-toast";
 
-// MOCK_CAMPAIGNS fallback data
-export const MOCK_CAMPAIGNS: Campaign[] = [
-    {
-        id: "camp-1",
-        name: "Welcome Onboarding Sequence",
-        subject: "Welcome to Briefly! Here's how to get started",
-        templateId: "tmpl-1",
-        segmentId: "seg-1",
-        segmentName: "Loyal Customers",
-        templateName: "Welcome Email Template",
-        status: "sent",
-        sentAt: "2026-05-15T08:00:00Z",
-        createdAt: "2026-05-14T10:00:00Z",
-        updatedAt: "2026-05-15T08:00:00Z",
-    },
-    {
-        id: "camp-2",
-        name: "VIP Special Promo",
-        subject: "Exclusive 25% discount for VIP members!",
-        templateId: "tmpl-3",
-        segmentId: "seg-3",
-        segmentName: "VIP Members",
-        templateName: "Loyalty Discount Offer",
-        status: "sending",
-        sentAt: null,
-        createdAt: "2026-05-28T14:00:00Z",
-        updatedAt: "2026-06-02T05:00:00Z",
-    },
-    {
-        id: "camp-3",
-        name: "June Newsletter",
-        subject: "Briefly June Digest: Product Updates & Analytics Tips",
-        templateId: "tmpl-2",
-        segmentId: "all",
-        segmentName: "All Customers",
-        templateName: "Monthly Newsletter",
-        status: "scheduled",
-        scheduledAt: "2026-06-05T09:00:00Z",
-        createdAt: "2026-05-30T11:00:00Z",
-        updatedAt: "2026-05-30T11:00:00Z",
-    },
-    {
-        id: "camp-4",
-        name: "Abandoned Shopping Cart",
-        subject: "Did you forget something? Your cart is waiting!",
-        templateId: "tmpl-4",
-        segmentId: "seg-8",
-        segmentName: "Churn Risks",
-        templateName: "Abandoned Cart Reminder",
-        status: "draft",
-        createdAt: "2026-06-01T16:00:00Z",
-        updatedAt: "2026-06-01T16:00:00Z",
-    },
-    {
-        id: "camp-5",
-        name: "Shopify Sync Announcement",
-        subject: "Sync Shopify directly with Briefly starting today",
-        templateId: "tmpl-1",
-        segmentId: "seg-6",
-        segmentName: "Shopify Referrals",
-        templateName: "Welcome Email Template",
-        status: "sent",
-        sentAt: "2026-04-20T10:00:00Z",
-        createdAt: "2026-04-19T09:00:00Z",
-        updatedAt: "2026-04-20T10:00:00Z",
-    },
-    {
-        id: "camp-6",
-        name: "Egypt Customer Survey",
-        subject: "Tell us how we are doing and win 500 EGP",
-        templateId: "tmpl-2",
-        segmentId: "seg-2",
-        segmentName: "High Spenders (Egypt)",
-        templateName: "Monthly Newsletter",
-        status: "failed",
-        sentAt: "2026-05-20T12:00:00Z",
-        createdAt: "2026-05-18T15:00:00Z",
-        updatedAt: "2026-05-20T12:00:00Z",
-    },
-    {
-        id: "camp-7",
-        name: "Newsletter Re-engagement Campaign",
-        subject: "We miss you! Re-opt in to receive Briefly tips",
-        templateId: "tmpl-3",
-        segmentId: "seg-4",
-        segmentName: "Newsletter Subscribers",
-        templateName: "Loyalty Discount Offer",
-        status: "draft",
-        createdAt: "2026-05-25T11:30:00Z",
-        updatedAt: "2026-05-25T11:30:00Z",
-    },
-    {
-        id: "camp-8",
-        name: "Alexandria Branch Opening Promo",
-        subject: "Join us at the new Alexandria branch this Thursday!",
-        templateId: "tmpl-3",
-        segmentId: "seg-5",
-        segmentName: "Alexandria Leads",
-        templateName: "Loyalty Discount Offer",
-        status: "sent",
-        sentAt: "2026-04-10T08:00:00Z",
-        createdAt: "2026-04-08T10:00:00Z",
-        updatedAt: "2026-04-10T08:00:00Z",
-    },
-];
+const ManageTemplatesButton = ({ onClick }: { onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className="inline-flex items-center gap-2 h-[40px] px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all"
+    >
+        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        Manage Templates
+    </button>
+);
 
 const Campaigns = () => {
     const navigate = useNavigate();
@@ -122,7 +31,7 @@ const Campaigns = () => {
     const [campaignToEdit, setCampaignToEdit] = useState<Campaign | null>(null);
 
     // Queries & Mutations
-    const { data: campaigns = MOCK_CAMPAIGNS, isLoading } = useCampaigns();
+    const { data: campaigns = [], isLoading } = useCampaigns();
     const deleteMutation = useDeleteCampaign();
     const sendMutation = useSendCampaign();
 
@@ -156,7 +65,7 @@ const Campaigns = () => {
         const query = search.toLowerCase();
         return (
             c.name.toLowerCase().includes(query) ||
-            c.subject.toLowerCase().includes(query)
+            c.subject?.toLowerCase().includes(query)
         );
     });
 
@@ -168,6 +77,7 @@ const Campaigns = () => {
                 onSearch={setSearch}
                 onCreate={handleCreate}
                 createLabel="Create Campaign"
+                extraActions={<ManageTemplatesButton onClick={() => navigate("/dashboard/templates")} />}
             >
                 <DataTable<Campaign>
                     columns={columns}

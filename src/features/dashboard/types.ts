@@ -1,3 +1,11 @@
+export interface DashboardCustomerEvent {
+    id: string;
+    customer: { name: string; id: string };
+    eventType: string;
+    occurredAt: string;
+    description: string;
+}
+
 export interface DashboardStats {
     totalCustomers: number;
     activeCustomers?: number;
@@ -9,6 +17,7 @@ export interface DashboardStats {
     campaignChange?: number;
     productChange?: number;
     orderChange?: number;
+    customerEvents?: DashboardCustomerEvent[];
 }
 
 export interface SalesDataPoint {
@@ -23,20 +32,25 @@ export interface TicketBreakdown {
     closed: number;
 }
 
-export interface AuditLogEntry {
-    id: string;
-    action: string;
-    entityType: string;
-    entityId?: string;
-    performedBy: string;
-    performedByName?: string;
-    details?: string;
-    relatedTo?: string;
-    createdAt: string;
+export interface RevenueStats {
+    currentRevenue: number;
+    lastRevenue: number;
+    revenueGrowth: number;
+    currentOrderCount: number;
+    lastOrderCount: number;
+    orderGrowth: number;
+}
+
+export interface AcquisitionDataPoint {
+    month: string;
+    count: number;
 }
 
 export interface DashboardData {
     stats: DashboardStats;
     salesOverview: SalesDataPoint[];
     ticketBreakdown: TicketBreakdown;
+    ticketStats: TicketBreakdown;
+    revenue: RevenueStats;
+    acquisition: AcquisitionDataPoint[];
 }

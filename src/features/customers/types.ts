@@ -37,6 +37,7 @@ export interface Customer {
     priceSensitivityIndex?: number | null;
     cohortMonth?: string | null;
     customerEvents?: CustomerEvent[];
+    productInteractions?: CustomerProductInteraction[];
     notes?: CustomerNote[];
     orders?: CustomerOrder[];
     supportTickets?: any[];
@@ -75,10 +76,40 @@ export interface CustomerNote {
 
 export interface CustomerEvent {
     id: string;
-    type: string;
+    eventType: string;
     description?: string;
-    createdAt: string;
+    occurredAt: string;
     metadata?: Record<string, unknown>;
+}
+
+export interface CustomerProductInteraction {
+    id: string;
+    interactionType: string;
+    rating?: number | null;
+    device?: string | null;
+    createdAt: string;
+    product?: {
+        id: string;
+        name: string;
+        imageUrl?: string | null;
+    } | null;
+}
+
+/** Unified timeline entry combining events and product interactions */
+export interface TimelineEntry {
+    id: string;
+    type: "event" | "interaction";
+    label: string;
+    description?: string;
+    timestamp: string;
+    icon: string;
+    product?: {
+        id: string;
+        name: string;
+        imageUrl?: string | null;
+    } | null;
+    rating?: number | null;
+    device?: string | null;
 }
 
 export interface CustomerFormData {

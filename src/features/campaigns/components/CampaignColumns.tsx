@@ -27,7 +27,7 @@ export const columns: Column<Campaign>[] = [
         width: "min-w-[160px]",
         render: (row) => (
             <span className="text-sm text-gray-700 font-medium">
-                {row.segment?.name || row.segmentName || "Returning Customers"}
+                {row.segment?.name || "All Customers"}
             </span>
         ),
     },
@@ -60,7 +60,7 @@ export const columns: Column<Campaign>[] = [
         header: "Scheduled",
         width: "min-w-[160px]",
         render: (row) => {
-            const dateStr = row.scheduledAt || row.createdAt || "2026-03-10T20:00:00.000Z";
+            const dateStr = row.scheduledAt || row.createdAt;
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return <span className="text-gray-400 font-medium">—</span>;
             
@@ -92,7 +92,7 @@ export const columns: Column<Campaign>[] = [
         width: "w-[80px]",
         render: (row) => (
             <span className="text-sm font-bold text-gray-800">
-                {row.metrics?.sent ?? 3000}
+                {row.metrics?.sent ?? 0}
             </span>
         ),
     },
@@ -103,7 +103,7 @@ export const columns: Column<Campaign>[] = [
         width: "w-[80px]",
         render: (row) => (
             <span className="text-sm font-semibold text-gray-600">
-                {row.metrics?.opened ?? 1800}
+                {row.metrics?.opened ?? 0}
             </span>
         ),
     },
@@ -114,7 +114,7 @@ export const columns: Column<Campaign>[] = [
         width: "w-[80px]",
         render: (row) => (
             <span className="text-sm font-semibold text-gray-600">
-                {row.metrics?.clicked ?? 700}
+                {row.metrics?.clicked ?? 0}
             </span>
         ),
     },
@@ -125,7 +125,7 @@ export const columns: Column<Campaign>[] = [
         width: "w-[80px]",
         render: (row) => (
             <span className="text-sm font-semibold text-gray-600">
-                {row.metrics?.converted ?? 210}
+                {row.metrics?.converted ?? 0}
             </span>
         ),
     },

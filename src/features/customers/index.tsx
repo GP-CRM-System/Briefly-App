@@ -12,6 +12,7 @@ import { columns } from "./components/CustomerColumns";
 import ActionMenu from "./components/ActionMenu";
 import FilterPanel from "./components/FilterPanel";
 import CustomerFormModal from "./components/CustomerFormModal";
+import ImportExportModal from "@/features/imports/ImportExportModal";
 
 const Customers = () => {
     const navigate = useNavigate();
@@ -23,6 +24,8 @@ const Customers = () => {
     /* Modal state */
     const [modalOpen, setModalOpen] = useState(false);
     const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
 
     /* ── Data ── */
     const { data: customers = MOCK_CUSTOMERS, isLoading } = useCustomers();
@@ -49,8 +52,8 @@ const Customers = () => {
                 onSearch={setSearch}
                 filterCount={countActiveFilters(activeFilters)}
                 onFilter={() => setFilterOpen((p) => !p)}
-                onExport={() => {}}
-                onImport={() => {}}
+                onExport={() => setExportOpen(true)}
+                onImport={() => setImportOpen(true)}
                 onCreate={handleCreate}
                 createLabel="Create Customer"
                 filterContent={
@@ -84,6 +87,19 @@ const Customers = () => {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 customer={customerToEdit}
+            />
+
+            <ImportExportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                mode="import"
+                entityType="customer"
+            />
+            <ImportExportModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                mode="export"
+                entityType="customer"
             />
         </>
     );

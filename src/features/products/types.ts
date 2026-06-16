@@ -30,6 +30,17 @@ export interface Product {
     imageUrl?: string;
     inventory?: number;
     variants?: any[];
+    orderItems?: ProductOrderItem[];
+}
+
+export interface ProductOrderItem {
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+    price: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export type ProductStatus = "active" | "draft" | "archived";

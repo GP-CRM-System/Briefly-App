@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
 import type { Segment } from "../types";
+import { isCondition, formatFilter } from "../segment.utils";
 import { useCreateSegment, useUpdateSegment } from "../segment.hooks";
 
 interface SegmentFormModalProps {
@@ -57,14 +58,24 @@ const SegmentFormModal = ({ open, onClose, segment }: SegmentFormModalProps) => 
     const updateMutation = useUpdateSegment();
     const isPending = createMutation.isPending || updateMutation.isPending;
 
+    // Detect if the segment has a complex (AND/OR) filter that can't be edited via this form
+    const hasComplexFilter = !!(segment?.filter && !isCondition(segment.filter));
+
     useEffect(() => {
         if (open) {
             if (segment) {
                 setName(segment.name || "");
                 setDescription(segment.description || "");
-                setFilterField(segment.filter?.field || "lifecycleStage");
-                setFilterOperator(segment.filter?.operator || "eq");
-                setFilterValue(segment.filter?.value || "");
+                // Only populate form fields for simple condition filters
+                if (segment.filter && isCondition(segment.filter)) {
+                    setFilterField(segment.filter.field || "lifecycleStage");
+                    setFilterOperator(segment.filter.operator || "eq");
+                    setFilterValue(String(segment.filter.value ?? ""));
+                } else {
+                    setFilterField("lifecycleStage");
+                    setFilterOperator("eq");
+                    setFilterValue("");
+                }
             } else {
                 setName("");
                 setDescription("");
@@ -136,6 +147,11 @@ const SegmentFormModal = ({ open, onClose, segment }: SegmentFormModalProps) => 
 
             {/* ── Filter Rules Card ── */}
             <FormCard title="Filter Rules" icon={<FilterIcon />}>
+                {hasComplexFilter && isEditing && (
+                    <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-700 font-medium">
+                        ⚠️ This segment has complex filter rules (AND/OR) that cannot be edited in this form. Saving will overwrite the filter with a single simple condition. Current filter: <span className="font-bold">{formatFilter(segment?.filter)}</span>
+                    </div>
+                )}
                 <FormRow>
                     <FormField label="Filter Field">
                         <select

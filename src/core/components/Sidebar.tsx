@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Icon } from "@/core/components";
 import { PermissionGuard } from "@/core/components/PermissionGuard";
 import { useUIStore } from "@/store/ui.store";
@@ -15,7 +15,8 @@ import { logout, logoSvg, letterLogo, tickets } from "@/assets/icons";import { d
     settingsIcon,
     closeIcon
 } from "@/assets/new";
-import { AiIdeaIcon } from "hugeicons-react";
+import { SparklesIcon } from "hugeicons-react";
+import { useCurrentSubscription } from "@/features/settings/settings.hooks";
 
 import { Chatting01Icon } from "hugeicons-react";
 
@@ -38,7 +39,7 @@ const navItems: NavItem[] = [
     { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations:read" },
     { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member:read" },
     { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports:read" },
-    { to: "/dashboard/ai", label: "AI Intelligence", icon: AiIdeaIcon, permission: "ai:read" },
+    { to: "/dashboard/ai", label: "Insights", icon: SparklesIcon, permission: "ai:read" },
 ];
 
 /* ───────────────────────── SidebarItem ───────────────────────── */
@@ -137,12 +138,21 @@ const SidebarItem = ({
 /* ───────────────────────── UpgradeCard ───────────────────────── */
 const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     const [dismissed, setDismissed] = useState(false);
+    const navigate = useNavigate();
+    const { data: subscription } = useCurrentSubscription();
 
     if (!sidebarOpen || dismissed) return null;
+
+    const isPaid = subscription?.plan?.name && subscription.plan.name !== "free" && (subscription?.status === "ACTIVE" || subscription?.status === "TRIALING");
+
+    // Hide card for paid plans
+    if (isPaid) return null;
+
+    // Free plan: show upgrade prompt
     return (
         <div className="w-full h-auto mb-3 p-3 border border-gray-100 rounded-[12px] bg-white shadow-sm flex flex-col gap-1.5">
             <div className="flex items-center justify-between mb-0.5">
-                <span className="text-sm text-gray-900 leading-none font-bold">5 Days left !</span>
+                <span className="text-sm text-gray-900 leading-none font-bold">Free Plan</span>
                 <div
                     onClick={() => setDismissed(true)}
                     className="bg-[#B3B3B3] rounded-full p-0.5 cursor-pointer hover:bg-gray-500 transition-colors flex items-center justify-center"
@@ -151,14 +161,14 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
                 </div>
             </div>
             <div className="flex flex-col gap-1.5">
-                <div className="w-full bg-gray-100 rounded-full h-[5px]">
-                    <div className="bg-[var(--color-primary-500)] h-[5px] rounded-full" style={{ width: '60%' }}></div>
-                </div>
                 <p className="text-[11px] text-gray-500 leading-normal font-normal">
-                    Select best plan now and unlock all special features
+                    Upgrade to unlock all special features.
                 </p>
             </div>
-            <button className="text-xs font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] transition-colors flex items-center gap-1 mt-0.5 cursor-pointer">
+            <button
+                onClick={() => navigate("/dashboard/settings")}
+                className="text-xs font-semibold text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] transition-colors flex items-center gap-1 mt-0.5 cursor-pointer"
+            >
                 Select plan <span>›</span>
             </button>
         </div>

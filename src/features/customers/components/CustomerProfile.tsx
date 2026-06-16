@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCustomer, useAddCustomerNote } from "../customer.hooks";
 import { getInitials } from "../utils";
+import type { TimelineEntry, CustomerProductInteraction, CustomerEvent } from "../types";
 
 /* ═══════════════════════════════════════════
    Helpers
    ═══════════════════════════════════════════ */
 
 const fmt = (v: string | number | null | undefined) =>
-    v != null ? Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : "—";
+    v != null ? Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—";
 
 const fmtDate = (d: string | null | undefined) => {
     if (!d) return "—";
@@ -47,11 +48,17 @@ const scoreLabel = (score: number | null | undefined): string => {
     return "Low";
 };
 
-const frequencyLabel = (f: string | null | undefined): string => {
-    if (!f) return "N/A";
+const frequencyLabel = (f: string | number | null | undefined): string => {
+    if (f == null) return "N/A";
     const n = Number(f);
-    if (n >= 10 || f.toLowerCase() === "frequent") return "Frequent";
-    if (n >= 5 || f.toLowerCase() === "regular") return "Regular";
+    if (isNaN(n)) {
+        const s = String(f).toLowerCase();
+        if (s === "frequent") return "Frequent";
+        if (s === "regular") return "Regular";
+        return "Occasional";
+    }
+    if (n >= 10) return "Frequent";
+    if (n >= 5) return "Regular";
     return "Occasional";
 };
 
@@ -91,6 +98,36 @@ const getEventIcon = (type: string) => {
     );
 };
 
+const getInteractionIcon = (type: string) => {
+    const t = type.toLowerCase();
+    if (t.includes("purchase") || t.includes("buy")) {
+        return (
+            <svg className="h-3.5 w-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        );
+    }
+    if (t.includes("cart") || t.includes("add")) {
+        return (
+            <svg className="h-3.5 w-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        );
+    }
+    if (t.includes("view")) {
+        return (
+            <svg className="h-3.5 w-3.5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        );
+    }
+    return (
+        <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+    );
+};
+
+const interactionLabel = (type: string): string => {
+    const t = type.toLowerCase();
+    if (t.includes("purchase") || t.includes("buy")) return "Purchased";
+    if (t.includes("cart") || t.includes("add")) return "Added to Cart";
+    if (t.includes("view")) return "Viewed Product";
+    return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 /* ═══════════════════════════════════════════
    Main Profile Page
    ═══════════════════════════════════════════ */
@@ -110,6 +147,33 @@ const CustomerProfile = () => {
             onSuccess: () => setNoteText(""),
         });
     };
+
+    // Build unified timeline from events + product interactions (must be before early returns)
+    const timeline: TimelineEntry[] = useMemo(() => {
+        if (!customer) return [];
+        const events: TimelineEntry[] = (customer.customerEvents ?? []).map((ev: CustomerEvent) => ({
+            id: ev.id,
+            type: "event" as const,
+            label: ev.description || ev.eventType,
+            description: ev.eventType,
+            timestamp: ev.occurredAt,
+            icon: ev.eventType,
+        }));
+        const interactions: TimelineEntry[] = (customer.productInteractions ?? []).map((pi: CustomerProductInteraction) => ({
+            id: pi.id,
+            type: "interaction" as const,
+            label: interactionLabel(pi.interactionType),
+            description: pi.product?.name,
+            timestamp: pi.createdAt,
+            icon: pi.interactionType,
+            product: pi.product,
+            rating: pi.rating,
+            device: pi.device,
+        }));
+        return [...events, ...interactions]
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, 50);
+    }, [customer]);
 
     /* ── Loading skeleton ── */
     if (isLoading || !customer) {
@@ -234,6 +298,14 @@ const CustomerProfile = () => {
                             <span className="text-gray-400 font-medium">Segment</span>
                             <span className="font-semibold text-gray-800">{c.rfmSegment || "—"}</span>
                         </div>
+                        {(c.rfmRecency != null || c.rfmFrequency != null || c.rfmMonetary != null) && (
+                            <div className="flex justify-between items-center text-sm border-t border-gray-50 pt-3">
+                                <span className="text-gray-400 font-medium">RFM</span>
+                                <span className="font-semibold text-gray-800 font-mono text-xs">
+                                    R:{c.rfmRecency ?? "—"} · F:{c.rfmFrequency ?? "—"} · M:{c.rfmMonetary ?? "—"}
+                                </span>
+                            </div>
+                        )}
                         <div className="flex justify-between items-center text-sm border-t border-gray-50 pt-3">
                             <span className="text-gray-400 font-medium">Cohort</span>
                             <span className="font-semibold text-gray-800">{c.cohortMonth || "—"}</span>
@@ -271,20 +343,6 @@ const CustomerProfile = () => {
                         <p className="text-xs text-gray-400 mt-4">Lifetime value</p>
                     </div>
 
-                    {/* Avg Order Value Card */}
-                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm relative flex flex-col justify-between">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-xs text-gray-400 font-medium mb-1">Avg Order Value</p>
-                                <p className="text-2xl font-bold text-gray-900">${fmt(c.avgOrderValue)}</p>
-                            </div>
-                            <span className="p-2 rounded-lg bg-blue-50 text-blue-500">
-                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            </span>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-4">Per transaction</p>
-                    </div>
-
                     {/* Last Order Card */}
                     <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm relative flex flex-col justify-between">
                         <div className="flex justify-between items-start">
@@ -297,6 +355,20 @@ const CustomerProfile = () => {
                             </span>
                         </div>
                         <p className="text-xs text-gray-400 mt-4">Most recent</p>
+                    </div>
+
+                    {/* Total Refunded Card */}
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm relative flex flex-col justify-between">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs text-gray-400 font-medium mb-1">Total Refunded</p>
+                                <p className="text-2xl font-bold text-gray-900">${fmt(c.totalRefunded)}</p>
+                            </div>
+                            <span className="p-2 rounded-lg bg-red-50 text-red-500">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            </span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-4">Lifetime refunds</p>
                     </div>
                 </div>
             </div>
@@ -413,6 +485,52 @@ const CustomerProfile = () => {
                             <p className="text-xs text-gray-400 mt-2">Last 30 Days</p>
                         </div>
                     </div>
+
+                    {/* Website Visits */}
+                    <div className="border border-gray-100 bg-[#F8FAFC] rounded-2xl p-5 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="p-2 rounded-full bg-blue-100 text-blue-500">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium">Website Visits</span>
+                        </div>
+                        <div className="mt-2">
+                            <p className="text-lg font-bold text-gray-900">{c.websiteVisitsLastMonth ?? 0}</p>
+                            <p className="text-xs text-gray-400 mt-2">Last 30 days</p>
+                        </div>
+                    </div>
+
+                    {/* Sentiment Score */}
+                    <div className="border border-gray-100 bg-[#F8FAFC] rounded-2xl p-5 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="p-2 rounded-full bg-blue-100 text-blue-500">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium">Sentiment Score</span>
+                        </div>
+                        <div>
+                            <p className="text-lg font-bold text-gray-900">
+                                {c.lastSentimentScore != null ? (c.lastSentimentScore >= 0.3 ? "Positive" : c.lastSentimentScore >= -0.3 ? "Neutral" : "Negative") : "N/A"}
+                            </p>
+                            {c.lastSentimentScore != null && (
+                                <p className="text-xs text-gray-400 mt-2">Score: {c.lastSentimentScore.toFixed(2)}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Avg Days Between Orders */}
+                    <div className="border border-gray-100 bg-[#F8FAFC] rounded-2xl p-5 flex flex-col justify-between">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="p-2 rounded-full bg-blue-100 text-blue-500">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium">Avg Days Between Orders</span>
+                        </div>
+                        <div className="mt-2">
+                            <p className="text-lg font-bold text-gray-900">{c.avgDaysBetweenOrders != null ? `${Math.round(c.avgDaysBetweenOrders)} days` : "N/A"}</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -471,21 +589,71 @@ const CustomerProfile = () => {
 
                 {/* Activity History */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <h2 className="text-base font-semibold text-gray-900 mb-4">Activity History</h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-base font-semibold text-gray-900">Activity History</h2>
+                        <div className="flex items-center gap-3 text-[10px] font-semibold text-gray-400">
+                            <span className="flex items-center gap-1">
+                                <span className="w-2 h-2 rounded-full bg-blue-500" /> Events
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <span className="w-2 h-2 rounded-full bg-purple-500" /> Interactions
+                            </span>
+                        </div>
+                    </div>
 
-                    <div className="space-y-0 max-h-[400px] overflow-y-auto pr-1">
-                        {c.customerEvents && c.customerEvents.length > 0 ? c.customerEvents.map((ev, idx) => (
-                            <div key={ev.id || idx} className="flex gap-4 relative pb-6">
+                    <div className="space-y-0 max-h-[500px] overflow-y-auto pr-1">
+                        {timeline.length > 0 ? timeline.map((entry, idx) => (
+                            <div key={entry.id || idx} className="flex gap-4 relative pb-6">
                                 {/* Timeline connector */}
-                                {idx < (c.customerEvents?.length ?? 0) - 1 && (
+                                {idx < timeline.length - 1 && (
                                     <div className="absolute left-[13px] top-6 bottom-0 w-px border-l-2 border-dashed border-gray-200" />
                                 )}
-                                <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5 z-10 border border-blue-100">
-                                    {getEventIcon(ev.type || ev.description || "")}
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 z-10 border ${
+                                    entry.type === "interaction"
+                                        ? "bg-purple-50 border-purple-100"
+                                        : "bg-blue-50 border-blue-100"
+                                }`}> 
+                                    {entry.type === "interaction"
+                                        ? getInteractionIcon(entry.icon)
+                                        : getEventIcon(entry.icon)
+                                    }
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-800 font-semibold">{ev.description || ev.type}</p>
-                                    <p className="text-xs text-gray-400 mt-1">{ev.createdAt ? fmtSimpleDate(ev.createdAt) : "—"}</p>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm text-gray-800 font-semibold truncate">{entry.label}</p>
+                                        {entry.type === "interaction" && (
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-purple-100 text-purple-600 border border-purple-200 flex-shrink-0">
+                                                Interaction
+                                            </span>
+                                        )}
+                                    </div>
+                                    {entry.description && entry.description !== entry.label && (
+                                        <p className="text-xs text-gray-500 mt-0.5 truncate">{entry.description}</p>
+                                    )}
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <p className="text-xs text-gray-400">{entry.timestamp ? fmtSimpleDate(entry.timestamp) : "—"}</p>
+                                        {entry.rating != null && (
+                                            <span className="text-xs text-amber-500 font-semibold">★ {entry.rating}</span>
+                                        )}
+                                        {entry.device && (
+                                            <span className="text-xs text-gray-400 capitalize">{entry.device}</span>
+                                        )}
+                                    </div>
+                                    {entry.product && (
+                                        <div
+                                            onClick={() => navigate(`/dashboard/products/${entry.product!.id}`)}
+                                            className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                                        >
+                                            {entry.product!.imageUrl ? (
+                                                <img src={entry.product!.imageUrl} alt="" className="w-8 h-8 rounded-md object-cover bg-white" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-md bg-gray-200 flex items-center justify-center">
+                                                    <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                                                </div>
+                                            )}
+                                            <span className="text-xs font-semibold text-gray-600 truncate">{entry.product!.name}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )) : (

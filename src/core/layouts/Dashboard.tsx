@@ -9,6 +9,8 @@ import Segments from "@/features/segments";
 import SegmentDetails from "@/features/segments/components/SegmentDetails";
 import Campaigns from "@/features/campaigns";
 import CampaignDetails from "@/features/campaigns/components/CampaignDetails";
+import Templates from "@/features/templates";
+import TemplateDetails from "@/features/templates/components/TemplateDetails";
 import Products from "@/features/products";
 import ProductDetails from "@/features/products/components/ProductDetails";
 import Orders from "@/features/orders";
@@ -43,6 +45,8 @@ const Dashboard = () => {
             <Route path="segments/:id" element={<SegmentDetails />} />
             <Route path="campaigns" element={<Campaigns />} />
             <Route path="campaigns/:id" element={<CampaignDetails />} />
+            <Route path="templates" element={<Templates />} />
+            <Route path="templates/:id" element={<TemplateDetails />} />
             <Route path="products" element={<Products />} />
             <Route path="products/:id" element={<ProductDetails />} />
             <Route path="orders" element={<Orders />} />

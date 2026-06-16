@@ -4,23 +4,8 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { useDashboardData, useAuditLogs } from "../dashboard.hooks";
-import type { SalesDataPoint, TicketBreakdown, AuditLogEntry } from "../types";
-
-/* ═══════════════════════════════════════════════════
-   Fallback / demo data — used when the API returns
-   incomplete or empty payloads so the UI always renders.
-   ═══════════════════════════════════════════════════ */
-const FALLBACK_SALES: SalesDataPoint[] = [
-    { date: "Apr 3", orders: 40, revenue: 7800 },
-    { date: "Apr 4", orders: 52, revenue: 9200 },
-    { date: "Apr 5", orders: 48, revenue: 8600 },
-    { date: "Apr 6", orders: 61, revenue: 11200 },
-    { date: "Apr 7", orders: 55, revenue: 10100 },
-    { date: "Apr 8", orders: 67, revenue: 12400 },
-];
-
-const FALLBACK_TICKETS: TicketBreakdown = { open: 31, pending: 45, closed: 24 };
+import { useDashboardData } from "../dashboard.hooks";
+import type { SalesDataPoint, TicketBreakdown, DashboardCustomerEvent } from "../types";
 
 /* ── Donut chart palette ── */
 const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
@@ -31,7 +16,7 @@ const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
 interface StatCardProps {
     label: string;
     value: string | number;
-    change?: number;          // e.g. 7 = +7%, -3 = –3%
+    change?: number;
     iconBg?: string;
 }
 
@@ -85,8 +70,14 @@ const DonutLegend = ({ payload }: any) => (
 );
 
 /* ══════════════════════════════════════════════════════
-   Activity Row
+   Helpers
    ══════════════════════════════════════════════════════ */
+const formatSalesDate = (d: string) => {
+    try {
+        return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } catch { return d; }
+};
+
 const formatDate = (d: string) => {
     try {
         return new Date(d).toLocaleDateString("en-US", {
@@ -104,18 +95,33 @@ const formatTime = (d: string) => {
 };
 
 /* ══════════════════════════════════════════════════════
+   Empty state
+   ══════════════════════════════════════════════════════ */
+const EmptyChart = ({ title }: { title: string }) => (
+    <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+        No data available for {title}
+    </div>
+);
+
+/* ══════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════ */
 const DashboardHome = () => {
     const navigate = useNavigate();
     const { data: dashboard, isLoading } = useDashboardData();
-    const { data: auditRaw = [] } = useAuditLogs();
 
-    /* Safely extract sub-objects with fallbacks */
+    /* Safely extract sub-objects — no hardcoded fallbacks */
     const stats = dashboard?.stats;
-    const salesData = dashboard?.salesOverview?.length ? dashboard.salesOverview : FALLBACK_SALES;
-    const tickets = dashboard?.ticketBreakdown ?? FALLBACK_TICKETS;
-    const auditLogs: AuditLogEntry[] = Array.isArray(auditRaw) ? auditRaw : [];
+    const rawSales = dashboard?.salesOverview;
+    const salesData = useMemo(() => {
+        if (!rawSales?.length) return [];
+        return rawSales.map((pt) => ({
+            ...pt,
+            date: formatSalesDate(pt.date),
+        }));
+    }, [rawSales]);
+    const tickets: TicketBreakdown = dashboard?.ticketBreakdown ?? { open: 0, pending: 0, closed: 0 };
+    const customerEvents: DashboardCustomerEvent[] = stats?.customerEvents ?? [];
 
     /* Donut chart data */
     const donutData = useMemo(() => {
@@ -139,10 +145,10 @@ const DashboardHome = () => {
         <div className="space-y-6">
             {/* ── Stats Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total Customers" value={stats?.totalCustomers ?? 0} change={stats?.customerChange ?? 7} />
-                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? 0} change={stats?.campaignChange ?? 2} />
-                <StatCard label="Total Products" value={stats?.totalProducts ?? 0} change={stats?.productChange ?? 9} />
-                <StatCard label="Total Orders" value={stats?.totalOrders ?? 0} change={stats?.orderChange ?? -3} />
+                <StatCard label="Total Customers" value={stats?.totalCustomers ?? 0} change={stats?.customerChange} />
+                <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? 0} change={stats?.campaignChange} />
+                <StatCard label="Total Products" value={stats?.totalProducts ?? 0} change={stats?.productChange} />
+                <StatCard label="Total Orders" value={stats?.totalOrders ?? 0} change={stats?.orderChange} />
             </div>
 
             {/* ── Charts Row ── */}
@@ -150,49 +156,55 @@ const DashboardHome = () => {
                 {/* Sales Overview — 2/3 width */}
                 <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-6">
                     <h2 className="text-base font-semibold text-gray-900 mb-4">Sales Overview</h2>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <LineChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                            <XAxis
-                                dataKey="date"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: "#94A3B8", fontSize: 12 }}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: "#94A3B8", fontSize: 12 }}
-                            />
-                            <Tooltip content={<SalesTooltip />} />
-                            <Line
-                                type="monotone"
-                                dataKey="orders"
-                                name="Orders"
-                                stroke="#4F8CFF"
-                                strokeWidth={2.5}
-                                dot={{ r: 4, fill: "#4F8CFF", strokeWidth: 2, stroke: "#fff" }}
-                                activeDot={{ r: 6 }}
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="revenue"
-                                name="Revenue ($)"
-                                stroke="#A78BFA"
-                                strokeWidth={2.5}
-                                dot={{ r: 4, fill: "#A78BFA", strokeWidth: 2, stroke: "#fff" }}
-                                activeDot={{ r: 6 }}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                    <div className="flex justify-center gap-6 mt-2">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="w-3 h-0.5 bg-[#4F8CFF] rounded-full inline-block" /> Orders
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="w-3 h-0.5 bg-[#A78BFA] rounded-full inline-block" /> Revenue ($)
-                        </div>
-                    </div>
+                    {salesData.length > 0 ? (
+                        <>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <LineChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                                    <XAxis
+                                        dataKey="date"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: "#94A3B8", fontSize: 12 }}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: "#94A3B8", fontSize: 12 }}
+                                    />
+                                    <Tooltip content={<SalesTooltip />} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="orders"
+                                        name="Orders"
+                                        stroke="#4F8CFF"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: "#4F8CFF", strokeWidth: 2, stroke: "#fff" }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        name="Revenue ($)"
+                                        stroke="#A78BFA"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: "#A78BFA", strokeWidth: 2, stroke: "#fff" }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                            <div className="flex justify-center gap-6 mt-2">
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span className="w-3 h-0.5 bg-[#4F8CFF] rounded-full inline-block" /> Orders
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span className="w-3 h-0.5 bg-[#A78BFA] rounded-full inline-block" /> Revenue ($)
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <EmptyChart title="Sales Overview" />
+                    )}
                 </div>
 
                 {/* Support Tickets Donut — 1/3 width */}
@@ -236,12 +248,12 @@ const DashboardHome = () => {
             {/* ── Recent Activities ── */}
             <div className="bg-white rounded-xl border border-gray-100">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-base font-semibold text-gray-900">Recent Activities</h2>
+                    <h2 className="text-base font-semibold text-gray-900">Recent Customer Events</h2>
                     <button
-                        onClick={() => navigate("/dashboard/settings")}
+                        onClick={() => navigate("/dashboard/customers")}
                         className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] transition-colors"
                     >
-                        View all
+                        View all customers
                     </button>
                 </div>
 
@@ -250,53 +262,55 @@ const DashboardHome = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-50">
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Activity Type</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Performed By</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Related To</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Details</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Event Type</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Customer</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Description</th>
                                 <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Date</th>
                                 <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {auditLogs.length === 0 ? (
+                            {customerEvents.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                                        No recent activities
+                                    <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
+                                        No recent customer events
                                     </td>
                                 </tr>
                             ) : (
-                                auditLogs.slice(0, 8).map((log) => (
-                                    <tr key={log.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                customerEvents.slice(0, 8).map((ev) => (
+                                    <tr key={ev.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-3.5">
                                             <div className="flex items-center gap-2">
                                                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                                    log.action?.toLowerCase().includes("create") ? "bg-emerald-400" :
-                                                    log.action?.toLowerCase().includes("delete") ? "bg-red-400" :
-                                                    log.action?.toLowerCase().includes("update") ? "bg-amber-400" :
-                                                    "bg-blue-400"
+                                                    ev.eventType === "order_placed" ? "bg-emerald-400" :
+                                                    ev.eventType === "cart_abandoned" ? "bg-red-400" :
+                                                    ev.eventType === "review_submitted" ? "bg-blue-400" :
+                                                    ev.eventType === "support_ticket_resolved" ? "bg-amber-400" :
+                                                    "bg-purple-400"
                                                 }`} />
-                                                <span className="text-gray-700 capitalize">{log.action?.replace(/_/g, " ") || "—"}</span>
+                                                <span className="text-gray-700 capitalize">{ev.eventType?.replace(/_/g, " ") || "—"}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3.5 text-gray-600">{log.performedByName || log.performedBy || "—"}</td>
-                                        <td className="px-6 py-3.5 text-gray-600 capitalize">{log.entityType || log.relatedTo || "—"}</td>
-                                        <td className="px-6 py-3.5 text-gray-500 max-w-[200px] truncate">{log.details || "—"}</td>
+                                        <td className="px-6 py-3.5 text-gray-600">
+                                            <button
+                                                onClick={() => navigate(`/dashboard/customers/${ev.customer.id}`)}
+                                                className="text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
+                                            >
+                                                {ev.customer.name}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-3.5 text-gray-500 max-w-[200px] truncate">{ev.description || "—"}</td>
                                         <td className="px-6 py-3.5 text-gray-500 whitespace-nowrap">
-                                            <div>{formatDate(log.createdAt)}</div>
-                                            <div className="text-[11px] text-gray-300">{formatTime(log.createdAt)}</div>
+                                            <div>{formatDate(ev.occurredAt)}</div>
+                                            <div className="text-[11px] text-gray-300">{formatTime(ev.occurredAt)}</div>
                                         </td>
                                         <td className="px-6 py-3.5">
-                                            {log.entityId && log.entityType ? (
-                                                <button
-                                                    onClick={() => navigate(`/dashboard/${log.entityType.toLowerCase()}s/${log.entityId}`)}
-                                                    className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
-                                                >
-                                                    View
-                                                </button>
-                                            ) : (
-                                                <span className="text-xs text-gray-300">—</span>
-                                            )}
+                                            <button
+                                                onClick={() => navigate(`/dashboard/customers/${ev.customer.id}`)}
+                                                className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
+                                            >
+                                                View
+                                            </button>
                                         </td>
                                     </tr>
                                 ))

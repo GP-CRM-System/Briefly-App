@@ -12,6 +12,7 @@ import { columns } from "./components/ProductColumns";
 import ActionMenu from "./components/ActionMenu";
 import FilterPanel from "./components/FilterPanel";
 import ProductFormModal from "./components/ProductFormModal";
+import ImportExportModal from "@/features/imports/ImportExportModal";
 
 const Products = () => {
     const navigate = useNavigate();
@@ -23,6 +24,8 @@ const Products = () => {
     /* Modal state */
     const [modalOpen, setModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
 
     /* ── Data ── */
     const { data: products = MOCK_PRODUCTS, isLoading } = useProducts();
@@ -49,8 +52,8 @@ const Products = () => {
                 onSearch={setSearch}
                 filterCount={countActiveProductFilters(activeFilters)}
                 onFilter={() => setFilterOpen((p) => !p)}
-                onExport={() => {}}
-                onImport={() => {}}
+                onExport={() => setExportOpen(true)}
+                onImport={() => setImportOpen(true)}
                 onCreate={handleCreate}
                 createLabel="Create Product"
                 filterContent={
@@ -84,6 +87,19 @@ const Products = () => {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 product={productToEdit}
+            />
+
+            <ImportExportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                mode="import"
+                entityType="product"
+            />
+            <ImportExportModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                mode="export"
+                entityType="product"
             />
         </>
     );

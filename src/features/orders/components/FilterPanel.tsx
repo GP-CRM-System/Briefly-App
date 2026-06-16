@@ -17,7 +17,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
 
     const handleApply = () => {
         onApply({
-            shippingStatus: shipping,
+            fulfillmentStatus: shipping,
             paymentStatus: payment,
             source,
             search: "",
@@ -50,7 +50,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
     return (
         <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-gray-100 bg-white p-5 shadow-xl z-50 flex flex-col gap-4">
             <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Shipping Status</h4>
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fulfillment Status</h4>
                 <div className="flex flex-wrap gap-2">
                     {["processing", "shipped", "delivered", "cancelled"].map((st) => {
                         const isSelected = shipping.has(st);

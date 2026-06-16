@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import apiClient from '@/api/client';
-import { ENDPOINTS } from '@/api/endpoints';
 import toast from 'react-hot-toast';
+import { authClient } from '@/lib/auth-client';
+import { fetchAuthSession } from '@/lib/auth-session';
+import { useAuthStore } from '@/store/auth.store';
 
 type CreateOrganizationProps = {
     onNext: () => void;
@@ -42,16 +43,28 @@ export default function CreateOrganization({ onNext }: CreateOrganizationProps) 
     const handleSubmit = async (values: typeof initialValues) => {
         setIsSubmitting(true);
         try {
-            await apiClient.post(ENDPOINTS.ORGANIZATION.CREATE, {
+            const { data: org, error } = await authClient.organization.create({
                 name: values.name,
                 slug: values.slug,
-                // logo: logoFile — handle separately if backend supports it
             });
-            
+            if (error) throw error;
+
+            await authClient.organization.setActive({
+                organizationId: org.id,
+            });
+
+            const session = await fetchAuthSession(3, 200);
+            if (session) {
+                useAuthStore.getState().setSession(
+                    session.token, session.user, session.role,
+                    session.permissions, session.onboardingComplete
+                );
+            }
+
             toast.success("Organization created!");
             onNext();
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to create organization");
+            toast.error(error?.message || "Failed to create organization");
         } finally {
             setIsSubmitting(false);
         }

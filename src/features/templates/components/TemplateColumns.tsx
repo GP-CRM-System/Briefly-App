@@ -1,17 +1,7 @@
 import { type Column } from "@/core/components/DataTable";
-import type { Segment } from "../types";
+import type { Template } from "../types";
 
-export const columns: Column<Segment>[] = [
-    {
-        key: "id",
-        header: "Segment ID",
-        width: "w-[150px]",
-        render: (row) => (
-            <span className="font-semibold text-gray-900">
-                #{row.id}
-            </span>
-        ),
-    },
+export const columns: Column<Template>[] = [
     {
         key: "name",
         header: "Name",
@@ -23,17 +13,26 @@ export const columns: Column<Segment>[] = [
         ),
     },
     {
-        key: "size",
-        header: "Size",
-        align: "center",
-        width: "w-[100px]",
+        key: "subject",
+        header: "Subject",
+        width: "min-w-[250px]",
         render: (row) => (
-            <span className="text-gray-700 text-sm font-medium">
-                {row.size?.toLocaleString() ?? 0}
+            <span className="text-gray-600 text-sm font-medium truncate block max-w-[300px]">
+                {row.subject || "—"}
             </span>
         ),
     },
-
+    {
+        key: "variables",
+        header: "Variables",
+        align: "center",
+        width: "w-[120px]",
+        render: (row) => (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100">
+                {row.variables?.length ?? 0}
+            </span>
+        ),
+    },
     {
         key: "createdAt",
         header: "Created At",
@@ -42,8 +41,6 @@ export const columns: Column<Segment>[] = [
             if (!row.createdAt) return <span className="text-gray-400">—</span>;
             const date = new Date(row.createdAt);
             if (isNaN(date.getTime())) return <span className="text-gray-700 text-sm">{row.createdAt}</span>;
-            
-            // Format like: "12 Apr 2026"
             return (
                 <span className="text-gray-700 text-sm">
                     {date.toLocaleDateString("en-GB", {

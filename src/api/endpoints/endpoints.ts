@@ -239,6 +239,7 @@ export const ENDPOINTS = {
   // ─── Audit Logs ───
   AUDIT_LOG: {
     GET_ALL: "/audit-logs",
+    GET_FOR_USER: (userId: string) => `/audit-logs/user/${userId}`,
   },
 
   // ─── Cron (Admin) ───

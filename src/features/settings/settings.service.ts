@@ -415,8 +415,13 @@ export const settingsService = {
         return data?.data || data;
     },
 
-    async createExport(entityType: string, format: string = "csv"): Promise<any> {
+    async createExport(entityType: string, format: string = "csv"): Promise<{ id: string; status: string; [key: string]: any }> {
         const { data } = await apiClient.post(ENDPOINTS.EXPORT.CREATE, { entityType, format });
+        return data?.data || data;
+    },
+
+    async getExportJob(id: string): Promise<any> {
+        const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ONE(id));
         return data?.data || data;
     },
 
@@ -433,11 +438,7 @@ export const settingsService = {
             });
             return data?.data || data || [];
         } catch {
-            return [
-                { id: "plan-starter", name: "starter", displayName: "Starter", price: 19, billingCycle: "monthly", features: { users: 3, customers: 2000, emails: 10000, storageGB: 1 } },
-                { id: "plan-professional", name: "professional", displayName: "Professional", price: 49, billingCycle: "monthly", features: { users: 10, customers: 10000, emails: 50000, storageGB: 5 } },
-                { id: "plan-enterprise", name: "enterprise", displayName: "Enterprise", price: 149, billingCycle: "monthly", features: { users: -1, customers: -1, emails: -1, storageGB: 50 } },
-            ];
+            return [];
         }
     },
 
@@ -461,15 +462,7 @@ export const settingsService = {
     },
 
     async getBillingInvoices(): Promise<BillingInvoice[]> {
-        // The backend doesn't have a dedicated invoices endpoint yet,
-        // so we derive from subscription history. Return static for now.
-        return [
-            { id: "INV-8429-01", date: "May 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-02", date: "Apr 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-03", date: "Mar 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-04", date: "Feb 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-05", date: "Jan 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-06", date: "Dec 01, 2023", amount: "$49.00", status: "paid" },
-        ];
+        // Backend doesn't have a dedicated invoices endpoint yet.
+        return [];
     }
 };

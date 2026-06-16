@@ -4,11 +4,12 @@ import OrganizationProfileTab from "./components/OrganizationProfileTab";
 import RolesPermissionsTab from "./components/RolesPermissionsTab";
 import ConnectionsTab from "./components/ConnectionsTab";
 import ImportsExportsTab from "./components/ImportsExportsTab";
+import AuditLogsTab from "./components/AuditLogsTab";
 import PaymentBillingTab from "./components/PaymentBillingTab";
-import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon } from "hugeicons-react";
+import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon, ClipboardIcon } from "hugeicons-react";
 
 const Settings = () => {
-    const [activeTab, setActiveTab] = useState<"profile" | "org" | "roles" | "connections" | "imports" | "billing">("profile");
+    const [activeTab, setActiveTab] = useState<"profile" | "org" | "roles" | "connections" | "imports" | "billing" | "audit">("profile");
 
     const menuItems = [
         { id: "profile" as const, label: "My Profile", icon: User02Icon },
@@ -16,6 +17,7 @@ const Settings = () => {
         { id: "roles" as const, label: "Roles & Permissions", icon: Shield01Icon },
         { id: "connections" as const, label: "Connections", icon: Link01Icon },
         { id: "imports" as const, label: "Imports & Exports", icon: ArrowDataTransferHorizontalIcon },
+        { id: "audit" as const, label: "Audit Logs", icon: ClipboardIcon },
         { id: "billing" as const, label: "Payment & Billing", icon: CreditCardIcon },
     ];
 
@@ -31,6 +33,8 @@ const Settings = () => {
                 return <ConnectionsTab />;
             case "imports":
                 return <ImportsExportsTab />;
+            case "audit":
+                return <AuditLogsTab />;
             case "billing":
                 return <PaymentBillingTab />;
             default:
@@ -88,4 +92,4 @@ const Settings = () => {
 };
 
 export default Settings;
-export { MyProfileTab, OrganizationProfileTab, RolesPermissionsTab, ConnectionsTab, ImportsExportsTab, PaymentBillingTab };
+export { MyProfileTab, OrganizationProfileTab, RolesPermissionsTab, ConnectionsTab, ImportsExportsTab, AuditLogsTab, PaymentBillingTab };

@@ -23,28 +23,22 @@ const PaymentBillingTab = () => {
     const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
     // Get active plan details
-    const activePlan = currentSubscription?.plan || plans.find((p) => p.id === currentSubscription?.planId) || plans[0] || {
-        id: "plan-professional",
-        name: "professional",
-        displayName: "Professional",
-        price: 49,
-        features: { users: 10, customers: 10000, emails: 50000, storageGB: 5 }
-    };
+    const activePlan = currentSubscription?.plan || plans.find((p) => p.id === currentSubscription?.planId) || plans[0];
 
     // Calculate usage metrics
-    const contactsLimit = activePlan.features?.customers ?? 10000;
-    const contactsUsed = currentSubscription?.usage?.customers ?? 8452;
-    const contactsPercent = contactsLimit === -1 ? 0 : Math.min(100, (contactsUsed / contactsLimit) * 100);
+    const contactsLimit = activePlan?.features?.customers ?? 0;
+    const contactsUsed = currentSubscription?.usage?.customers ?? 0;
+    const contactsPercent = contactsLimit === -1 ? 0 : contactsLimit > 0 ? Math.min(100, (contactsUsed / contactsLimit) * 100) : 0;
 
-    const emailsLimit = activePlan.features?.emails ?? 50000;
-    const emailsUsed = currentSubscription?.usage?.emails ?? 42000;
-    const emailsPercent = emailsLimit === -1 ? 0 : Math.min(100, (emailsUsed / emailsLimit) * 100);
+    const emailsLimit = activePlan?.features?.emails ?? 0;
+    const emailsUsed = currentSubscription?.usage?.emails ?? 0;
+    const emailsPercent = emailsLimit === -1 ? 0 : emailsLimit > 0 ? Math.min(100, (emailsUsed / emailsLimit) * 100) : 0;
 
-    const storageLimitGB = activePlan.features?.storageGB ?? 5;
+    const storageLimitGB = activePlan?.features?.storageGB ?? 0;
     const storageUsedBytes = currentSubscription?.usage?.storageBytes;
     const storageUsedGB = currentSubscription?.usage?.storageGB ?? 
-        (storageUsedBytes ? Number((storageUsedBytes / (1024 * 1024 * 1024)).toFixed(1)) : 2.1);
-    const storagePercent = storageLimitGB === -1 ? 0 : Math.min(100, (storageUsedGB / storageLimitGB) * 100);
+        (storageUsedBytes ? Number((storageUsedBytes / (1024 * 1024 * 1024)).toFixed(1)) : 0);
+    const storagePercent = storageLimitGB === -1 ? 0 : storageLimitGB > 0 ? Math.min(100, (storageUsedGB / storageLimitGB) * 100) : 0;
 
     const handleUpgrade = () => {
         setUpgradeModalOpen(true);
@@ -103,11 +97,11 @@ const PaymentBillingTab = () => {
                     <div className="lg:col-span-5 border border-blue-100 bg-blue-50/10 rounded-xl p-5 flex flex-col justify-between space-y-4">
                         <div className="space-y-2">
                             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">
-                                {activePlan.displayName?.toUpperCase() || activePlan.name?.toUpperCase()} PLAN
+                                {activePlan ? (activePlan.displayName?.toUpperCase() || activePlan.name?.toUpperCase()) + " PLAN" : "NO PLAN"}
                             </span>
                             <div className="flex items-baseline gap-1 text-gray-900">
                                 <span className="text-3xl font-extrabold">
-                                    ${Number(activePlan.price ?? 0).toFixed(2)}
+                                    ${Number(activePlan?.price ?? 0).toFixed(2)}
                                 </span>
                                 <span className="text-sm font-semibold text-gray-400">/ month</span>
                             </div>
@@ -121,7 +115,7 @@ const PaymentBillingTab = () => {
                                 {initializeMutation.isPending && <Loading01Icon className="animate-spin" size={14} />}
                                 Upgrade Plan
                             </button>
-                            {currentSubscription?.status !== "canceled" && (
+                            {currentSubscription && currentSubscription.status !== "canceled" && (
                                 <button
                                     onClick={handleCancelSubscription}
                                     disabled={cancelMutation.isPending}
@@ -228,7 +222,7 @@ const PaymentBillingTab = () => {
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
                                                 inv.status === "paid" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
                                             }`}>
-                                                {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                                                {inv.status ? inv.status.charAt(0).toUpperCase() + inv.status.slice(1) : "—"}
                                             </span>
                                         </td>
                                         <td className="py-4.5 px-6">
@@ -269,7 +263,7 @@ const PaymentBillingTab = () => {
                         {/* Body */}
                         <div className="p-6 space-y-4 overflow-y-auto max-h-[400px]">
                             {plans.map((plan) => {
-                                const isCurrent = plan.id === activePlan.id;
+                                const isCurrent = plan.id === activePlan?.id;
                                 return (
                                     <div
                                         key={plan.id}
