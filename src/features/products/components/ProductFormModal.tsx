@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
 import type { Product, ProductFormData } from "../types";
@@ -52,12 +52,16 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
     const updateMutation = useUpdateProduct();
     const isPending = createMutation.isPending || updateMutation.isPending;
 
-    /* Sync form when modal opens */
-    useEffect(() => {
+    const [prevOpen, setPrevOpen] = useState(open);
+    const [prevProduct, setPrevProduct] = useState(product);
+
+    if (open !== prevOpen || product !== prevProduct) {
+        setPrevOpen(open);
+        setPrevProduct(product);
         if (open) {
             setForm(product ? productToFormData(product) : { ...EMPTY_PRODUCT_FORM });
         }
-    }, [open, product]);
+    }
 
     const update = (key: keyof ProductFormData, value: string) =>
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -109,6 +113,15 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                         placeholder="Describe this product…"
                         rows={3}
                         className={inputClasses + " resize-none"}
+                    />
+                </FormField>
+                <FormField label="Image URL">
+                    <input
+                        type="url"
+                        value={form.imageUrl || ""}
+                        onChange={(e) => update("imageUrl", e.target.value)}
+                        placeholder="e.g. https://example.com/image.png"
+                        className={inputClasses}
                     />
                 </FormField>
                 <FormRow>

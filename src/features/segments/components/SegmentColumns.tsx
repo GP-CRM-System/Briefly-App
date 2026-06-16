@@ -1,21 +1,42 @@
 import { type Column } from "@/core/components/DataTable";
 import type { Segment } from "../types";
 
-export const columns: Column<Segment>[] = [
+const StatusBadge = ({ status }: { status?: string }) => {
+    const isActive = !status || status.toLowerCase() === "active";
+    return (
+        <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-['Poppins'] ${
+                isActive
+                    ? "bg-[#dcfce7] text-[#16a34a] border border-[#bbf7d0]"
+                    : "bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]"
+            }`}
+        >
+            <span
+                className={`w-1.5 h-1.5 rounded-full inline-block ${
+                    isActive ? "bg-[#22c55e]" : "bg-[#94a3b8]"
+                }`}
+            />
+            {isActive ? "Active" : "Inactive"}
+        </span>
+    );
+};
+
+/* ── Standard Columns (Node 3157-32779) ── */
+export const standardColumns: Column<Segment>[] = [
     {
         key: "id",
         header: "Segment ID",
-        width: "w-[150px]",
+        width: "w-[120px]",
         render: (row) => (
-            <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                #{row.id}
+            <span className="font-['Poppins'] text-sm text-[#64748b] font-mono tracking-tight">
+                #{row.id.slice(0, 8)}
             </span>
         ),
     },
     {
         key: "name",
         header: "Name",
-        width: "min-w-[200px]",
+        width: "min-w-[180px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
                 {row.name}
@@ -26,7 +47,7 @@ export const columns: Column<Segment>[] = [
         key: "customerCount",
         header: "Size",
         align: "center",
-        width: "w-[100px]",
+        width: "w-[80px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
                 {row.customerCount ?? 0}
@@ -37,20 +58,16 @@ export const columns: Column<Segment>[] = [
         key: "type",
         header: "Type",
         align: "center",
-        width: "w-[120px]",
+        width: "w-[110px]",
         render: (row) => {
-            const typeVal = row.type || "Dynamic";
-            return (
-                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-['Poppins'] font-medium bg-[#eff6ff] text-[#4a90e2] border border-[#bedbff] capitalize">
-                    {typeVal}
-                </span>
-            );
+            const isActive = !row.status || row.status.toLowerCase() === "active";
+            return <StatusBadge status={isActive ? "Active" : row.status} />;
         },
     },
     {
         key: "creator",
         header: "Creator",
-        width: "min-w-[150px]",
+        width: "min-w-[130px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
                 {row.creator || "System"}
@@ -59,23 +76,132 @@ export const columns: Column<Segment>[] = [
     },
     {
         key: "createdAt",
-        header: "Created At",
-        width: "w-[150px]",
+        header: "Created at",
+        width: "w-[170px]",
         render: (row) => {
-            if (!row.createdAt) return <span className="text-gray-400">—</span>;
-            const date = new Date(row.createdAt);
-            if (isNaN(date.getTime())) return <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">{row.createdAt}</span>;
-            
-            // Format like: "12 Apr 2026"
+            const d = row.createdAt;
+            if (!d) return <span className="text-gray-400 text-sm">—</span>;
+            const date = new Date(d);
+            if (isNaN(date.getTime()))
+                return (
+                    <span className="font-['Poppins'] text-sm text-[#1a1a1a]">{d}</span>
+                );
             return (
-                <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                    {date.toLocaleDateString("en-GB", {
-                        day: "numeric",
+                <span className="font-['Poppins'] text-sm text-[#1a1a1a]">
+                    {date.toLocaleDateString("en-US", {
                         month: "short",
-                        year: "numeric"
+                        day: "numeric",
+                        year: "numeric",
                     })}
                 </span>
             );
         },
     },
 ];
+
+/* ── Detailed Columns (Node 3686-12190) ── */
+export const detailedColumns: Column<Segment>[] = [
+    {
+        key: "name",
+        header: "Name",
+        width: "min-w-[180px]",
+        render: (row) => (
+            <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
+                {row.name}
+            </span>
+        ),
+    },
+    {
+        key: "customerCount",
+        header: "Size",
+        align: "center",
+        width: "w-[80px]",
+        render: (row) => (
+            <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
+                {row.customerCount ?? 0}
+            </span>
+        ),
+    },
+    {
+        key: "type",
+        header: "Type",
+        align: "center",
+        width: "w-[110px]",
+        render: (row) => {
+            const isActive = !row.status || row.status.toLowerCase() === "active";
+            return <StatusBadge status={isActive ? "Active" : row.status} />;
+        },
+    },
+    {
+        key: "filter",
+        header: "Object",
+        align: "center",
+        width: "w-[100px]",
+        render: (row) => (
+            <span className="font-['Poppins'] text-sm text-[#45464d]">
+                {(row as any).object || "Contact"}
+            </span>
+        ),
+    },
+    {
+        key: "updatedAt",
+        header: "Last update",
+        width: "w-[170px]",
+        render: (row) => {
+            const d = row.updatedAt || row.createdAt;
+            if (!d) return <span className="text-gray-400 text-sm">—</span>;
+            const date = new Date(d);
+            if (isNaN(date.getTime()))
+                return (
+                    <span className="font-['Poppins'] text-sm text-[#1a1a1a]">{d}</span>
+                );
+            return (
+                <span className="font-['Poppins'] text-sm text-[#1a1a1a]">
+                    {date.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                    })}
+                </span>
+            );
+        },
+    },
+    {
+        key: "creator",
+        header: "Creator",
+        width: "min-w-[130px]",
+        render: (row) => (
+            <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
+                {row.creator || "System"}
+            </span>
+        ),
+    },
+    {
+        key: "id",
+        header: "Folder",
+        align: "center",
+        width: "w-[80px]",
+        render: (row) => (
+            <span className="font-['Poppins'] text-sm text-[#45464d]">
+                {(row as any).folder || "—"}
+            </span>
+        ),
+    },
+    {
+        key: "customerCount",
+        header: "Used in",
+        align: "center",
+        width: "w-[90px]",
+        render: (row) => (
+            <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
+                {(row as any).usedInCount ?? 0}
+            </span>
+        ),
+    },
+];
+
+/* ── Default export kept as detailedColumns for backward compat ── */
+export const columns = detailedColumns;

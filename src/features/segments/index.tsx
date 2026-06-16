@@ -1,160 +1,58 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "@/core/components/PageLayout";
 import DataTable from "@/core/components/DataTable";
 import type { Segment } from "./types";
 import { useSegments, useDeleteSegment } from "./segment.hooks";
-import { columns } from "./components/SegmentColumns";
+import { standardColumns, detailedColumns } from "./components/SegmentColumns";
 import ActionMenu from "./components/ActionMenu";
 import SegmentFormModal from "./components/SegmentFormModal";
 
-// MOCK_SEGMENTS fallback data - matching the first screenshot for Segment ID, Name, Size, Type, Creator, Created At
-export const MOCK_SEGMENTS: Segment[] = [
-    {
-        id: "124578954",
-        name: "VIP Customers",
-        description: "This segment encapsulates the premium tier of our customer base, specifically identifying those who have demonstrated high loyalty through sustained purchasing behavior. Requirements focus on a Lifetime Value exceeding $1,000 and a minimum threshold of 3 completed orders, ensuring inclusion of only our most reliable recurring revenue drivers.",
-        filter: {
-            field: "totalSpent",
-            operator: "gte",
-            value: "4000",
-        },
-        rules: [
-            { category: "Financial Performance", description: "Total Spent is greater than or equal to $4,000.00", icon: "finance" },
-            { category: "Geographic Targeting", description: "City is within New York, London", icon: "geo" },
-            { category: "Engagement Level", description: "Order Count is greater than or equal to 3 transactions", icon: "engagement" },
-            { category: "Engagement Level", description: "Order Count is greater than or equal to 3 transactions", icon: "engagement" }
-        ],
-        customerCount: 0, // 0 as in the segments list screenshot (will display 1,200 in details)
-        type: "Dynamic",
-        status: "Active",
-        creator: "Menna Fathy",
-        creatorRole: "Lead Strategist",
-        creatorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", // Omar Ali avatar for details page
-        sizeTrend: "↑ + 5% Since last week",
-        lastUpdated: "Last updated 14m ago",
-        createdAt: "2026-04-12T00:00:00Z", // Displays as "12 Apr 2026"
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578955",
-        name: "High Spenders (Egypt)",
-        description: "Customers who spent more than 1000 EGP total.",
-        filter: {
-            field: "totalSpent",
-            operator: "gt",
-            value: "1000",
-        },
-        customerCount: 8,
-        type: "Dynamic",
-        status: "Active",
-        creator: "Omar Ali",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578956",
-        name: "Alexandria Leads",
-        description: "All customers located in Alexandria city.",
-        filter: {
-            field: "city",
-            operator: "eq",
-            value: "Alexandria",
-        },
-        customerCount: 12,
-        type: "Dynamic",
-        status: "Active",
-        creator: "Sarah Smith",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578957",
-        name: "Newsletter Subscribers",
-        description: "Subscribers who opted in for email marketing.",
-        filter: {
-            field: "acceptsMarketing",
-            operator: "eq",
-            value: "true",
-        },
-        customerCount: 28,
-        type: "Dynamic",
-        status: "Active",
-        creator: "John Doe",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578958",
-        name: "VIP Members (Egypt)",
-        description: "VIP tagged customers who are highly engaged.",
-        filter: {
-            field: "tags",
-            operator: "contains",
-            value: "VIP",
-        },
-        customerCount: 5,
-        type: "Dynamic",
-        status: "Active",
-        creator: "Menna Fathy",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578959",
-        name: "Shopify Leads",
-        description: "Referrals synced from Shopify store integration.",
-        filter: {
-            field: "source",
-            operator: "eq",
-            value: "shopify",
-        },
-        customerCount: 22,
-        type: "Dynamic",
-        status: "Active",
-        creator: "Omar Ali",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578960",
-        name: "New Accounts",
-        description: "Fresh accounts registered under 3 months ago.",
-        filter: {
-            field: "lifecycleStage",
-            operator: "eq",
-            value: "New",
-        },
-        customerCount: 7,
-        type: "Dynamic",
-        status: "Active",
-        creator: "Sarah Smith",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-    {
-        id: "124578961",
-        name: "Churn Risks",
-        description: "Customers who are classified as Churn Risks.",
-        filter: {
-            field: "lifecycleStage",
-            operator: "eq",
-            value: "Churn Risk",
-        },
-        customerCount: 4,
-        type: "Dynamic",
-        status: "Active",
-        creator: "John Doe",
-        createdAt: "2026-04-12T00:00:00Z",
-        updatedAt: "2026-04-12T00:00:00Z",
-    },
-];
+/* ── View Mode Toggle ── */
+const ViewToggle = ({
+    mode,
+    onChange,
+}: {
+    mode: "standard" | "detailed";
+    onChange: (m: "standard" | "detailed") => void;
+}) => (
+    <div className="flex items-center rounded-[10px] border border-[rgba(179,179,179,0.27)] bg-white shadow-[2px_4px_5px_rgba(180,191,205,0.2)] p-[3px] h-[49px]">
+        {(["standard", "detailed"] as const).map((opt) => (
+            <button
+                key={opt}
+                onClick={() => onChange(opt)}
+                className={`relative h-full px-4 rounded-[8px] text-sm font-medium transition-all duration-200 ${
+                    mode === opt
+                        ? "bg-[var(--color-primary-500)] text-white shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                }`}
+            >
+                {opt === "standard" ? (
+                    <span className="flex items-center gap-2">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+                        </svg>
+                        Standard
+                    </span>
+                ) : (
+                    <span className="flex items-center gap-2">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                        Detailed
+                    </span>
+                )}
+            </button>
+        ))}
+    </div>
+);
 
 const Segments = () => {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [segmentToEdit, setSegmentToEdit] = useState<Segment | null>(null);
+    const [viewMode, setViewMode] = useState<"standard" | "detailed">("detailed");
 
     // Filters state
     const [filterOpen, setFilterOpen] = useState(false);
@@ -164,6 +62,15 @@ const Segments = () => {
     // Queries & Mutations
     const { data: segments = [], isLoading, isError } = useSegments();
     const deleteMutation = useDeleteSegment();
+
+    // Derive unique creators from real API data (no mock fallback)
+    const creatorOptions = useMemo(() => {
+        const names = segments.map((s) => s.creator).filter(Boolean) as string[];
+        return Array.from(new Set(names)).sort();
+    }, [segments]);
+
+    // Pick the active column set based on viewMode
+    const activeColumns = viewMode === "standard" ? standardColumns : detailedColumns;
 
     if (isError) {
         return (
@@ -198,8 +105,9 @@ const Segments = () => {
     // Client-side filtering & search
     const filteredSegments = segments.filter((s) => {
         const query = search.toLowerCase();
-        const matchesSearch = s.name.toLowerCase().includes(query) || 
-                              (s.description && s.description.toLowerCase().includes(query));
+        const matchesSearch =
+            s.name.toLowerCase().includes(query) ||
+            (s.description && s.description.toLowerCase().includes(query));
         const matchesCreator = !creatorFilter || s.creator === creatorFilter;
         const matchesType = !typeFilter || s.type === typeFilter;
         return matchesSearch && matchesCreator && matchesType;
@@ -217,6 +125,9 @@ const Segments = () => {
                 onFilter={() => setFilterOpen((p) => !p)}
                 onCreate={handleCreate}
                 createLabel="Create Segment"
+                extraActions={
+                    <ViewToggle mode={viewMode} onChange={setViewMode} />
+                }
                 filterContent={
                     filterOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -224,22 +135,20 @@ const Segments = () => {
                             <div className="absolute inset-0 bg-black/20 backdrop-blur-[1.5px]" onClick={() => setFilterOpen(false)} />
 
                             {/* Dialog */}
-                            <div 
+                            <div
                                 className="relative w-[380px] max-w-full bg-[#f6f8fa] rounded-2xl shadow-2xl border border-gray-200/50 z-10 p-5 flex flex-col gap-4"
                                 style={{ animation: "modalSlideIn 0.2s ease-out" }}
                             >
                                 {/* Header */}
                                 <div className="flex items-center justify-between w-full">
-                                    <p className="font-['Poppins'] font-semibold text-[18px] text-[#1a1a1a]">
-                                        Filter
-                                    </p>
-                                    <button 
+                                    <p className="font-['Poppins'] font-semibold text-[18px] text-[#1a1a1a]">Filter</p>
+                                    <button
                                         onClick={() => setFilterOpen(false)}
                                         className="bg-[#b3b3b3]/80 hover:bg-gray-400 rounded-full p-1 cursor-pointer transition-colors flex items-center justify-center size-[24px]"
                                     >
                                         <svg className="w-[12px] h-[12px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
                                         </svg>
                                     </button>
                                 </div>
@@ -250,23 +159,20 @@ const Segments = () => {
                                 {/* Filter inputs */}
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-1.5">
-                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">
-                                            Creator
-                                        </p>
+                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">Creator</p>
                                         <select
                                             value={creatorFilter}
                                             onChange={(e) => setCreatorFilter(e.target.value)}
                                             className="border border-gray-300 bg-white h-[40px] rounded-[6px] px-3 text-sm text-gray-700 outline-none cursor-pointer hover:border-gray-400 transition-colors"
                                         >
                                             <option value="">All Creators</option>
-                                            <option value="Menna Fathy">Menna Fathy</option>
-                                            <option value="Omar Ali">Omar Ali</option>
+                                            {creatorOptions.map((name) => (
+                                                <option key={name} value={name}>{name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="flex flex-col gap-1.5">
-                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">
-                                            Type
-                                        </p>
+                                        <p className="font-['Poppins'] font-semibold text-[12px] text-gray-500 uppercase tracking-wider">Type</p>
                                         <select
                                             value={typeFilter}
                                             onChange={(e) => setTypeFilter(e.target.value)}
@@ -281,13 +187,13 @@ const Segments = () => {
 
                                 {/* Footer Buttons */}
                                 <div className="flex gap-[16px] h-[40px] items-center w-full mt-1">
-                                    <button 
+                                    <button
                                         onClick={() => { setCreatorFilter(""); setTypeFilter(""); }}
                                         className="border border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-400 transition-all h-[40px] flex items-center justify-center rounded-[6px] flex-1 font-['Poppins'] font-semibold text-[14px] cursor-pointer"
                                     >
                                         Clear
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => setFilterOpen(false)}
                                         className="bg-[#4a90e2] text-white hover:bg-blue-600 hover:shadow-sm transition-all h-[40px] flex items-center justify-center rounded-[6px] flex-1 font-['Poppins'] font-semibold text-[14px] cursor-pointer"
                                     >
@@ -307,7 +213,7 @@ const Segments = () => {
                 }
             >
                 <DataTable<Segment>
-                    columns={columns}
+                    columns={activeColumns}
                     data={filteredSegments}
                     pageSize={9}
                     selectable

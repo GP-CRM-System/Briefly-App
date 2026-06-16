@@ -67,14 +67,23 @@ export const DEFAULT_FILTERS: FilterState = {
     spentMin: 0,
     spentMax: 50_000,
     lifecycles: new Set<string>(),
+    tags: new Set<string>(),
+    ordersMin: 0,
+    ordersMax: 999,
 };
 
 export const LIFECYCLE_OPTIONS = [
     "Loyal", "Churned", "Prospect", "New", "Active", "At-Risk", "VIP", "Returning", "Winback",
 ];
 
+export const TAG_FILTER_OPTIONS = ["Loyal", "Churned", "Prospect", "Lead", "VIP", "Premium"];
+
 /** Create a fresh copy of default filters (avoids shared Set reference) */
-export const freshFilters = (): FilterState => ({ ...DEFAULT_FILTERS, lifecycles: new Set() });
+export const freshFilters = (): FilterState => ({
+    ...DEFAULT_FILTERS,
+    lifecycles: new Set(),
+    tags: new Set(),
+});
 
 /* ═══════════════════════════════════════════
    Client-side filtering
@@ -121,12 +130,31 @@ export const filterCustomers = (
         });
     }
 
+    if (filters.tags.size > 0) {
+        const selectedTags = new Set(Array.from(filters.tags).map((t) => t.toLowerCase()));
+        result = result.filter((c) => {
+            const customerTags = (c.tags || []).map((t) => t.toLowerCase());
+            return Array.from(selectedTags).some((t) => customerTags.includes(t));
+        });
+    }
+
+    if (filters.ordersMax < 999) {
+        result = result.filter((c) => {
+            const orders = c.totalOrders ?? 0;
+            return orders >= filters.ordersMin && orders <= filters.ordersMax;
+        });
+    }
+
     return result;
 };
 
 /** Count how many filters are actively applied */
 export const countActiveFilters = (f: FilterState): number =>
-    (f.name ? 1 : 0) + (f.spentMax < 50_000 ? 1 : 0) + f.lifecycles.size;
+    (f.name ? 1 : 0) +
+    (f.spentMax < 50_000 ? 1 : 0) +
+    f.lifecycles.size +
+    f.tags.size +
+    (f.ordersMax < 999 ? 1 : 0);
 
 /* ═══════════════════════════════════════════
    Form helpers

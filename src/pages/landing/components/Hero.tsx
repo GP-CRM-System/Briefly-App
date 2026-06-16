@@ -32,7 +32,7 @@ const Hero: React.FC = () => {
     const primaryButtonClass =
         "min-w-[160px] sm:min-w-[200px] lg:min-w-[221px] bg-[#4A90E2] font-medium text-base sm:text-lg lg:text-[20px] text-center text-white py-3 px-6 rounded-lg border border-[#4A90E2] shadow-sm hover:bg-[#3a7bc8] hover:shadow-xl hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90E2]/25 flex items-center justify-center gap-2";
     const secondaryButtonClass =
-        "min-w-[160px] sm:min-w-[200px] lg:min-w-[221px] bg-white font-medium text-base sm:text-lg lg:text-[20px] text-[#4A90E2] py-3 px-6 rounded-lg border border-[#4A90E2] shadow-sm hover:bg-[#eef5ff] hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90E2]/20 flex items-center justify-center gap-2";
+        "min-w-[160px] sm:min-w-[200px] lg:min-w-[221px] bg-white font-medium text-base sm:text-lg lg:text-[20px] text-[#4A90E2] py-3 px-6 rounded-lg border border-[#4A90E2] shadow-sm hover:bg-[#4A90E2] hover:text-white hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90E2]/20 flex items-center justify-center gap-2";
 
     return (
         <div
@@ -77,9 +77,9 @@ const Hero: React.FC = () => {
                     <MakiArrowRi className="w-5 h-5" aria-hidden />
                 </Link>
 
-                <button className={secondaryButtonClass}>
+                <button className={`${secondaryButtonClass} group`}>
                     Watch Demo
-                    <PlayBlue className="w-7 h-7" aria-hidden />
+                    <PlayBlue className="w-7 h-7 transition-all duration-300 group-hover:brightness-0 group-hover:invert" aria-hidden />
                 </button>
             </motion.div>
 

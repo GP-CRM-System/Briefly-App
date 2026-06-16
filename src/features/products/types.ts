@@ -29,7 +29,21 @@ export interface Product {
     updatedAt?: string;
     imageUrl?: string;
     inventory?: number;
-    variants?: any[];
+    variants?: ProductVariant[];
+}
+
+export interface ProductVariant {
+    id: string;
+    productId: string;
+    name: string;
+    sku?: string | null;
+    price: number;
+    inventory: number;
+    barcode?: string | null;
+    imageUrl?: string | null;
+    status?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type ProductStatus = "active" | "draft" | "archived";
@@ -51,6 +65,7 @@ export interface ProductFormData {
     trackInventory: string;
     weight: string;
     weightUnit: string;
+    imageUrl?: string;
 }
 
 export interface ProductFilterState {

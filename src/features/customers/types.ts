@@ -97,4 +97,7 @@ export interface FilterState {
     spentMin: number;
     spentMax: number;
     lifecycles: Set<string>;
+    tags: Set<string>;
+    ordersMin: number;
+    ordersMax: number;
 }

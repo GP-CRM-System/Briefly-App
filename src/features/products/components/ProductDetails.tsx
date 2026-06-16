@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useProduct, useDeleteProduct } from "../product.hooks";
+import { useProduct, useDeleteProduct, useCreateVariant } from "../product.hooks";
 import ProductFormModal from "./ProductFormModal";
+import type { ProductVariant } from "../types";
 import toast from "react-hot-toast";
+import Modal, { FormField, FormRow, inputClasses } from "@/core/components/Modal";
 
 const fmtCurrency = (v: string | number | null | undefined) => {
     if (v == null) return "—";
@@ -29,8 +31,18 @@ const ProductDetails = () => {
 
     const { data: product, isLoading } = useProduct(id);
     const deleteMutation = useDeleteProduct();
+    const createVariantMutation = useCreateVariant();
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isAddVariantOpen, setIsAddVariantOpen] = useState(false);
+    const [variantForm, setVariantForm] = useState({
+        name: "",
+        sku: "",
+        price: "",
+        inventory: "0",
+        barcode: "",
+        imageUrl: "",
+    });
     
     // Pagination & checkbox states for variants table
     const [selectedVariants, setSelectedVariants] = useState<Set<string>>(new Set());
@@ -38,7 +50,7 @@ const ProductDetails = () => {
     if (isLoading || !product) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -64,18 +76,41 @@ const ProductDetails = () => {
     const displayBrand = p.brand || "Briefly Gold";
     const displayColorway = "Gold / Neutral";
 
-    // Generate high fidelity variants matching the mockup table
-    const mockVariants = [
-        { id: "v-1", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-2", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-3", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-4", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-5", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-6", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" },
-        { id: "v-7", name: "Black / 42", inventory: 35, sku: p.sku ? `${p.sku}-BLK-42` : "NAM270-BLK-42", price: 75, barcode: "194953123456", status: "active" }
-    ];
+    const variants = p.variants || [];
 
-    const variants = p.variants && p.variants.length > 0 ? p.variants : mockVariants;
+    const handleAddVariant = () => {
+        if (!variantForm.name.trim()) {
+            toast.error("Variant name is required");
+            return;
+        }
+        if (!variantForm.price || Number(variantForm.price) < 0) {
+            toast.error("Price must be a valid number >= 0");
+            return;
+        }
+        createVariantMutation.mutate({
+            productId: p.id,
+            payload: {
+                name: variantForm.name,
+                sku: variantForm.sku || undefined,
+                price: parseFloat(variantForm.price),
+                inventory: parseInt(variantForm.inventory) || 0,
+                barcode: variantForm.barcode || undefined,
+                imageUrl: variantForm.imageUrl || undefined,
+            }
+        }, {
+            onSuccess: () => {
+                setIsAddVariantOpen(false);
+                setVariantForm({
+                    name: "",
+                    sku: "",
+                    price: "",
+                    inventory: "0",
+                    barcode: "",
+                    imageUrl: "",
+                });
+            }
+        });
+    };
 
     // Toggle selected state for single variant
     const toggleVariant = (id: string) => {
@@ -93,7 +128,7 @@ const ProductDetails = () => {
         if (selectedVariants.size === variants.length) {
             setSelectedVariants(new Set());
         } else {
-            setSelectedVariants(new Set(variants.map((v: any) => v.id)));
+            setSelectedVariants(new Set(variants.map((v: ProductVariant) => v.id)));
         }
     };
 
@@ -128,7 +163,7 @@ const ProductDetails = () => {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsEditModalOpen(true)}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-all cursor-pointer"
+                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary-600 hover:bg-primary-700 active:scale-95 text-sm font-semibold text-white shadow-sm shadow-primary-200 transition-all cursor-pointer"
                     >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -155,12 +190,12 @@ const ProductDetails = () => {
                 <div className="lg:col-span-5 flex flex-col gap-6">
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center justify-between min-h-[440px]">
                         {/* Image Box */}
-                        <div className="relative w-full aspect-[4/3] rounded-2xl bg-gray-50/60 border border-blue-500/10 flex items-center justify-center p-6 overflow-hidden group">
+                        <div className="relative w-full aspect-[4/3] rounded-2xl bg-gray-50/60 border border-primary-500/10 flex items-center justify-center p-6 overflow-hidden group">
                             {/* Blue Alignment Dotted Overlays (Mockup aesthetics) */}
-                            <div className="absolute inset-0 border-x border-dashed border-blue-400/5 pointer-events-none"></div>
-                            <div className="absolute inset-0 border-y border-dashed border-blue-400/5 pointer-events-none"></div>
-                            <div className="absolute left-0 right-0 top-1/2 border-t border-dashed border-blue-400/20 pointer-events-none"></div>
-                            <div className="absolute top-0 bottom-0 left-1/2 border-l border-dashed border-blue-400/20 pointer-events-none"></div>
+                            <div className="absolute inset-0 border-x border-dashed border-primary-400/5 pointer-events-none"></div>
+                            <div className="absolute inset-0 border-y border-dashed border-primary-400/5 pointer-events-none"></div>
+                            <div className="absolute left-0 right-0 top-1/2 border-t border-dashed border-primary-400/20 pointer-events-none"></div>
+                            <div className="absolute top-0 bottom-0 left-1/2 border-l border-dashed border-primary-400/20 pointer-events-none"></div>
 
                             {imageUrl ? (
                                 <img 
@@ -180,14 +215,14 @@ const ProductDetails = () => {
                             )}
 
                             {/* Resolution badge */}
-                            <div className="absolute bottom-3 bg-blue-500 text-white font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-sm select-none">
+                            <div className="absolute bottom-3 bg-primary-500 text-white font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-sm select-none">
                                 408 &times; 287
                             </div>
                         </div>
 
                         {/* Image Carousel Mock Thumbnails */}
                         <div className="grid grid-cols-3 gap-3 w-full mt-6">
-                            <div className="aspect-[4/3] rounded-xl border-2 border-blue-500 bg-gray-50 flex items-center justify-center p-2 cursor-pointer shadow-sm">
+                            <div className="aspect-[4/3] rounded-xl border-2 border-primary-500 bg-gray-50 flex items-center justify-center p-2 cursor-pointer shadow-sm">
                                 {imageUrl ? (
                                     <img src={imageUrl} alt="thumb-1" className="max-w-full max-h-full object-contain" />
                                 ) : (
@@ -246,7 +281,7 @@ const ProductDetails = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Category */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
                                         <line x1="7" y1="7" x2="7.01" y2="7" />
@@ -260,7 +295,7 @@ const ProductDetails = () => {
 
                             {/* Sub Category */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <polygon points="12 2 2 7 12 12 22 7 12 2" />
                                         <polyline points="2 17 12 22 22 17" />
@@ -275,7 +310,7 @@ const ProductDetails = () => {
 
                             {/* Brand */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
                                         <path d="M9 12l2 2 4-4" />
@@ -289,7 +324,7 @@ const ProductDetails = () => {
 
                             {/* Colorway */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03345 19.1749 5.2798 19.262 5.52382 19.233C6.72124 19.0909 7.4273 18.2577 7.91136 17.5244C8.2435 17.0213 8.68115 16.5 9.5 16.5C10.3188 16.5 10.7565 17.0213 11.0886 17.5244C11.5727 18.2577 12.2788 19.0909 13.4762 19.233C13.7202 19.262 13.9665 19.1749 14.1414 19C15.9097 17.1962 17 14.7255 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12" />
                                         <circle cx="7.5" cy="10.5" r="1" fill="currentColor" />
@@ -316,8 +351,18 @@ const ProductDetails = () => {
                     </div>
 
                     <button
-                        onClick={() => toast.success("Add Variant flow opened!")}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-semibold text-white shadow-sm shadow-blue-200 transition-all cursor-pointer self-start sm:self-auto"
+                        onClick={() => {
+                            setVariantForm({
+                                name: "",
+                                sku: p.sku ? `${p.sku}-${variants.length + 1}` : "",
+                                price: String(p.price || ""),
+                                inventory: "0",
+                                barcode: "",
+                                imageUrl: "",
+                            });
+                            setIsAddVariantOpen(true);
+                        }}
+                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary-600 hover:bg-primary-700 active:scale-95 text-xs font-semibold text-white shadow-sm shadow-primary-200 transition-all cursor-pointer self-start sm:self-auto"
                     >
                         <svg className="w-4 h-4 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <line x1="12" y1="5" x2="12" y2="19" />
@@ -337,7 +382,7 @@ const ProductDetails = () => {
                                         type="checkbox" 
                                         checked={selectedVariants.size === variants.length}
                                         onChange={toggleAllVariants}
-                                        className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                        className="w-4 h-4 rounded text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer"
                                     />
                                 </th>
                                 <th className="p-4">Name</th>
@@ -350,13 +395,13 @@ const ProductDetails = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {variants.map((v: any) => {
+                            {variants.map((v: ProductVariant) => {
                                 const isSelected = selectedVariants.has(v.id);
                                 return (
                                     <tr 
                                         key={v.id} 
                                         className={`hover:bg-gray-50/50 transition-colors text-xs font-semibold text-gray-700 ${
-                                            isSelected ? "bg-blue-50/20" : ""
+                                            isSelected ? "bg-primary-50/20" : ""
                                         }`}
                                     >
                                         <td className="p-4 text-center">
@@ -364,7 +409,7 @@ const ProductDetails = () => {
                                                 type="checkbox" 
                                                 checked={isSelected}
                                                 onChange={() => toggleVariant(v.id)}
-                                                className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                                className="w-4 h-4 rounded text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer"
                                             />
                                         </td>
                                         <td className="p-4 text-gray-900 font-bold">{v.name}</td>
@@ -399,13 +444,13 @@ const ProductDetails = () => {
                         </tbody>
                     </table>
                 </div>
-
+ 
                 {/* Pagination Controls */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
                     <p className="text-xs font-semibold text-gray-400">
                         Showing data 1 to {variants.length} of {variants.length} entries
                     </p>
-
+ 
                     <div className="flex items-center gap-1.5 self-center sm:self-auto select-none">
                         <button 
                             disabled 
@@ -413,7 +458,7 @@ const ProductDetails = () => {
                         >
                             &lt;
                         </button>
-                        <button className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-sm shadow-blue-100">
+                        <button className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-xs font-bold text-white shadow-sm shadow-primary-100">
                             1
                         </button>
                         <button 
@@ -450,13 +495,88 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </div>
-
+ 
             {/* ── Form Modal ── */}
             <ProductFormModal
                 open={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 product={p}
             />
+
+            {/* ── Add Variant Modal ── */}
+            <Modal
+                open={isAddVariantOpen}
+                onClose={() => setIsAddVariantOpen(false)}
+                title="Add Variant"
+                subtitle="Create a new variant for this product."
+                onSubmit={handleAddVariant}
+                submitLabel="Add Variant"
+                loading={createVariantMutation.isPending}
+            >
+                <div className="space-y-4">
+                    <FormField label="Variant Name" required>
+                        <input
+                            type="text"
+                            value={variantForm.name}
+                            onChange={(e) => setVariantForm(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder="e.g. Size L / Red"
+                            className={inputClasses}
+                        />
+                    </FormField>
+                    <FormRow>
+                        <FormField label="SKU">
+                            <input
+                                type="text"
+                                value={variantForm.sku}
+                                onChange={(e) => setVariantForm(prev => ({ ...prev, sku: e.target.value }))}
+                                placeholder="e.g. SKU-123"
+                                className={inputClasses}
+                            />
+                        </FormField>
+                        <FormField label="Price" required>
+                            <input
+                                type="number"
+                                value={variantForm.price}
+                                onChange={(e) => setVariantForm(prev => ({ ...prev, price: e.target.value }))}
+                                placeholder="0.00"
+                                min="0"
+                                step="0.01"
+                                className={inputClasses}
+                            />
+                        </FormField>
+                    </FormRow>
+                    <FormRow>
+                        <FormField label="Inventory Quantity">
+                            <input
+                                type="number"
+                                value={variantForm.inventory}
+                                onChange={(e) => setVariantForm(prev => ({ ...prev, inventory: e.target.value }))}
+                                placeholder="0"
+                                min="0"
+                                className={inputClasses}
+                            />
+                        </FormField>
+                        <FormField label="Barcode">
+                            <input
+                                type="text"
+                                value={variantForm.barcode}
+                                onChange={(e) => setVariantForm(prev => ({ ...prev, barcode: e.target.value }))}
+                                placeholder="e.g. 194953123456"
+                                className={inputClasses}
+                            />
+                        </FormField>
+                    </FormRow>
+                    <FormField label="Image URL">
+                        <input
+                            type="url"
+                            value={variantForm.imageUrl}
+                            onChange={(e) => setVariantForm(prev => ({ ...prev, imageUrl: e.target.value }))}
+                            placeholder="e.g. https://example.com/variant.png"
+                            className={inputClasses}
+                        />
+                    </FormField>
+                </div>
+            </Modal>
         </div>
     );
 };

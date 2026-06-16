@@ -1,10 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEmployees } from "../employee.hooks";
+import { useEmployees, useUpdateEmployeeRole } from "../employee.hooks";
 import { MOCK_EMPLOYEES, getEmployeeInitials } from "../utils";
-import toast from "react-hot-toast";
 
 const fmtRelativeTime = (dStr: string) => {
-    // Return relative time for simulation or parse date
     if (!dStr) return "";
     try {
         const date = new Date(dStr);
@@ -29,6 +27,7 @@ const EmployeeProfile = () => {
 
     // Query Hook
     const { data: employees = [], isLoading } = useEmployees();
+    const updateRoleMutation = useUpdateEmployeeRole();
 
     // Fallback to mock data if not loaded
     const employee = employees.find((e) => e.id === id) || MOCK_EMPLOYEES.find((e) => e.id === id) || MOCK_EMPLOYEES[0];
@@ -36,7 +35,7 @@ const EmployeeProfile = () => {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[300px]">
-                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -55,12 +54,12 @@ const EmployeeProfile = () => {
             {/* Profile Header Banner Card */}
             <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm relative">
                 {/* Colored Cover Banner */}
-                <div className="h-[140px] bg-gradient-to-r from-blue-400 to-blue-500 w-full"></div>
+                <div className="h-[140px] bg-gradient-to-r from-primary-400 to-primary-500 w-full"></div>
                 
                 {/* Profile Details area */}
                 <div className="px-6 pb-6 pt-16 relative flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                     {/* Square avatar overlapping the banner */}
-                    <div className="absolute -top-12 left-6 w-24 h-24 rounded-3xl bg-blue-500 border-4 border-white flex items-center justify-center text-white text-3xl font-black shadow-md">
+                    <div className="absolute -top-12 left-6 w-24 h-24 rounded-3xl bg-primary-500 border-4 border-white flex items-center justify-center text-white text-3xl font-black shadow-md">
                         {getEmployeeInitials(employee.name)}
                         {/* Status active green circle dot */}
                         <span className="absolute bottom-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-400 border-2 border-white"></span>
@@ -70,20 +69,30 @@ const EmployeeProfile = () => {
                         <div>
                             <div className="flex items-center gap-2.5">
                                 <h1 className="text-xl font-black text-gray-900">{employee.name}</h1>
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 uppercase border border-blue-100">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary-50 text-primary-600 uppercase border border-primary-100">
                                     {employee.status || "active"}
                                 </span>
                             </div>
-                            <p className="text-sm font-semibold text-gray-400 mt-1">{employee.role || "UIUX Designer"}</p>
+                            <p className="text-sm font-semibold text-gray-400 mt-1">{employee.role || "member"}</p>
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => toast.success("Edit profile details...")}
-                        className="inline-flex items-center gap-1.5 h-[38px] px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 transition-all shadow-sm focus:outline-none"
-                    >
-                        ✏️ Edit Profile
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-gray-400">Update Role:</span>
+                        <select
+                            value={employee.role || ""}
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    updateRoleMutation.mutate({ id: employee.id, role: e.target.value });
+                                }
+                            }}
+                            className="h-[38px] px-3 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-700 focus:outline-none focus:border-primary-500 cursor-pointer"
+                        >
+                            <option value="">Select role</option>
+                            <option value="admin">Administrator (admin)</option>
+                            <option value="member">Member (member)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -98,7 +107,7 @@ const EmployeeProfile = () => {
                         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider pb-1">Contact Details</h3>
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-base flex-shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-500 flex items-center justify-center text-base flex-shrink-0">
                                     📧
                                 </div>
                                 <div className="min-w-0">
@@ -108,7 +117,7 @@ const EmployeeProfile = () => {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-base flex-shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-500 flex items-center justify-center text-base flex-shrink-0">
                                     📞
                                 </div>
                                 <div>
@@ -118,7 +127,7 @@ const EmployeeProfile = () => {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-base flex-shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-500 flex items-center justify-center text-base flex-shrink-0">
                                     📍
                                 </div>
                                 <div>
@@ -145,11 +154,11 @@ const EmployeeProfile = () => {
                             <div className="border border-gray-50 bg-gray-50/20 p-4 rounded-2xl flex flex-col justify-between">
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Rev. Target</span>
-                                    <span className="text-2xl font-black text-blue-500 mt-1">{employee.revenueTarget || 94}%</span>
+                                    <span className="text-2xl font-black text-primary-500 mt-1">{employee.revenueTarget || 94}%</span>
                                 </div>
                                 <div className="w-full bg-gray-200/60 rounded-full h-[6px] mt-2">
                                     <div
-                                        className="bg-blue-500 h-[6px] rounded-full transition-all duration-500"
+                                        className="bg-primary-500 h-[6px] rounded-full transition-all duration-500"
                                         style={{ width: `${employee.revenueTarget || 94}%` }}
                                     ></div>
                                 </div>

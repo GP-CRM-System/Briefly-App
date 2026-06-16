@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
 import { useCreateTicket, useUpdateTicket } from "../ticket.hooks";
+import { useCustomers } from "@/features/customers/customer.hooks";
 import type { Ticket } from "../types";
 import toast from "react-hot-toast";
 
@@ -45,49 +46,67 @@ const SettingsIcon = () => (
 const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
     const createMutation = useCreateTicket();
     const updateMutation = useUpdateTicket();
+    const { data: customers = [] } = useCustomers();
 
     const [name, setName] = useState("");
-    const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState("");
     const [subject, setSubject] = useState("");
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
-    const [status, setStatus] = useState<"open" | "pending" | "resolved" | "closed">("open");
+    const [status, setStatus] = useState<"open" | "pending" | "closed">("open");
 
-    useEffect(() => {
+    const [prevOpen, setPrevOpen] = useState(open);
+    const [prevTicket, setPrevTicket] = useState(ticket);
+
+    if (open !== prevOpen || ticket !== prevTicket) {
+        setPrevOpen(open);
+        setPrevTicket(ticket);
         if (open) {
             if (ticket) {
                 setName(ticket.name || "");
-                setCustomerName(ticket.customerName || "");
+                setCustomerId(ticket.customerId || "");
                 setSubject(ticket.subject || "");
                 setDescription(ticket.description || "");
-                setPriority(ticket.priority || "medium");
-                setStatus(ticket.status || "open");
+                
+                const cleanPriority = ticket.priority?.toLowerCase();
+                setPriority(
+                    cleanPriority === "low" || cleanPriority === "medium" || cleanPriority === "high"
+                        ? (cleanPriority as "low" | "medium" | "high")
+                        : "medium"
+                );
+                
+                const cleanStatus = ticket.status?.toLowerCase();
+                setStatus(
+                    cleanStatus === "open" || cleanStatus === "pending" || cleanStatus === "closed"
+                        ? (cleanStatus as "open" | "pending" | "closed")
+                        : "open"
+                );
             } else {
                 setName("");
-                setCustomerName("");
+                setCustomerId("");
                 setSubject("");
                 setDescription("");
                 setPriority("medium");
                 setStatus("open");
             }
         }
-    }, [open, ticket]);
+    }
 
     if (!open) return null;
 
     const handleSubmit = () => {
-        if (!name.trim() || !customerName.trim() || !subject.trim() || !description.trim()) {
+        if (!name.trim() || !customerId.trim() || !subject.trim() || !description.trim()) {
             toast.error("Please fill in all fields");
             return;
         }
 
         const payload = {
             name,
-            customerName,
+            customerId,
             subject,
             description,
-            priority,
-            status,
+            priority: priority.toUpperCase(),
+            status: status.toUpperCase(),
         };
 
         if (ticket) {
@@ -133,14 +152,19 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
             {/* ── Customer Information ── */}
             <FormCard title="Customer Information" icon={<UserIcon />}>
                 <FormField label="Customer Name" required>
-                    <input
-                        type="text"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        placeholder="Customer name"
-                        className={inputClasses}
+                    <select
+                        value={customerId}
+                        onChange={(e) => setCustomerId(e.target.value)}
+                        className={selectClasses}
                         required
-                    />
+                    >
+                        <option value="">Select Customer</option>
+                        {customers.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.name} ({c.email})
+                            </option>
+                        ))}
+                    </select>
                 </FormField>
             </FormCard>
 
@@ -174,7 +198,7 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
                     <FormField label="Priority">
                         <select
                             value={priority}
-                            onChange={(e) => setPriority(e.target.value as any)}
+                            onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
                             className={selectClasses}
                         >
                             <option value="low">Low</option>
@@ -185,12 +209,11 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
                     <FormField label="Status">
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value as any)}
+                            onChange={(e) => setStatus(e.target.value as "open" | "pending" | "closed")}
                             className={selectClasses}
                         >
                             <option value="open">Open</option>
                             <option value="pending">Pending</option>
-                            <option value="resolved">Resolved</option>
                             <option value="closed">Closed</option>
                         </select>
                     </FormField>

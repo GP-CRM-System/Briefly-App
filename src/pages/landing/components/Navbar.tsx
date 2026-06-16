@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
 
                 <div className="hidden lg:flex gap-3 items-center">
                     <Link to="/login">
-                        <button className={`${desktopButtonClass} border border-[#4A90E2] text-gray-500 hover:bg-[#eef5ff]`}>
+                        <button className={`${desktopButtonClass} border border-[#4A90E2] text-gray-500 hover:bg-[#4A90E2] hover:text-white`}>
                             Sign in
                         </button>
                     </Link>

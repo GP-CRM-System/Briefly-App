@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Modal, { FormCard, FormField, inputClasses, selectClasses } from "@/core/components/Modal";
 import { useCustomers } from "@/features/customers/customer.hooks";
 import { useProducts } from "@/features/products/product.hooks";
@@ -57,7 +57,10 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
     const [notes, setNotes] = useState("");
     const [discount, setDiscount] = useState<number>(0);
 
-    useEffect(() => {
+    const [prevOpen, setPrevOpen] = useState(open);
+
+    if (open !== prevOpen) {
+        setPrevOpen(open);
         if (open) {
             setCustomerId("");
             setSelectedItems([]);
@@ -66,7 +69,7 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
             setNotes("");
             setDiscount(0);
         }
-    }, [open]);
+    }
 
     // Subtotal calculation
     const subtotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -144,20 +147,20 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
 
         const payload = {
             customerId,
-            shippingStatus: "processing",
-            paymentStatus: "pending",
-            subtotal: subtotal.toFixed(2),
-            discountAmount: discount.toFixed(2),
-            taxAmount: tax.toFixed(2),
-            shippingAmount: "0.00",
-            totalAmount: grandTotal.toFixed(2),
+            shippingStatus: "PROCESSING",
+            paymentStatus: "PENDING",
+            subtotal: parseFloat(subtotal.toFixed(2)),
+            discountAmount: parseFloat(discount.toFixed(2)),
+            taxAmount: parseFloat(tax.toFixed(2)),
+            shippingAmount: 0.00,
+            totalAmount: parseFloat(grandTotal.toFixed(2)),
             currency: "USD",
             source: "Web Store",
             note: notes,
             items: selectedItems.map((item) => ({
                 productId: item.productId,
                 quantity: item.quantity,
-                price: item.price.toFixed(2),
+                price: parseFloat(item.price.toFixed(2)),
             })),
         };
 
@@ -202,13 +205,13 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
                     <button
                         type="button"
                         onClick={() => toast.success("Redirecting to create customer...")}
-                        className="h-[44px] px-4 rounded-lg border border-dashed border-blue-200 text-blue-500 bg-blue-50/50 hover:bg-blue-50 text-xs font-bold flex items-center gap-1.5 transition-all flex-shrink-0"
+                        className="h-[44px] px-4 rounded-lg border border-dashed border-primary-200 text-primary-500 bg-primary-50/50 hover:bg-primary-50 text-xs font-bold flex items-center gap-1.5 transition-all flex-shrink-0"
                     >
                         <span>+</span> New Customer
                     </button>
                 </div>
             </FormCard>
-
+ 
             {/* ── Order Items ── */}
             <FormCard
                 title="Order Items"
@@ -219,7 +222,7 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
                             <button
                                 type="button"
                                 onClick={handleAddProduct}
-                                className="text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-1"
+                                className="text-xs font-bold text-primary-500 hover:text-primary-600 transition-colors flex items-center gap-1"
                             >
                                 + Add Product
                             </button>
@@ -347,7 +350,7 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
                                     value={discount || ""}
                                     onChange={(e) => setDiscount(Math.max(0, Number(e.target.value || 0)))}
                                     placeholder="0.00"
-                                    className="w-20 h-[30px] px-2 rounded-lg border border-gray-200 bg-white text-right text-xs font-semibold text-gray-700 outline-none focus:border-blue-400 transition-all"
+                                    className="w-20 h-[30px] px-2 rounded-lg border border-gray-200 bg-white text-right text-xs font-semibold text-gray-700 outline-none focus:border-primary-400 transition-all"
                                 />
                             </div>
                             <div className="flex justify-between">
@@ -356,7 +359,7 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
                             </div>
                         </div>
                     </div>
-
+ 
                     <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
                         <div className="flex items-end justify-between">
                             <div>
@@ -367,7 +370,7 @@ const OrderFormModal = ({ open, onClose }: OrderFormModalProps) => {
                                 USD
                             </span>
                         </div>
-                        <div className="bg-blue-500 text-white rounded-xl p-3 flex items-center justify-between text-xs font-semibold mt-1">
+                        <div className="bg-primary-500 text-white rounded-xl p-3 flex items-center justify-between text-xs font-semibold mt-1">
                             <span>Need Help?</span>
                             <span className="underline cursor-pointer">Docs →</span>
                         </div>

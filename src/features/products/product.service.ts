@@ -1,6 +1,6 @@
 import apiClient from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints/endpoints";
-import type { Product } from "./types";
+import type { Product, ProductVariant } from "./types";
 
 /** Thin service layer — keeps API logic out of components */
 export const productService = {
@@ -27,5 +27,10 @@ export const productService = {
 
     async remove(id: string): Promise<void> {
         await apiClient.delete(ENDPOINTS.PRODUCT.DELETE(id));
+    },
+
+    async createVariant(productId: string, payload: Record<string, unknown>): Promise<ProductVariant> {
+        const { data } = await apiClient.post(`/products/${productId}/variants`, payload);
+        return data?.data || data;
     },
 };

@@ -43,7 +43,7 @@ export interface ConnectionDetails {
     conflictHandling: string;
     lastSyncAt: string;
     lastSyncStatus: "success" | "failed";
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface SyncLog {
@@ -74,4 +74,55 @@ export interface UsageMetric {
     used: number;
     limit: number;
     percentage: number;
+}
+
+export interface BackendRole {
+    id: string;
+    name?: string;
+    role?: string;
+    description?: string;
+    userCount?: number;
+    _count?: {
+        members?: number;
+    };
+    permission?: Record<string, string[]>;
+    permissions?: Record<string, string[]>;
+}
+
+export interface BackendIntegration {
+    id: string;
+    provider: string;
+    name?: string;
+    isActive?: boolean;
+    shopDomain?: string;
+    createdAt?: string;
+    syncMode?: string;
+    lastSyncedAt?: string;
+    syncStatus?: string;
+    metadata?: Record<string, unknown>;
+}
+
+export interface BackendSyncLog {
+    id: string;
+    startedAt?: string;
+    createdAt?: string;
+    status?: string;
+    itemsFailed?: number;
+    syncType?: string;
+    entityType?: string;
+    itemsProcessed?: number;
+    itemsCreated?: number;
+    itemsUpdated?: number;
+}
+
+export interface BackendImportExportJob {
+    id: string;
+    fileName?: string;
+    createdAt?: string;
+    status?: string;
+    entityType?: string;
+    format?: string;
+    user?: {
+        name?: string;
+    };
 }

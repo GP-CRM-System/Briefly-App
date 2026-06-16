@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
-import toast from "react-hot-toast";
-import type { Campaign, Template } from "../types";
+import type { Campaign } from "../types";
 import { useCreateCampaign, useUpdateCampaign, useTemplates, useSegmentsForDropdown } from "../campaign.hooks";
-import { MOCK_SEGMENTS } from "@/features/segments";
 
 interface CampaignFormModalProps {
     open: boolean;
@@ -57,7 +55,7 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
     const { data: apiSegments } = useSegmentsForDropdown();
 
     const templates = apiTemplates && apiTemplates.length > 0 ? apiTemplates : MOCK_TEMPLATES;
-    const segments = apiSegments && apiSegments.length > 0 ? apiSegments : MOCK_SEGMENTS;
+    const segments = apiSegments && apiSegments.length > 0 ? apiSegments : [];
 
     // Mutations
     const createMutation = useCreateCampaign();

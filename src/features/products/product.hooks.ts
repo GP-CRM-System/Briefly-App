@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "./product.service";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
 
 /** Query key factory — keeps keys consistent and enables targeted invalidation */
 export const productKeys = {
@@ -41,7 +42,7 @@ export const useCreateProduct = () => {
             qc.invalidateQueries({ queryKey: productKeys.all });
             toast.success("Product created!");
         },
-        onError: (err: any) => {
+        onError: (err: AxiosError<{ message?: string }>) => {
             toast.error(err?.response?.data?.message || "Failed to create product");
         },
     });
@@ -57,7 +58,7 @@ export const useUpdateProduct = () => {
             qc.invalidateQueries({ queryKey: productKeys.all });
             toast.success("Product updated!");
         },
-        onError: (err: any) => {
+        onError: (err: AxiosError<{ message?: string }>) => {
             toast.error(err?.response?.data?.message || "Failed to update product");
         },
     });
@@ -72,8 +73,24 @@ export const useDeleteProduct = () => {
             qc.invalidateQueries({ queryKey: productKeys.all });
             toast.success("Product deleted");
         },
-        onError: (err: any) => {
+        onError: (err: AxiosError<{ message?: string }>) => {
             toast.error(err?.response?.data?.message || "Failed to delete product");
+        },
+    });
+};
+
+/** Create a product variant */
+export const useCreateVariant = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ productId, payload }: { productId: string; payload: Record<string, unknown> }) =>
+            productService.createVariant(productId, payload),
+        onSuccess: (_, { productId }) => {
+            qc.invalidateQueries({ queryKey: productKeys.detail(productId) });
+            toast.success("Variant created!");
+        },
+        onError: (err: AxiosError<{ message?: string }>) => {
+            toast.error(err?.response?.data?.message || "Failed to create variant");
         },
     });
 };

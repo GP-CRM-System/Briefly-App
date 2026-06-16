@@ -347,30 +347,85 @@ const SegmentDetails = () => {
                         </div>
 
                         <div className="space-y-3">
-                            {segment.rules && segment.rules.length > 0 ? (
-                                segment.rules.map((rule, index) => (
-                                    <div key={index} className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
-                                        {rule.icon === "finance" && <FinanceIcon />}
-                                        {rule.icon === "geo" && <GeoIcon />}
-                                        {rule.icon === "engagement" && <EngagementIcon />}
-                                        <div className="flex flex-col h-[39px] justify-center leading-none">
-                                            <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">{rule.category}</p>
-                                            <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">{rule.description}</p>
+                            {(() => {
+                                /* ── Dynamic condition derivation ── */
+                                const FIELD_LABELS: Record<string, string> = {
+                                    totalSpent: "Total Spent", totalOrders: "Order Count",
+                                    lifecycleStage: "Lifecycle Stage", country: "Country",
+                                    city: "City", source: "Source", acceptsMarketing: "Accepts Marketing",
+                                    tags: "Tags",
+                                };
+                                const OP_LABELS: Record<string, string> = {
+                                    eq: "is equal to", neq: "is not equal to",
+                                    gt: "is greater than", lt: "is less than",
+                                    gte: "is greater than or equal to", lte: "is less than or equal to",
+                                    contains: "contains", in: "is in list",
+                                };
+
+                                const getIconForField = (field: string) => {
+                                    if (field === "totalSpent" || field === "totalOrders") return "finance";
+                                    if (field === "country" || field === "city") return "geo";
+                                    return "engagement";
+                                };
+                                const getCategoryForField = (field: string) => {
+                                    if (field === "totalSpent" || field === "totalOrders") return "Finance";
+                                    if (field === "country" || field === "city") return "Geography";
+                                    return "Engagement";
+                                };
+                                const formatValue = (field: string, value: string) => {
+                                    if (field === "totalSpent") return `$${Number(value).toLocaleString()}`;
+                                    return value;
+                                };
+
+                                // Priority: explicit rules → conditions from API → single filter fallback
+                                if (segment.rules && segment.rules.length > 0) {
+                                    return segment.rules.map((rule, index) => (
+                                        <div key={index} className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
+                                            {rule.icon === "finance" && <FinanceIcon />}
+                                            {rule.icon === "geo" && <GeoIcon />}
+                                            {rule.icon === "engagement" && <EngagementIcon />}
+                                            <div className="flex flex-col h-[39px] justify-center leading-none">
+                                                <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">{rule.category}</p>
+                                                <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">{rule.description}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
-                            ) : (
-                                // Generic single rule format if segment rules not defined
-                                <div className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
-                                    <FinanceIcon />
-                                    <div className="flex flex-col h-[39px] justify-center leading-none">
-                                        <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">Dynamic Rule</p>
-                                        <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">
-                                            {segment.filter?.field} is equal to {segment.filter?.value}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                                    ));
+                                }
+
+                                // Derive from conditions array or single filter
+                                const conditionsList = (segment as any).conditions && (segment as any).conditions.length > 0
+                                    ? (segment as any).conditions
+                                    : segment.filter?.field ? [segment.filter] : [];
+
+                                if (conditionsList.length === 0) {
+                                    return (
+                                        <div className="flex items-center justify-center py-8 text-gray-400 text-sm">
+                                            No filter conditions defined.
+                                        </div>
+                                    );
+                                }
+
+                                return conditionsList.map((cond: { field: string; operator: string; value: string }, idx: number) => {
+                                    const iconType = getIconForField(cond.field);
+                                    const category = getCategoryForField(cond.field);
+                                    const fieldLabel = FIELD_LABELS[cond.field] || cond.field;
+                                    const opLabel = OP_LABELS[cond.operator] || cond.operator;
+                                    const displayVal = formatValue(cond.field, cond.value);
+                                    const description = `${fieldLabel} ${opLabel} ${displayVal}`;
+
+                                    return (
+                                        <div key={idx} className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">
+                                            {iconType === "finance" && <FinanceIcon />}
+                                            {iconType === "geo" && <GeoIcon />}
+                                            {iconType === "engagement" && <EngagementIcon />}
+                                            <div className="flex flex-col h-[39px] justify-center leading-none">
+                                                <p className="font-['Poppins'] font-medium text-[#8a8a8a] text-[12px] leading-tight">{category}</p>
+                                                <p className="font-['Poppins'] font-normal text-[#1a1a1a] text-[16px] leading-snug mt-0.5">{description}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                });
+                            })()}
                         </div>
                     </div>
                 </div>

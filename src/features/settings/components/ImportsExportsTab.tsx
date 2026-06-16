@@ -9,6 +9,23 @@ import Modal, { FormField, inputClasses, selectClasses } from "@/core/components
 import toast from "react-hot-toast";
 import { Upload01Icon, Download01Icon, ArrowReloadHorizontalIcon, Loading01Icon } from "hugeicons-react";
 
+const formatJobDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        });
+    } catch {
+        return dateStr;
+    }
+};
+
 const ImportsExportsTab = () => {
     const { data: jobs = [], refetch, isFetching } = useImportExportJobs();
 
@@ -107,7 +124,7 @@ const ImportsExportsTab = () => {
                     </button>
                     <button
                         onClick={() => setIsExportOpen(true)}
-                        className="flex-1 sm:flex-none px-4.5 py-2.5 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none px-4.5 py-2.5 bg-primary-500 text-white text-sm font-semibold rounded-lg hover:bg-primary-600 transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2"
                     >
                         <Download01Icon size={14} /> New Export
                     </button>
@@ -215,7 +232,7 @@ const ImportsExportsTab = () => {
                                             </td>
                                             <td className="py-4 px-6">
                                                 <span className={`px-2.5 py-1 rounded text-xs font-semibold ${
-                                                    job.type.toLowerCase() === "import" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"
+                                                    job.type.toLowerCase() === "import" ? "bg-purple-50 text-purple-600" : "bg-primary-50 text-primary-600"
                                                 }`}>
                                                     {job.type.charAt(0).toUpperCase() + job.type.slice(1)}
                                                 </span>
@@ -224,7 +241,7 @@ const ImportsExportsTab = () => {
                                                 {job.fileName}
                                             </td>
                                             <td className="py-4 px-6 text-gray-500">{job.createdBy}</td>
-                                            <td className="py-4 px-6 text-gray-400 font-normal">{job.createdAt}</td>
+                                            <td className="py-4 px-6 text-gray-400 font-normal">{formatJobDate(job.createdAt)}</td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-16 bg-gray-100 h-1.5 rounded-full overflow-hidden">
@@ -246,7 +263,7 @@ const ImportsExportsTab = () => {
                                                     <button
                                                         onClick={() => handleDownloadJob(job.id)}
                                                         disabled={downloadExportMutation.isPending}
-                                                        className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold disabled:opacity-50"
+                                                        className="p-2 bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold disabled:opacity-50"
                                                         title="Download Export File"
                                                     >
                                                         {downloadExportMutation.isPending ? (
@@ -366,4 +383,3 @@ const ImportsExportsTab = () => {
 };
 
 export default ImportsExportsTab;
-

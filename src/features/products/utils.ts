@@ -150,6 +150,7 @@ export const EMPTY_PRODUCT_FORM: ProductFormData = {
     trackInventory: "true",
     weight: "",
     weightUnit: "kg",
+    imageUrl: "",
 };
 
 export const productToFormData = (p: Product): ProductFormData => ({
@@ -160,7 +161,7 @@ export const productToFormData = (p: Product): ProductFormData => ({
     costPrice: String(p.costPrice ?? ""),
     sku: p.sku || "",
     barcode: p.barcode || "",
-    quantity: String(p.quantity ?? 0),
+    quantity: String(p.inventory ?? p.quantity ?? 0),
     category: p.category || CATEGORY_OPTIONS[0],
     type: p.type || "",
     vendor: p.vendor || "",
@@ -169,25 +170,27 @@ export const productToFormData = (p: Product): ProductFormData => ({
     trackInventory: String(p.trackInventory ?? true),
     weight: String(p.weight ?? ""),
     weightUnit: p.weightUnit || "kg",
+    imageUrl: p.imageUrl || p.image || "",
 });
 
 export const productFormDataToPayload = (f: ProductFormData) => ({
     name: f.name,
-    description: f.description,
+    description: f.description || undefined,
     price: parseFloat(f.price) || 0,
     compareAtPrice: f.compareAtPrice ? parseFloat(f.compareAtPrice) : null,
     costPrice: f.costPrice ? parseFloat(f.costPrice) : null,
-    sku: f.sku,
-    barcode: f.barcode,
-    quantity: parseInt(f.quantity) || 0,
-    category: f.category,
-    type: f.type,
-    vendor: f.vendor,
-    brand: f.brand,
+    sku: f.sku || undefined,
+    barcode: f.barcode || undefined,
+    inventory: parseInt(f.quantity) || 0,
+    category: f.category || undefined,
+    type: f.type || undefined,
+    vendor: f.vendor || undefined,
+    brand: f.brand || undefined,
     status: f.status,
     trackInventory: f.trackInventory === "true",
     weight: f.weight ? parseFloat(f.weight) : null,
     weightUnit: f.weightUnit,
+    imageUrl: f.imageUrl ? f.imageUrl : undefined,
 });
 
 /* ═══════════════════════════════════════════

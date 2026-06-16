@@ -1,6 +1,17 @@
 import apiClient from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints/endpoints";
-import type { Role, ConnectionDetails, ImportExportJob, BillingInvoice, SyncLog } from "./types";
+import type {
+    Role,
+    ConnectionDetails,
+    ImportExportJob,
+    BillingInvoice,
+    SyncLog,
+    BackendRole,
+    BackendIntegration,
+    BackendSyncLog,
+    BackendImportExportJob,
+    ResourcePermissions,
+} from "./types";
 
 export const settingsService = {
     // ─── File Upload (Avatar / Logo) ───
@@ -15,22 +26,22 @@ export const settingsService = {
     },
 
     // ─── My Profile ───
-    async updateUser(payload: { name?: string; email?: string; image?: string | null }): Promise<any> {
+    async updateUser(payload: { name?: string; email?: string; image?: string | null }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.UPDATE_USER, payload);
         return data;
     },
 
-    async changePassword(payload: { currentPassword: string; newPassword: string }): Promise<any> {
+    async changePassword(payload: { currentPassword: string; newPassword: string }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.CHANGE_PASSWORD, payload);
         return data;
     },
 
-    async deleteUser(): Promise<any> {
+    async deleteUser(): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.DELETE_USER);
         return data;
     },
 
-    async changeEmail(payload: { newEmail: string }): Promise<any> {
+    async changeEmail(payload: { newEmail: string }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.CHANGE_EMAIL, {
             newEmail: payload.newEmail,
             callbackURL: `${window.location.origin}/verify-email`,
@@ -39,7 +50,7 @@ export const settingsService = {
     },
 
     // ─── Social Account Linking ───
-    async linkSocial(provider: string): Promise<any> {
+    async linkSocial(provider: string): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.LINK_SOCIAL, {
             provider,
             callbackURL: window.location.href,
@@ -47,12 +58,12 @@ export const settingsService = {
         return data;
     },
 
-    async unlinkAccount(providerId: string): Promise<any> {
+    async unlinkAccount(providerId: string): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.AUTH.UNLINK_ACCOUNT, { providerId });
         return data;
     },
 
-    async listAccounts(): Promise<any[]> {
+    async listAccounts(): Promise<unknown[]> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.AUTH.LIST_ACCOUNTS);
             return data?.data || data || [];
@@ -62,7 +73,7 @@ export const settingsService = {
     },
 
     // ─── Organization Profile ───
-    async getOrganization(): Promise<any> {
+    async getOrganization(): Promise<unknown> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.ORGANIZATION.GET_FULL);
             return data?.data || data;
@@ -71,12 +82,12 @@ export const settingsService = {
         }
     },
 
-    async updateOrganization(payload: { name: string; slug: string; logo?: string | null }): Promise<any> {
+    async updateOrganization(payload: { name: string; slug: string; logo?: string | null }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.ORGANIZATION.UPDATE, { data: payload });
         return data;
     },
 
-    async deleteOrganization(): Promise<any> {
+    async deleteOrganization(): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.ORGANIZATION.DELETE);
         return data;
     },
@@ -93,7 +104,7 @@ export const settingsService = {
             if (rolesList && rolesList.length > 0) {
                 // Map backend array-based permissions { resource: ["read","write"] }
                 // to frontend boolean-based { resource: { read: true, write: true, delete: false } }
-                return rolesList.map((r: any) => ({
+                return rolesList.map((r: BackendRole) => ({
                     id: r.id,
                     name: r.name || r.role,
                     description: r.description || "",
@@ -152,7 +163,7 @@ export const settingsService = {
         ];
     },
 
-    async createRole(payload: { name: string; description: string; permissions: Record<string, any> }): Promise<Role> {
+    async createRole(payload: { name: string; description: string; permissions: Record<string, ResourcePermissions> }): Promise<Role> {
         // Convert frontend boolean permissions to backend array format
         const backendPermissions = settingsService._mapPermissionsToBackend(payload.permissions);
         const { data } = await apiClient.post(ENDPOINTS.ROLE.CREATE, {
@@ -170,8 +181,8 @@ export const settingsService = {
         };
     },
 
-    async updateRole(id: string, payload: { name?: string; description?: string; permissions?: Record<string, any> }): Promise<any> {
-        const body: any = {};
+    async updateRole(id: string, payload: { name?: string; description?: string; permissions?: Record<string, ResourcePermissions> }): Promise<unknown> {
+        const body: Record<string, unknown> = {};
         if (payload.name) body.name = payload.name.toLowerCase().replace(/\s+/g, "-");
         if (payload.description) body.description = payload.description;
         if (payload.permissions) body.permissions = settingsService._mapPermissionsToBackend(payload.permissions);
@@ -179,7 +190,7 @@ export const settingsService = {
         return data?.data || data;
     },
 
-    async deleteRole(id: string): Promise<any> {
+    async deleteRole(id: string): Promise<unknown> {
         const { data } = await apiClient.delete(ENDPOINTS.ROLE.DELETE(id));
         return data?.data || data || { success: true };
     },
@@ -264,7 +275,7 @@ export const settingsService = {
             const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.GET_ALL);
             const integrations = data?.data || data;
             if (Array.isArray(integrations) && integrations.length > 0) {
-                return integrations.map((i: any) => ({
+                return integrations.map((i: BackendIntegration) => ({
                     id: i.id,
                     provider: i.provider,
                     name: i.name || i.provider || "Connection",
@@ -288,32 +299,32 @@ export const settingsService = {
         return [];
     },
 
-    async connectMeta(payload: { channel: string; accessToken: string; name?: string; metadata: Record<string, string> }): Promise<any> {
+    async connectMeta(payload: { channel: string; accessToken: string; name?: string; metadata: Record<string, string> }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.CONNECT_META, payload);
         return data?.data || data;
     },
 
-    async connectShopify(payload: { shopDomain: string; accessToken: string; name?: string }): Promise<any> {
+    async connectShopify(payload: { shopDomain: string; accessToken: string; name?: string }): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.CONNECT_SHOPIFY, payload);
         return data?.data || data;
     },
 
-    async testConnection(id: string): Promise<any> {
+    async testConnection(id: string): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.TEST_CONNECTION(id));
         return data?.data || data;
     },
 
-    async syncConnection(id: string): Promise<any> {
+    async syncConnection(id: string): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.FULL_SYNC(id));
         return data?.data || data;
     },
 
-    async updateIntegration(id: string, payload: Record<string, unknown>): Promise<any> {
+    async updateIntegration(id: string, payload: Record<string, unknown>): Promise<unknown> {
         const { data } = await apiClient.patch(ENDPOINTS.INTEGRATION.UPDATE(id), payload);
         return data?.data || data;
     },
 
-    async deleteIntegration(id: string): Promise<any> {
+    async deleteIntegration(id: string): Promise<unknown> {
         await apiClient.delete(ENDPOINTS.INTEGRATION.DELETE(id));
         return { success: true };
     },
@@ -323,7 +334,7 @@ export const settingsService = {
             const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id));
             const logs = data?.data || data;
             if (Array.isArray(logs)) {
-                return logs.map((l: any) => ({
+                return logs.map((l: BackendSyncLog) => ({
                     id: l.id,
                     timestamp: l.startedAt || l.createdAt || new Date().toISOString(),
                     level: l.status === "failed" ? "error" as const : l.itemsFailed > 0 ? "warning" as const : "info" as const,
@@ -347,12 +358,12 @@ export const settingsService = {
             const { data } = await apiClient.get(ENDPOINTS.IMPORT.GET_ALL);
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
-                return jobs.map((j: any) => ({
+                return jobs.map((j: BackendImportExportJob) => ({
                     id: j.id,
                     type: "import" as const,
                     fileName: j.fileName || "unknown",
                     createdBy: j.user?.name || "Admin User",
-                    createdAt: j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+                    createdAt: j.createdAt || "",
                     progress: j.status === "COMPLETED" ? 100 : j.status === "PROCESSING" ? 50 : 0,
                     status: j.status === "COMPLETED" ? "completed" as const : j.status === "FAILED" || j.status === "PARTIALLY_FAILED" ? "failed" as const : "pending" as const,
                 }));
@@ -368,12 +379,12 @@ export const settingsService = {
             const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ALL);
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
-                return jobs.map((j: any) => ({
+                return jobs.map((j: BackendImportExportJob) => ({
                     id: j.id,
                     type: "export" as const,
                     fileName: j.fileName || `export_${j.entityType}.${j.format || "csv"}`,
                     createdBy: j.user?.name || "Admin User",
-                    createdAt: j.createdAt ? new Date(j.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+                    createdAt: j.createdAt || "",
                     progress: j.status === "COMPLETED" ? 100 : j.status === "PROCESSING" ? 50 : 0,
                     status: j.status === "COMPLETED" ? "completed" as const : j.status === "FAILED" ? "failed" as const : "pending" as const,
                 }));
@@ -395,7 +406,7 @@ export const settingsService = {
         );
     },
 
-    async createImport(file: File, entityType: string): Promise<any> {
+    async createImport(file: File, entityType: string): Promise<unknown> {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("entityType", entityType);
@@ -405,7 +416,7 @@ export const settingsService = {
         return data?.data || data;
     },
 
-    async createExport(entityType: string, format: string = "csv"): Promise<any> {
+    async createExport(entityType: string, format: string = "csv"): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.EXPORT.CREATE, { entityType, format });
         return data?.data || data;
     },
@@ -416,7 +427,7 @@ export const settingsService = {
     },
 
     // ─── Subscriptions & Billing ───
-    async getPlans(): Promise<any[]> {
+    async getPlans(): Promise<unknown[]> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS);
             return data?.data || data || [];
@@ -429,7 +440,7 @@ export const settingsService = {
         }
     },
 
-    async getCurrentSubscription(): Promise<any> {
+    async getCurrentSubscription(): Promise<unknown> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.CURRENT);
             return data?.data || data;
@@ -438,12 +449,12 @@ export const settingsService = {
         }
     },
 
-    async initializeSubscription(planId: string, billingCycle: string = "monthly"): Promise<any> {
+    async initializeSubscription(planId: string, billingCycle: string = "monthly"): Promise<unknown> {
         const { data } = await apiClient.post(ENDPOINTS.SUBSCRIPTION.INITIALIZE, { planId, billingCycle });
         return data?.data || data;
     },
 
-    async cancelSubscription(immediately: boolean = false): Promise<any> {
+    async cancelSubscription(immediately: boolean = false): Promise<unknown> {
         const { data } = await apiClient.patch(ENDPOINTS.SUBSCRIPTION.CANCEL, { immediately });
         return data?.data || data;
     },

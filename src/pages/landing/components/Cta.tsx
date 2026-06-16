@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { play as Play } from "@/assets/icons";
 
 const Cta: React.FC = () => {
     const primaryButtonClass =
@@ -21,7 +20,9 @@ const Cta: React.FC = () => {
                         </button>
                     </Link>
                     <button className={`${secondaryButtonClass} group flex items-center justify-center gap-2 mx-auto sm:mx-0`}>
-                        <Play className="w-5 h-5 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0" aria-hidden />
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
                         Watch Demo
                     </button>
                 </div>

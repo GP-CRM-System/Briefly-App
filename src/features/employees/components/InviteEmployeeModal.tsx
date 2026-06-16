@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Modal, { FormCard, FormField, inputClasses, selectClasses } from "@/core/components/Modal";
 import { useInviteEmployee } from "../employee.hooks";
 import toast from "react-hot-toast";
@@ -28,12 +28,15 @@ const InviteEmployeeModal = ({ open, onClose }: InviteEmployeeModalProps) => {
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("");
 
-    useEffect(() => {
+    const [prevOpen, setPrevOpen] = useState(open);
+
+    if (open !== prevOpen) {
+        setPrevOpen(open);
         if (open) {
             setEmail("");
             setRole("");
         }
-    }, [open]);
+    }
 
     if (!open) return null;
 
@@ -92,10 +95,8 @@ const InviteEmployeeModal = ({ open, onClose }: InviteEmployeeModalProps) => {
                         required
                     >
                         <option value="">Select a Role</option>
-                        <option value="Administrator">Administrator</option>
-                        <option value="Manager">Manager</option>
-                        <option value="UIUX Designer">UIUX Designer</option>
-                        <option value="Member">Member</option>
+                        <option value="admin">Administrator</option>
+                        <option value="member">Member</option>
                     </select>
                 </FormField>
             </FormCard>
