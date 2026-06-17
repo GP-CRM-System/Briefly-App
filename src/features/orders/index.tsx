@@ -7,13 +7,13 @@ import DataTable from "@/core/components/DataTable";
 
 import type { Order, OrderFilterState } from "./types";
 import { useOrders, useDeleteOrder } from "./order.hooks";
-import { useCreateImport } from "@/features/settings/settings.hooks";
 import { freshOrderFilters, filterOrders, countActiveFilters } from "./utils";
 
 import { columns } from "./components/OrderColumns";
 import ActionMenu from "./components/ActionMenu";
 import FilterPanel from "./components/FilterPanel";
 import OrderFormModal from "./components/OrderFormModal";
+import ImportExportModal from "@/features/imports/ImportExportModal";
 
 const Orders = () => {
     const navigate = useNavigate();
@@ -24,71 +24,14 @@ const Orders = () => {
 
     /* Modal state */
     const [modalOpen, setModalOpen] = useState(false);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
 
     /* ── Data ── */
     const { data: orders = [], isLoading, isError } = useOrders();
     const deleteMutation = useDeleteOrder();
-    const createImportMutation = useCreateImport();
 
-    const handleExport = () => {
-        if (!filtered.length) {
-            toast.error("No orders to export");
-            return;
-        }
 
-        const csvData = filtered.map(o => ({
-            ID: o.id,
-            Customer: o.customerName || o.customer?.name || "",
-            Email: o.customerEmail || o.customer?.email || "",
-            ShippingStatus: o.shippingStatus || "",
-            PaymentStatus: o.paymentStatus || "",
-            Total: o.totalAmount || 0,
-            Currency: o.currency || "",
-            Source: o.source || "",
-            CreatedAt: o.createdAt,
-        }));
-
-        const headers = Object.keys(csvData[0]);
-        const csvRows = [
-            headers.join(","),
-            ...csvData.map(row =>
-                headers.map(h => {
-                    const val = row[h as keyof typeof row];
-                    const escaped = ('' + (val ?? '')).replace(/"/g, '""');
-                    return `"${escaped}"`;
-                }).join(",")
-            )
-        ];
-
-        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        toast.success("Orders exported successfully!");
-    };
-
-    const handleImport = () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".csv";
-        input.onchange = (e: any) => {
-            const file = e.target.files?.[0];
-            if (file) {
-                createImportMutation.mutate({ file, entityType: "order" }, {
-                    onSuccess: () => {
-                        toast.success("Orders import job created! You can check progress in Settings -> Imports & Exports.");
-                    }
-                });
-            }
-        };
-        input.click();
-    };
 
     if (isError) {
         return (
@@ -122,8 +65,8 @@ const Orders = () => {
                 onSearch={setSearch}
                 filterCount={countActiveFilters(activeFilters)}
                 onFilter={() => setFilterOpen((p) => !p)}
-                onExport={handleExport}
-                onImport={handleImport}
+                onExport={() => setExportOpen(true)}
+                onImport={() => setImportOpen(true)}
                 onCreate={() => setModalOpen(true)}
                 createLabel="Create Order"
                 filterContent={
@@ -155,6 +98,19 @@ const Orders = () => {
             <OrderFormModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
+            />
+
+            <ImportExportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                mode="import"
+                entityType="order"
+            />
+            <ImportExportModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                mode="export"
+                entityType="order"
             />
         </>
     );

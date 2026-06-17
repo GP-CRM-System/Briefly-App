@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useOrder, useAddOrderNote } from "../order.hooks";
-import { MOCK_ORDERS } from "../utils";
 
 const fmtOrderDetailsDate = (d: string | null | undefined) => {
     if (!d) return "—";
@@ -14,7 +13,7 @@ const fmtOrderDetailsDate = (d: string | null | undefined) => {
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? "PM" : "AM";
         hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours ? hours : 12;
         const strMinutes = minutes < 10 ? "0" + minutes : minutes;
         
         return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} at ${hours}:${strMinutes} ${ampm}`;
@@ -23,18 +22,21 @@ const fmtOrderDetailsDate = (d: string | null | undefined) => {
     }
 };
 
+const fulfillmentSteps = ["unfulfilled", "processing", "shipped", "delivered"];
+
+const getFulfillmentStep = (status?: string) => {
+    const idx = fulfillmentSteps.indexOf(status?.toLowerCase() ?? "");
+    return idx >= 0 ? idx : 0;
+};
+
 const OrderDetails = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    // Query Hook
-    const { data: orderData, isLoading } = useOrder(id);
+    const { data: order, isLoading } = useOrder(id);
     const addNoteMutation = useAddOrderNote(id);
 
     const [newNote, setNewNote] = useState("");
-
-    // Fallback to mock data if loading fails/not found
-    const order = orderData || MOCK_ORDERS.find((o) => o.id === id) || MOCK_ORDERS[0];
 
     const handleAddNote = (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,6 +56,19 @@ const OrderDetails = () => {
             </div>
         );
     }
+
+    if (!order) {
+        return (
+            <div className="flex items-center justify-center min-h-[300px]">
+                <p className="text-gray-400 text-sm">Order not found</p>
+            </div>
+        );
+    }
+
+    const paymentLower = order.paymentStatus?.toLowerCase() ?? "";
+    const isPaid = paymentLower === "paid";
+    const fulfillmentStep = getFulfillmentStep(order.fulfillmentStatus);
+    const paymentTransaction = order.transactions?.find((t) => t.type === "PAYMENT" && t.status === "SUCCESS");
 
     return (
         <div className="space-y-6 max-w-[1250px]">
@@ -84,10 +99,7 @@ const OrderDetails = () => {
                         </div>
                         <div className="flex items-center gap-3 pt-2">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-semibold capitalize">
-                                🌐 {order.source || "Web Store"}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 text-xs font-semibold">
-                                👥 VIP Customers
+                                {order.source || "Web Store"}
                             </span>
                         </div>
                     </div>
@@ -99,38 +111,56 @@ const OrderDetails = () => {
                             
                             <div className="space-y-4">
                                 <div className="text-xs font-semibold text-gray-500">
-                                    Shipping Status: <span className="text-gray-900 font-bold capitalize">{order.shippingStatus}</span> <span className="text-gray-400">(Pending)</span>
+                                    Fulfillment: <span className="text-gray-900 font-bold capitalize">{order.fulfillmentStatus || "unfulfilled"}</span>
                                 </div>
                                 
                                 {/* Step Tracker Line */}
                                 <div className="flex items-center w-full max-w-[400px] pt-2">
-                                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow">
-                                        ✓
-                                    </div>
-                                    <div className="flex-1 h-0.5 bg-blue-500"></div>
-                                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow">
-                                        2
-                                    </div>
-                                    <div className="flex-1 h-0.5 bg-gray-200"></div>
-                                    <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold">
-                                        3
-                                    </div>
+                                    {fulfillmentSteps.map((step, i) => (
+                                        <div key={step} className="contents">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow ${
+                                                i <= fulfillmentStep
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-gray-100 border border-gray-200 text-gray-400"
+                                            }`}>
+                                                {i < fulfillmentStep ? "✓" : i + 1}
+                                            </div>
+                                            {i < fulfillmentSteps.length - 1 && (
+                                                <div className={`flex-1 h-0.5 ${i < fulfillmentStep ? "bg-blue-500" : "bg-gray-200"}`}></div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
                         <div className="pt-4 border-t border-gray-50">
                             <div className="text-xs font-semibold text-gray-500 mb-2">
-                                Payment Status: <span className="text-gray-900 font-bold capitalize">{order.paymentStatus === "paid" ? "Paid in full" : order.paymentStatus}</span> <span className="text-gray-400">({order.paymentStatus === "paid" ? "Paid" : "Unpaid"})</span>
+                                Payment Status: <span className="text-gray-900 font-bold capitalize">{isPaid ? "Paid in full" : order.paymentStatus}</span>
                             </div>
                             
-                            {/* Card green banner */}
-                            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
-                                <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Verified Payment - Visa **** 4242</span>
-                            </div>
+                            {isPaid && paymentTransaction ? (
+                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
+                                    <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Verified Payment — {paymentTransaction.provider} ({paymentTransaction.currency} {Number(paymentTransaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })})</span>
+                                </div>
+                            ) : isPaid ? (
+                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
+                                    <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Verified Payment</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 text-xs font-semibold">
+                                    <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <span>Payment pending</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -156,16 +186,15 @@ const OrderDetails = () => {
                                                     📦
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-gray-800 leading-tight">{item.productName}</p>
-                                                    <p className="text-[10px] text-gray-400 mt-0.5">ID: {item.productSku}</p>
+                                                    <p className="font-semibold text-gray-800 leading-tight">{item.product?.name || "—"}</p>
                                                 </div>
                                             </td>
                                             <td className="py-4 text-center font-semibold text-gray-600">{item.quantity}</td>
                                             <td className="py-4 text-right font-medium text-gray-700">
-                                                ${Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                ${Number(item.product?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="py-4 text-right font-bold text-gray-900">
-                                                ${(Number(item.price) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                ${(Number(item.product?.price ?? 0) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                         </tr>
                                     ))}
@@ -188,11 +217,11 @@ const OrderDetails = () => {
                                 <span className="font-semibold text-gray-800">${Number(order.subtotal ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Discount <span className="text-xs text-rose-500 font-medium">(-10%)</span></span>
+                                <span>Discount</span>
                                 <span className="font-semibold text-rose-500">-${Number(order.discountAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Tax (8%)</span>
+                                <span>Tax</span>
                                 <span className="font-semibold text-gray-800">${Number(order.taxAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="flex justify-between">
@@ -209,36 +238,59 @@ const OrderDetails = () => {
                         </div>
                     </div>
 
-                    {/* Warning Box */}
-                    <div className="bg-rose-50 border border-rose-100 rounded-3xl p-5 shadow-sm space-y-2">
-                        <div className="flex items-center gap-2 text-rose-700 text-sm font-bold">
-                            <svg className="w-4.5 h-4.5 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <span>Partial Refund Issued</span>
+                    {/* Customer Card */}
+                    {order.customer && (
+                        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-3">
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Customer</h3>
+                            <button
+                                onClick={() => navigate(`/dashboard/customers/${order.customer!.id}`)}
+                                className="text-sm font-semibold text-blue-600 hover:underline"
+                            >
+                                {order.customer.name}
+                            </button>
+                            <p className="text-xs text-gray-500">{order.customer.email}</p>
+                            {order.customer.phone && <p className="text-xs text-gray-500">{order.customer.phone}</p>}
+                            {order.customer.city && <p className="text-xs text-gray-400">{order.customer.city}{order.customer.address ? `, ${order.customer.address}` : ""}</p>}
                         </div>
-                        <p className="text-xs text-rose-600 leading-relaxed">
-                            A refund of $150.00 was processed for 'Damaged Item' on Oct 25.
-                        </p>
-                    </div>
+                    )}
+
+                    {/* Transactions Card */}
+                    {order.transactions && order.transactions.length > 0 && (
+                        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-3">
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Transactions</h3>
+                            {order.transactions.map((tx) => (
+                                <div key={tx.id} className="flex items-center justify-between text-xs py-2 border-b border-gray-50 last:border-0">
+                                    <div>
+                                        <p className="font-semibold text-gray-800">{tx.provider}</p>
+                                        <p className="text-gray-400">{tx.type} · {fmtOrderDetailsDate(tx.createdAt)}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-semibold text-gray-800">{tx.currency} {Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                            tx.status === "SUCCESS" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+                                        }`}>
+                                            {tx.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Admin Notes Timeline Card */}
                     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Admin Notes</h3>
-                            <button className="text-xs font-bold text-blue-500 hover:underline">✏️ Edit</button>
-                        </div>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Order Note</h3>
 
-                        {/* Timeline quote box */}
-                        <div className="relative border border-gray-50 bg-gray-50/20 rounded-2xl p-4 mt-2">
-                            <span className="absolute top-2 left-2 text-3xl font-serif text-gray-200 leading-none">“</span>
-                            <p className="text-xs text-gray-500 leading-relaxed pl-4 relative z-10 italic">
-                                {order.note || "Customer requested express delivery as they need the support package by end of week."}
-                            </p>
-                            <div className="text-right mt-2 text-[10px] font-bold text-blue-500">
-                                — Sarah Ahmed, Oct 24
+                        {order.note ? (
+                            <div className="relative border border-gray-50 bg-gray-50/20 rounded-2xl p-4">
+                                <span className="absolute top-2 left-2 text-3xl font-serif text-gray-200 leading-none">"</span>
+                                <p className="text-xs text-gray-500 leading-relaxed pl-4 relative z-10 italic">
+                                    {order.note}
+                                </p>
                             </div>
-                        </div>
+                        ) : (
+                            <p className="text-xs text-gray-400 italic">No notes yet</p>
+                        )}
 
                         {/* Add note interface */}
                         <form onSubmit={handleAddNote} className="space-y-2 pt-2">

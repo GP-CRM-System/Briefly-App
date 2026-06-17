@@ -1,57 +1,57 @@
 export interface OrderItem {
     id: string;
-    orderId: string;
-    productId: string;
     quantity: number;
-    price: string | number;
-    createdAt?: string;
-    updatedAt?: string;
-    productName?: string;
-    productSku?: string;
-    productImageUrl?: string;
     product?: {
         id: string;
         name: string;
         price: string;
-        imageUrl?: string;
-        sku?: string;
     };
 }
 
-export interface OrderNote {
+export interface OrderTransaction {
     id: string;
-    content: string;
+    orderId: string;
+    externalId?: string | null;
+    amount: string;
+    currency: string;
+    provider: string;
+    status: string;
+    type: string;
+    metadata?: Record<string, unknown> | null;
+    errorMessage?: string | null;
     createdAt: string;
-    author?: string;
+    updatedAt: string;
+}
+
+export interface OrderCustomer {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    city?: string;
+    address?: string;
+    source?: string;
+    lifecycleStage?: string;
+    totalOrders?: number;
+    totalSpent?: string;
 }
 
 export interface Order {
     id: string;
-    customerId: string;
-    customerName?: string;
-    customerEmail?: string;
-    customer?: {
-        id: string;
-        name: string;
-        email: string;
-        phone?: string;
-    };
-    shippingStatus: "processing" | "shipped" | "delivered" | "cancelled" | "pending";
-    paymentStatus: "paid" | "pending" | "failed";
+    createdAt: string;
+    source: string;
+    paymentStatus: string;
+    fulfillmentStatus?: string;
     subtotal: string | number;
     discountAmount?: string | number;
     taxAmount?: string | number;
     shippingAmount?: string | number;
     totalAmount: string | number;
-    currency: string;
-    source: string;
-    createdAt: string;
-    updatedAt: string;
+    customer?: OrderCustomer;
     orderItems?: OrderItem[];
-    notes?: OrderNote[];
-    note?: string;
-    refundAmount?: string | number;
-    tags?: string[];
+    note?: string | null;
+    supportTickets?: unknown[];
+    transactions?: OrderTransaction[];
 }
 
 export interface OrderFormData {
@@ -65,7 +65,7 @@ export interface OrderFormData {
 }
 
 export interface OrderFilterState {
-    shippingStatus: Set<string>;
+    fulfillmentStatus: Set<string>;
     paymentStatus: Set<string>;
     source: string;
     search: string;

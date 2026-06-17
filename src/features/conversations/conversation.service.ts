@@ -4,7 +4,9 @@ import type { Conversation, Message, SendMessagePayload, PaginatedResponse, Star
 
 export const conversationService = {
     async getAll(): Promise<Conversation[]> {
-        const { data } = await apiClient.get(ENDPOINTS.CONVERSATION.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.CONVERSATION.GET_ALL, {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 

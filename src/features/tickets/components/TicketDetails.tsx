@@ -276,7 +276,7 @@ const TicketDetails = () => {
                                     {ticket.notes.map((note) => (
                                         <div key={note.id} className="bg-[rgba(138,138,138,0.04)] rounded-[14px] p-5 flex flex-col gap-2">
                                             <p className="text-[13px] text-[#1a1a1a] font-normal leading-[22px] font-['Poppins']">
-                                                {note.content}
+                                                {note.content || note.body}
                                             </p>
                                             <span className="text-[11px] text-[#4a90e2] font-medium self-end font-['Poppins']">
                                                 — {note.author || "Sarah Ahmed"} at {fmtTicketDate(note.createdAt)}

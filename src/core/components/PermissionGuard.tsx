@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/store/auth.store";
 
 type PermissionGuardProps = {
-    /** Permission string in format "Resource.action" e.g. "Contact.read" */
+    /** Permission string in format "resource:action" e.g. "customers:read" */
     permission: string;
     /** Content shown when user DOES NOT have permission */
     fallback?: React.ReactNode;
@@ -14,7 +14,7 @@ type PermissionGuardProps = {
  * that the current user's role doesn't have access to.
  *
  * @example
- * <PermissionGuard permission="Contact.read">
+ * <PermissionGuard permission="customers:read">
  *     <ContactsPage />
  * </PermissionGuard>
  */
@@ -27,10 +27,10 @@ export function PermissionGuard({
 
     // console.log(permissions);
 
-    const [resource, action] = permission.split(".");
+    const [resource, action] = permission.split(":");
 
     if (!resource || !action) {
-        console.warn(`[PermissionGuard] Invalid permission format: "${permission}". Expected "Resource.action".`);
+        console.warn(`[PermissionGuard] Invalid permission format: "${permission}". Expected "resource:action".`);
         return <>{fallback}</>;
     }
 

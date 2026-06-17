@@ -4,7 +4,9 @@ import type { Notification, UnreadCountResponse } from "./types";
 
 export const notificationService = {
     async getAll(): Promise<Notification[]> {
-        const { data } = await apiClient.get(ENDPOINTS.NOTIFICATION.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.NOTIFICATION.GET_ALL, {
+            params: { limit: 1000 }
+        });
         // Handle paginated { data: [...] } or plain array responses
         const list = data?.data ?? data;
         return Array.isArray(list) ? list : [];

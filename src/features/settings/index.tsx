@@ -5,14 +5,15 @@ import OrganizationProfileTab from "./components/OrganizationProfileTab";
 import RolesPermissionsTab from "./components/RolesPermissionsTab";
 import ConnectionsTab from "./components/ConnectionsTab";
 import ImportsExportsTab from "./components/ImportsExportsTab";
+import AuditLogsTab from "./components/AuditLogsTab";
 import PaymentBillingTab from "./components/PaymentBillingTab";
-import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon } from "hugeicons-react";
+import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon, ClipboardIcon } from "hugeicons-react";
 
 const Settings = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
     
-    const validTabs = ["profile", "org", "roles", "connections", "imports", "billing"] as const;
+    const validTabs = ["profile", "org", "roles", "connections", "imports", "audit", "billing"] as const;
     const queryTab = searchParams.get("tab") || (location.state as any)?.tab;
     const initialTab = (queryTab && validTabs.includes(queryTab as any)) 
         ? (queryTab as typeof validTabs[number]) 
@@ -38,6 +39,7 @@ const Settings = () => {
         { id: "roles" as const, label: "Roles & Permissions", icon: Shield01Icon },
         { id: "connections" as const, label: "Connections", icon: Link01Icon },
         { id: "imports" as const, label: "Imports & Exports", icon: ArrowDataTransferHorizontalIcon },
+        { id: "audit" as const, label: "Audit Logs", icon: ClipboardIcon },
         { id: "billing" as const, label: "Payment & Billing", icon: CreditCardIcon },
     ];
 
@@ -53,6 +55,8 @@ const Settings = () => {
                 return <ConnectionsTab />;
             case "imports":
                 return <ImportsExportsTab />;
+            case "audit":
+                return <AuditLogsTab />;
             case "billing":
                 return <PaymentBillingTab />;
             default:
@@ -110,4 +114,4 @@ const Settings = () => {
 };
 
 export default Settings;
-export { MyProfileTab, OrganizationProfileTab, RolesPermissionsTab, ConnectionsTab, ImportsExportsTab, PaymentBillingTab };
+export { MyProfileTab, OrganizationProfileTab, RolesPermissionsTab, ConnectionsTab, ImportsExportsTab, AuditLogsTab, PaymentBillingTab };

@@ -20,7 +20,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
     const toggleCategory = (cat: string) => {
         setLocal((prev) => {
             const next = new Set(prev.categories);
-            next.has(cat) ? next.delete(cat) : next.add(cat);
+            if (next.has(cat)) { next.delete(cat); } else { next.add(cat); }
             return { ...prev, categories: next };
         });
     };
@@ -28,7 +28,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
     const toggleStatus = (st: string) => {
         setLocal((prev) => {
             const next = new Set(prev.statuses);
-            next.has(st) ? next.delete(st) : next.add(st);
+            if (next.has(st)) { next.delete(st); } else { next.add(st); }
             return { ...prev, statuses: next };
         });
     };

@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useProduct, useDeleteProduct, useCreateVariant } from "../product.hooks";
+import { useProduct, useProducts, useDeleteProduct } from "../product.hooks";
+import { useProductRecommendations } from "@/features/ai/ai.hooks";
 import ProductFormModal from "./ProductFormModal";
-import type { ProductVariant } from "../types";
-import toast from "react-hot-toast";
-import Modal, { FormField, FormRow, inputClasses } from "@/core/components/Modal";
 
 const fmtCurrency = (v: string | number | null | undefined) => {
     if (v == null) return "—";
@@ -30,105 +28,70 @@ const ProductDetails = () => {
     const navigate = useNavigate();
 
     const { data: product, isLoading } = useProduct(id);
+    const { data: allProducts = [] } = useProducts();
+    const { data: recommendations } = useProductRecommendations(id ?? "");
     const deleteMutation = useDeleteProduct();
-    const createVariantMutation = useCreateVariant();
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isAddVariantOpen, setIsAddVariantOpen] = useState(false);
-    const [variantForm, setVariantForm] = useState({
-        name: "",
-        sku: "",
-        price: "",
-        inventory: "0",
-        barcode: "",
-        imageUrl: "",
-    });
-    
-    // Pagination & checkbox states for variants table
     const [selectedVariants, setSelectedVariants] = useState<Set<string>>(new Set());
+
+    // Resolve recommended product IDs to full product objects (must be before any early returns)
+    const recommendedProducts = useMemo(() => {
+        if (!recommendations?.recommendations) return [];
+        const raw = recommendations.recommendations as Array<Record<string, unknown>>;
+        if (!Array.isArray(raw) || raw.length === 0) return [];
+        const productMap = new Map(allProducts.map((p) => [p.id, p]));
+        return raw
+            .map((r) => ({
+                itemId: String(r.itemId ?? r.item_id ?? ""),
+                similarity: Number(r.similarity ?? 0),
+            }))
+            .filter((r) => r.itemId && r.itemId !== id) // exclude self
+            .slice(0, 6) // limit to 6
+            .map((r) => ({
+                ...r,
+                product: productMap.get(r.itemId) ?? null,
+            }));
+    }, [recommendations, allProducts, id]);
 
     if (isLoading || !product) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     const p = product;
-    
+
     const handleDelete = () => {
         if (!window.confirm(`Are you sure you want to delete "${p.name}"? This action cannot be undone.`)) return;
-        deleteMutation.mutate(p.id, { 
+        deleteMutation.mutate(p.id, {
             onSuccess: () => {
                 navigate("/dashboard/products");
-            } 
+            }
         });
     };
 
-    // Extracting image and inventory gracefully
     const imageUrl = p.imageUrl || p.image || (p.images && p.images[0]) || "";
-    const stock = p.inventory !== undefined ? p.inventory : (p.quantity !== undefined ? p.quantity : 0);
+    const stock = p.inventory ?? 0;
+    const displayCategory = p.category || "—";
+    const weight = p.weight != null ? `${Number(p.weight).toFixed(1)} ${p.weightUnit || ""}` : "—";
+    const orderItems = p.orderItems ?? [];
+    const variants = p.variants ?? [];
 
-    // Derived properties for standard sneakers look if blank (for premium fidelity)
-    const displayCategory = p.category || "Home";
-    const displaySubCategory = p.type || "Furniture";
-    const displayBrand = p.brand || "Briefly Gold";
-    const displayColorway = "Gold / Neutral";
-
-    const variants = p.variants || [];
-
-    const handleAddVariant = () => {
-        if (!variantForm.name.trim()) {
-            toast.error("Variant name is required");
-            return;
-        }
-        if (!variantForm.price || Number(variantForm.price) < 0) {
-            toast.error("Price must be a valid number >= 0");
-            return;
-        }
-        createVariantMutation.mutate({
-            productId: p.id,
-            payload: {
-                name: variantForm.name,
-                sku: variantForm.sku || undefined,
-                price: parseFloat(variantForm.price),
-                inventory: parseInt(variantForm.inventory) || 0,
-                barcode: variantForm.barcode || undefined,
-                imageUrl: variantForm.imageUrl || undefined,
-            }
-        }, {
-            onSuccess: () => {
-                setIsAddVariantOpen(false);
-                setVariantForm({
-                    name: "",
-                    sku: "",
-                    price: "",
-                    inventory: "0",
-                    barcode: "",
-                    imageUrl: "",
-                });
-            }
-        });
-    };
-
-    // Toggle selected state for single variant
-    const toggleVariant = (id: string) => {
+    const toggleVariant = (vId: string) => {
         const next = new Set(selectedVariants);
-        if (next.has(id)) {
-            next.delete(id);
-        } else {
-            next.add(id);
-        }
+        if (next.has(vId)) next.delete(vId);
+        else next.add(vId);
         setSelectedVariants(next);
     };
 
-    // Toggle all visible variants
     const toggleAllVariants = () => {
         if (selectedVariants.size === variants.length) {
             setSelectedVariants(new Set());
         } else {
-            setSelectedVariants(new Set(variants.map((v: ProductVariant) => v.id)));
+            setSelectedVariants(new Set(variants.map((v: any) => v.id)));
         }
     };
 
@@ -136,8 +99,8 @@ const ProductDetails = () => {
         <div className="space-y-8 max-w-[1200px] pb-12 animate-fade-in">
             {/* ── Breadcrumbs ── */}
             <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
-                <span 
-                    onClick={() => navigate("/dashboard/products")} 
+                <span
+                    onClick={() => navigate("/dashboard/products")}
                     className="hover:text-gray-600 cursor-pointer transition-colors"
                 >
                     Products
@@ -151,7 +114,9 @@ const ProductDetails = () => {
                 <div className="space-y-1">
                     <div className="flex items-center gap-3 flex-wrap">
                         <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">{p.name}</h1>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize border bg-green-50 text-green-600 border-green-200">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize border ${
+                            p.status === "active" ? "bg-green-50 text-green-600 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"
+                        }`}>
                             {p.status || "active"}
                         </span>
                     </div>
@@ -163,7 +128,7 @@ const ProductDetails = () => {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsEditModalOpen(true)}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary-600 hover:bg-primary-700 active:scale-95 text-sm font-semibold text-white shadow-sm shadow-primary-200 transition-all cursor-pointer"
+                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-all cursor-pointer"
                     >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -186,21 +151,19 @@ const ProductDetails = () => {
 
             {/* ── Visual and Metadata Cards ── */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left Column: Image Card (5/12 cols) */}
+                {/* Left Column: Image Card */}
                 <div className="lg:col-span-5 flex flex-col gap-6">
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center justify-between min-h-[440px]">
-                        {/* Image Box */}
-                        <div className="relative w-full aspect-[4/3] rounded-2xl bg-gray-50/60 border border-primary-500/10 flex items-center justify-center p-6 overflow-hidden group">
-                            {/* Blue Alignment Dotted Overlays (Mockup aesthetics) */}
-                            <div className="absolute inset-0 border-x border-dashed border-primary-400/5 pointer-events-none"></div>
-                            <div className="absolute inset-0 border-y border-dashed border-primary-400/5 pointer-events-none"></div>
-                            <div className="absolute left-0 right-0 top-1/2 border-t border-dashed border-primary-400/20 pointer-events-none"></div>
-                            <div className="absolute top-0 bottom-0 left-1/2 border-l border-dashed border-primary-400/20 pointer-events-none"></div>
+                        <div className="relative w-full aspect-[4/3] rounded-2xl bg-gray-50/60 border border-blue-500/10 flex items-center justify-center p-6 overflow-hidden group">
+                            <div className="absolute inset-0 border-x border-dashed border-blue-400/5 pointer-events-none"></div>
+                            <div className="absolute inset-0 border-y border-dashed border-blue-400/5 pointer-events-none"></div>
+                            <div className="absolute left-0 right-0 top-1/2 border-t border-dashed border-blue-400/20 pointer-events-none"></div>
+                            <div className="absolute top-0 bottom-0 left-1/2 border-l border-dashed border-blue-400/20 pointer-events-none"></div>
 
                             {imageUrl ? (
-                                <img 
-                                    src={imageUrl} 
-                                    alt={p.name} 
+                                <img
+                                    src={imageUrl}
+                                    alt={p.name}
                                     className="max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                                 />
                             ) : (
@@ -213,23 +176,17 @@ const ProductDetails = () => {
                                     <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">No Image Available</span>
                                 </div>
                             )}
-
-                            {/* Resolution badge */}
-                            <div className="absolute bottom-3 bg-primary-500 text-white font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-sm select-none">
-                                408 &times; 287
-                            </div>
                         </div>
 
-                        {/* Image Carousel Mock Thumbnails */}
+                        {/* Thumbnail strip */}
                         <div className="grid grid-cols-3 gap-3 w-full mt-6">
-                            <div className="aspect-[4/3] rounded-xl border-2 border-primary-500 bg-gray-50 flex items-center justify-center p-2 cursor-pointer shadow-sm">
+                            <div className="aspect-[4/3] rounded-xl border-2 border-blue-500 bg-gray-50 flex items-center justify-center p-2 cursor-pointer shadow-sm">
                                 {imageUrl ? (
                                     <img src={imageUrl} alt="thumb-1" className="max-w-full max-h-full object-contain" />
                                 ) : (
                                     <span className="text-[10px] font-bold text-gray-400">Main</span>
                                 )}
                             </div>
-
                             <div className="aspect-[4/3] rounded-xl border border-gray-100 hover:border-gray-200 bg-gray-50 flex items-center justify-center p-2 cursor-pointer transition-all">
                                 {imageUrl ? (
                                     <img src={imageUrl} alt="thumb-2" className="max-w-full max-h-full object-contain opacity-60 grayscale" />
@@ -237,7 +194,6 @@ const ProductDetails = () => {
                                     <span className="text-[10px] font-bold text-gray-400">Thumb 1</span>
                                 )}
                             </div>
-
                             <div className="aspect-[4/3] rounded-xl border border-gray-100 bg-white hover:bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-all select-none">
                                 <span className="text-xs font-bold text-gray-800">+ 2 More</span>
                             </div>
@@ -245,14 +201,14 @@ const ProductDetails = () => {
                     </div>
                 </div>
 
-                {/* Right Column: Overview and Classification (7/12 cols) */}
+                {/* Right Column: Overview and Classification */}
                 <div className="lg:col-span-7 flex flex-col gap-6">
                     {/* Product Overview Card */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between h-full min-h-[220px]">
                         <div className="space-y-3">
                             <h3 className="text-base font-bold text-gray-900">Product Overview</h3>
                             <p className="text-sm text-gray-500 leading-relaxed font-medium">
-                                {p.description || "The Product details show premium build and custom features. Built with standard specifications to meet all requirements seamlessly while maintaining high aesthetic quality."}
+                                {p.description || "No description available."}
                             </p>
                         </div>
 
@@ -261,12 +217,10 @@ const ProductDetails = () => {
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Price</p>
                                 <p className="text-lg font-black text-gray-900 mt-1">{fmtCurrency(p.price)}</p>
                             </div>
-
                             <div>
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">SKU</p>
-                                <p className="text-sm font-bold text-gray-800 mt-1.5 font-mono truncate">{p.sku || "—"}</p>
+                                <p className="text-sm font-bold text-gray-800 mt-1.5 font-mono truncate">{p.sku || "N/A"}</p>
                             </div>
-
                             <div>
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                                 <p className="text-sm font-bold text-gray-800 mt-1.5">{stock} in stock</p>
@@ -276,12 +230,10 @@ const ProductDetails = () => {
 
                     {/* Classification Card */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-                        <h3 className="text-base font-bold text-gray-900 mb-4">Classification</h3>
-
+                        <h3 className="text-base font-bold text-gray-900 mb-4">Details</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* Category */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
                                         <line x1="7" y1="7" x2="7.01" y2="7" />
@@ -292,49 +244,41 @@ const ProductDetails = () => {
                                     <p className="text-xs font-bold text-gray-800 mt-0.5">{displayCategory}</p>
                                 </div>
                             </div>
-
-                            {/* Sub Category */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                                        <polyline points="2 17 12 22 22 17" />
-                                        <polyline points="2 12 12 17 22 12" />
+                                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                                        <path d="M12 8v8" />
+                                        <path d="M8 12h8" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Sub Category</p>
-                                    <p className="text-xs font-bold text-gray-800 mt-0.5">{displaySubCategory}</p>
+                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Barcode</p>
+                                    <p className="text-xs font-bold text-gray-800 mt-0.5 font-mono">{p.barcode || "—"}</p>
                                 </div>
                             </div>
-
-                            {/* Brand */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                                        <path d="M9 12l2 2 4-4" />
+                                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                                        <line x1="3" y1="6" x2="21" y2="6" />
+                                        <path d="M16 10a4 4 0 01-8 0" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Brand</p>
-                                    <p className="text-xs font-bold text-gray-800 mt-0.5">{displayBrand}</p>
+                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Weight</p>
+                                    <p className="text-xs font-bold text-gray-800 mt-0.5">{weight}</p>
                                 </div>
                             </div>
-
-                            {/* Colorway */}
                             <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 bg-gray-50/30 hover:bg-gray-50 transition-colors">
-                                <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03345 19.1749 5.2798 19.262 5.52382 19.233C6.72124 19.0909 7.4273 18.2577 7.91136 17.5244C8.2435 17.0213 8.68115 16.5 9.5 16.5C10.3188 16.5 10.7565 17.0213 11.0886 17.5244C11.5727 18.2577 12.2788 19.0909 13.4762 19.233C13.7202 19.262 13.9665 19.1749 14.1414 19C15.9097 17.1962 17 14.7255 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12" />
-                                        <circle cx="7.5" cy="10.5" r="1" fill="currentColor" />
-                                        <circle cx="11.5" cy="8.5" r="1" fill="currentColor" />
-                                        <circle cx="15.5" cy="11.5" r="1" fill="currentColor" />
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Colorway</p>
-                                    <p className="text-xs font-bold text-gray-800 mt-0.5">{displayColorway}</p>
+                                    <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Status</p>
+                                    <p className="text-xs font-bold text-gray-800 mt-0.5 capitalize">{p.status || "active"}</p>
                                 </div>
                             </div>
                         </div>
@@ -343,240 +287,196 @@ const ProductDetails = () => {
             </div>
 
             {/* ── Product Variants Card ── */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-bold text-gray-900">Product Variants</h3>
-                        <p className="text-xs text-gray-400 font-semibold">Manage different options like size or color</p>
+            {variants.length > 0 && (
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-bold text-gray-900">Product Variants</h3>
+                            <p className="text-xs text-gray-400 font-semibold">Manage different options like size or color</p>
+                        </div>
                     </div>
 
-                    <button
-                        onClick={() => {
-                            setVariantForm({
-                                name: "",
-                                sku: p.sku ? `${p.sku}-${variants.length + 1}` : "",
-                                price: String(p.price || ""),
-                                inventory: "0",
-                                barcode: "",
-                                imageUrl: "",
-                            });
-                            setIsAddVariantOpen(true);
-                        }}
-                        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary-600 hover:bg-primary-700 active:scale-95 text-xs font-semibold text-white shadow-sm shadow-primary-200 transition-all cursor-pointer self-start sm:self-auto"
-                    >
-                        <svg className="w-4 h-4 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        Add Variant
-                    </button>
+                    <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
+                                    <th className="p-4 w-12 text-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedVariants.size === variants.length && variants.length > 0}
+                                            onChange={toggleAllVariants}
+                                            className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                        />
+                                    </th>
+                                    <th className="p-4">Name</th>
+                                    <th className="p-4 text-center">Inventory</th>
+                                    <th className="p-4">SKU</th>
+                                    <th className="p-4">Price</th>
+                                    <th className="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {variants.map((v: any) => {
+                                    const isSelected = selectedVariants.has(v.id);
+                                    return (
+                                        <tr
+                                            key={v.id}
+                                            className={`hover:bg-gray-50/50 transition-colors text-xs font-semibold text-gray-700 ${isSelected ? "bg-blue-50/20" : ""}`}
+                                        >
+                                            <td className="p-4 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => toggleVariant(v.id)}
+                                                    className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                                />
+                                            </td>
+                                            <td className="p-4 text-gray-900 font-bold">{v.name}</td>
+                                            <td className="p-4 text-center font-bold text-gray-800">{v.inventory ?? "—"}</td>
+                                            <td className="p-4 font-mono text-[11px] text-gray-500 font-medium">{v.sku || "—"}</td>
+                                            <td className="p-4 text-gray-900 font-bold">{fmtCurrency(v.price)}</td>
+                                            <td className="p-4 text-center">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize border ${v.status === "active" ? "bg-green-50 text-green-600 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                                                    {v.status || "active"}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            )}
 
-                {/* Variants Table Container */}
-                <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                                <th className="p-4 w-12 text-center">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={selectedVariants.size === variants.length}
-                                        onChange={toggleAllVariants}
-                                        className="w-4 h-4 rounded text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer"
-                                    />
-                                </th>
-                                <th className="p-4">Name</th>
-                                <th className="p-4 text-center">Inventory</th>
-                                <th className="p-4">SKU</th>
-                                <th className="p-4">Price</th>
-                                <th className="p-4">Barcode</th>
-                                <th className="p-4 text-center">Status</th>
-                                <th className="p-4 text-center w-16">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {variants.map((v: ProductVariant) => {
-                                const isSelected = selectedVariants.has(v.id);
-                                return (
-                                    <tr 
-                                        key={v.id} 
-                                        className={`hover:bg-gray-50/50 transition-colors text-xs font-semibold text-gray-700 ${
-                                            isSelected ? "bg-primary-50/20" : ""
-                                        }`}
+            {/* ── Recent Orders Card ── */}
+            {orderItems.length > 0 && (
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
+                    <div className="mb-6">
+                        <h3 className="text-lg font-bold text-gray-900">Recent Orders</h3>
+                        <p className="text-xs text-gray-400 font-semibold">Orders containing this product ({orderItems.length})</p>
+                    </div>
+
+                    <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
+                                    <th className="p-4">Order ID</th>
+                                    <th className="p-4 text-center">Quantity</th>
+                                    <th className="p-4 text-right">Price</th>
+                                    <th className="p-4">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {orderItems.slice(0, 10).map((item) => (
+                                    <tr
+                                        key={item.id}
+                                        className="hover:bg-gray-50/50 transition-colors text-xs font-semibold text-gray-700 cursor-pointer"
+                                        onClick={() => navigate(`/dashboard/orders/${item.orderId}`)}
                                     >
-                                        <td className="p-4 text-center">
-                                            <input 
-                                                type="checkbox" 
-                                                checked={isSelected}
-                                                onChange={() => toggleVariant(v.id)}
-                                                className="w-4 h-4 rounded text-primary-600 border-gray-300 focus:ring-primary-500 cursor-pointer"
-                                            />
-                                        </td>
-                                        <td className="p-4 text-gray-900 font-bold">{v.name}</td>
-                                        <td className="p-4 text-center font-bold text-gray-800">{v.inventory}</td>
-                                        <td className="p-4 font-mono text-[11px] text-gray-500 font-medium">{v.sku}</td>
-                                        <td className="p-4 text-gray-900 font-bold">{v.price}$</td>
-                                        <td className="p-4 font-mono text-[11px] text-gray-500 font-medium">{v.barcode || "—"}</td>
-                                        <td className="p-4 text-center">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize border ${
-                                                v.status === "active"
-                                                    ? "bg-green-50 text-green-600 border-green-200"
-                                                    : "bg-gray-50 text-gray-500 border-gray-200"
-                                            }`}>
-                                                {v.status || "active"}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-center">
-                                            <button 
-                                                onClick={() => toast.success(`Action menu for ${v.name}`)}
-                                                className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-                                            >
-                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                    <circle cx="12" cy="5" r="1.5" />
-                                                    <circle cx="12" cy="12" r="1.5" />
-                                                    <circle cx="12" cy="19" r="1.5" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        <td className="p-4 text-blue-600 font-bold">#{item.orderId}</td>
+                                        <td className="p-4 text-center font-bold text-gray-800">{item.quantity}</td>
+                                        <td className="p-4 text-right text-gray-900 font-bold">{fmtCurrency(item.price)}</td>
+                                        <td className="p-4 text-gray-500 font-medium">{fmtDateText(item.createdAt)}</td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
- 
-                {/* Pagination Controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
-                    <p className="text-xs font-semibold text-gray-400">
-                        Showing data 1 to {variants.length} of {variants.length} entries
-                    </p>
- 
-                    <div className="flex items-center gap-1.5 self-center sm:self-auto select-none">
-                        <button 
-                            disabled 
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 cursor-not-allowed"
-                        >
-                            &lt;
-                        </button>
-                        <button className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-xs font-bold text-white shadow-sm shadow-primary-100">
-                            1
-                        </button>
-                        <button 
-                            onClick={() => toast.success("Page 2")}
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                        >
-                            2
-                        </button>
-                        <button 
-                            onClick={() => toast.success("Page 3")}
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                        >
-                            3
-                        </button>
-                        <button 
-                            onClick={() => toast.success("Page 4")}
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                        >
-                            4
-                        </button>
-                        <span className="text-xs font-bold text-gray-400 px-1">..</span>
-                        <button 
-                            onClick={() => toast.success("Page 40")}
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                        >
-                            40
-                        </button>
-                        <button 
-                            onClick={() => toast.success("Next Page")}
-                            className="w-8 h-8 rounded-lg border border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                        >
-                            &gt;
-                        </button>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
- 
+            )}
+
+            {/* ── Frequently Bought Together ── */}
+            {recommendedProducts.length > 0 && (
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900">Frequently Bought Together</h3>
+                            <p className="text-xs text-gray-400 font-semibold">Customers who bought this also purchased</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {recommendedProducts.map((rec) => {
+                            const prod = rec.product;
+                            const img = prod?.imageUrl || prod?.image || (prod?.images && prod.images[0]) || "";
+                            const similarityPct = Math.round(rec.similarity * 100);
+                            return (
+                                <div
+                                    key={rec.itemId}
+                                    onClick={() => navigate(`/dashboard/products/${rec.itemId}`)}
+                                    className="group relative bg-white rounded-2xl border border-gray-100 hover:border-purple-200 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+                                >
+                                    {/* Similarity badge */}
+                                    <div className="absolute top-2 right-2 z-10">
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-purple-100 text-purple-600 border border-purple-200">
+                                            {similarityPct}% match
+                                        </span>
+                                    </div>
+
+                                    {/* Image */}
+                                    <div className="aspect-square bg-gray-50 flex items-center justify-center p-3">
+                                        {img ? (
+                                            <img
+                                                src={img}
+                                                alt={prod?.name || "Product"}
+                                                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                                                <svg className="w-6 h-6 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                                    <polyline points="21 15 16 10 5 21" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="p-3">
+                                        <p className="text-xs font-bold text-gray-800 truncate">{prod?.name || "Unknown Product"}</p>
+                                        <p className="text-sm font-black text-gray-900 mt-1">{prod ? fmtCurrency(prod.price) : "—"}</p>
+                                        {prod?.category && (
+                                            <p className="text-[10px] text-gray-400 font-semibold mt-1 truncate">{prod.category}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {recommendations && recommendations.recommendations.length === 0 && (
+                <div className="bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm p-8">
+                    <div className="flex flex-col items-center text-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-500">No co-purchase data yet</p>
+                        <p className="text-xs text-gray-400">Recommendations will appear once customers purchase multiple products together.</p>
+                    </div>
+                </div>
+            )}
+
             {/* ── Form Modal ── */}
             <ProductFormModal
                 open={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 product={p}
             />
-
-            {/* ── Add Variant Modal ── */}
-            <Modal
-                open={isAddVariantOpen}
-                onClose={() => setIsAddVariantOpen(false)}
-                title="Add Variant"
-                subtitle="Create a new variant for this product."
-                onSubmit={handleAddVariant}
-                submitLabel="Add Variant"
-                loading={createVariantMutation.isPending}
-            >
-                <div className="space-y-4">
-                    <FormField label="Variant Name" required>
-                        <input
-                            type="text"
-                            value={variantForm.name}
-                            onChange={(e) => setVariantForm(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder="e.g. Size L / Red"
-                            className={inputClasses}
-                        />
-                    </FormField>
-                    <FormRow>
-                        <FormField label="SKU">
-                            <input
-                                type="text"
-                                value={variantForm.sku}
-                                onChange={(e) => setVariantForm(prev => ({ ...prev, sku: e.target.value }))}
-                                placeholder="e.g. SKU-123"
-                                className={inputClasses}
-                            />
-                        </FormField>
-                        <FormField label="Price" required>
-                            <input
-                                type="number"
-                                value={variantForm.price}
-                                onChange={(e) => setVariantForm(prev => ({ ...prev, price: e.target.value }))}
-                                placeholder="0.00"
-                                min="0"
-                                step="0.01"
-                                className={inputClasses}
-                            />
-                        </FormField>
-                    </FormRow>
-                    <FormRow>
-                        <FormField label="Inventory Quantity">
-                            <input
-                                type="number"
-                                value={variantForm.inventory}
-                                onChange={(e) => setVariantForm(prev => ({ ...prev, inventory: e.target.value }))}
-                                placeholder="0"
-                                min="0"
-                                className={inputClasses}
-                            />
-                        </FormField>
-                        <FormField label="Barcode">
-                            <input
-                                type="text"
-                                value={variantForm.barcode}
-                                onChange={(e) => setVariantForm(prev => ({ ...prev, barcode: e.target.value }))}
-                                placeholder="e.g. 194953123456"
-                                className={inputClasses}
-                            />
-                        </FormField>
-                    </FormRow>
-                    <FormField label="Image URL">
-                        <input
-                            type="url"
-                            value={variantForm.imageUrl}
-                            onChange={(e) => setVariantForm(prev => ({ ...prev, imageUrl: e.target.value }))}
-                            placeholder="e.g. https://example.com/variant.png"
-                            className={inputClasses}
-                        />
-                    </FormField>
-                </div>
-            </Modal>
         </div>
     );
 };

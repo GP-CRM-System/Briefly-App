@@ -19,8 +19,8 @@ export type AuthUser = {
     email: string;
     emailVerified: boolean;
     image: string | null;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: string | Date;
+    updatedAt: string | Date;
 };
 
 type AuthState = {
@@ -29,11 +29,13 @@ type AuthState = {
     role: string | null;
     permissions: Record<string, string[]> | null;
     onboardingComplete: boolean;
+    sessionRestored: boolean;
 
     // Actions
     setSession: (token: string, user: AuthUser, role: string | null, permissions: Record<string, string[]> | null, onboardingComplete?: boolean) => void;
     completeOnboarding: () => void;
     clearSession: () => void;
+    setSessionRestored: (restored: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -51,8 +53,19 @@ export const useAuthStore = create<AuthState>()(
             completeOnboarding: () =>
                 set({ onboardingComplete: true }),
 
+            sessionRestored: false,
+
+            setSessionRestored: (restored) =>
+                set({ sessionRestored: restored }),
+
             clearSession: () =>
-                set({ token: null, user: null, role: null, permissions: null, onboardingComplete: false }),
+                set({
+                    token: null,
+                    user: null,
+                    role: null,
+                    permissions: null,
+                    onboardingComplete: false,
+                }),
         }),
         {
             name: "briefly-auth",

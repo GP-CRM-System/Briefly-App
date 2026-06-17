@@ -6,7 +6,9 @@ import type { Customer } from "./types";
 export const customerService = {
 
     async getAll(): Promise<Customer[]> {
-        const { data } = await apiClient.get(ENDPOINTS.CUSTOMER.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.CUSTOMER.GET_ALL, {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 

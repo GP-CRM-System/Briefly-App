@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import Modal, { FormCard, FormField, FormRow, inputClasses, selectClasses } from "@/core/components/Modal";
 import type { Campaign } from "../types";
 import { useCreateCampaign, useUpdateCampaign, useTemplates, useSegmentsForDropdown } from "../campaign.hooks";
@@ -7,6 +8,12 @@ interface CampaignFormModalProps {
     open: boolean;
     onClose: () => void;
     campaign?: Campaign | null;
+}
+
+interface Template {
+    id: string;
+    name: string;
+    subject: string;
 }
 
 const InfoIcon = () => (
@@ -55,7 +62,7 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
     const { data: apiSegments } = useSegmentsForDropdown();
 
     const templates = apiTemplates && apiTemplates.length > 0 ? apiTemplates : MOCK_TEMPLATES;
-    const segments = apiSegments && apiSegments.length > 0 ? apiSegments : [];
+    const segments = apiSegments || [];
 
     // Mutations
     const createMutation = useCreateCampaign();

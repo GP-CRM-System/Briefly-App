@@ -44,13 +44,13 @@ export const standardColumns: Column<Segment>[] = [
         ),
     },
     {
-        key: "customerCount",
+        key: "size",
         header: "Size",
         align: "center",
         width: "w-[80px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                {row.customerCount ?? 0}
+                {row.customerCount ?? row.size ?? 0}
             </span>
         ),
     },
@@ -71,9 +71,11 @@ export const standardColumns: Column<Segment>[] = [
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
                 {row.creator || "System"}
+
             </span>
         ),
     },
+
     {
         key: "createdAt",
         header: "Created at",

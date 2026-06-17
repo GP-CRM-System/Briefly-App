@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/auth.store";
+import { hasValidAuthSession } from "@/lib/auth-session";
 
 /**
  * Axios client — for ALL API calls (auth + CRM data).
@@ -30,9 +31,12 @@ apiClient.interceptors.request.use((config) => {
 // ─── Response interceptor: auto-logout on 401 ───
 apiClient.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         if (error.response?.status === 401) {
-            useAuthStore.getState().clearSession();
+            const stillAuthenticated = await hasValidAuthSession();
+            if (!stillAuthenticated) {
+                useAuthStore.getState().clearSession();
+            }
         }
         return Promise.reject(error);
     }

@@ -240,6 +240,7 @@ export const ENDPOINTS = {
   // ─── Audit Logs ───
   AUDIT_LOG: {
     GET_ALL: "/audit-logs",
+    GET_FOR_USER: (userId: string) => `/audit-logs/user/${userId}`,
   },
 
   // ─── Cron (Admin) ───
@@ -248,6 +249,17 @@ export const ENDPOINTS = {
     LIFECYCLE: "/cron/lifecycle",
     VIP: "/cron/vip",
     CLEANUP_IDEMPOTENCY: "/cron/cleanup/idempotency",
+  },
+
+  // ─── AI Intelligence ───
+  AI: {
+    COMPUTE_CHURN: "/ai/churn",
+    GET_CHURN: "/ai/churn",
+    COMPUTE_SEGMENTS: "/ai/segment",
+    GET_SEGMENTS: "/ai/segment",
+    COMPUTE_RECOMMENDATIONS: "/ai/recommend",
+    GET_RECOMMENDATIONS: (productId: string) => `/ai/recommend/${productId}`,
+    GET_HEALTH: "/ai/health",
   },
 
   // ─── Health ───

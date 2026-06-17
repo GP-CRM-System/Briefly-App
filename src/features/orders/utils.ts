@@ -1,7 +1,7 @@
 import type { Order, OrderFilterState } from "./types";
 
 export const freshOrderFilters = (): OrderFilterState => ({
-    shippingStatus: new Set<string>(),
+    fulfillmentStatus: new Set<string>(),
     paymentStatus: new Set<string>(),
     source: "",
     search: "",
@@ -9,7 +9,7 @@ export const freshOrderFilters = (): OrderFilterState => ({
 
 export const countActiveFilters = (filters: OrderFilterState): number => {
     let count = 0;
-    if (filters.shippingStatus.size > 0) count++;
+    if (filters.fulfillmentStatus.size > 0) count++;
     if (filters.paymentStatus.size > 0) count++;
     if (filters.source) count++;
     return count;
@@ -91,12 +91,12 @@ export const filterOrders = (orders: Order[], search: string, filters: OrderFilt
         if (search) {
             const query = search.toLowerCase();
             const idMatch = order.id?.toLowerCase().includes(query);
-            const nameMatch = order.customerName?.toLowerCase().includes(query) || order.customer?.name?.toLowerCase().includes(query);
+            const nameMatch = order.customer?.name?.toLowerCase().includes(query);
             if (!idMatch && !nameMatch) return false;
         }
 
-        // Shipping status filter
-        if (filters.shippingStatus.size > 0 && !filters.shippingStatus.has(order.shippingStatus)) {
+        // Fulfillment status filter
+        if (filters.fulfillmentStatus.size > 0 && !filters.fulfillmentStatus.has(order.fulfillmentStatus || "")) {
             return false;
         }
 
@@ -117,120 +117,83 @@ export const filterOrders = (orders: Order[], search: string, filters: OrderFilt
 export const MOCK_ORDERS: Order[] = [
     {
         id: "ORD-1245",
-        customerId: "cust-1",
-        customerName: "Ahmed Hassan",
         customer: {
             id: "cust-1",
             name: "Ahmed Hassan",
             email: "ahmedhassan55@gmail.com",
             phone: "+201068551047",
         },
-        shippingStatus: "delivered",
+        fulfillmentStatus: "delivered",
         paymentStatus: "failed",
         subtotal: 3100.00,
         discountAmount: 310.00,
         taxAmount: 223.20,
         shippingAmount: 45.00,
         totalAmount: 3058.20,
-        currency: "USD",
         source: "Web Store",
         createdAt: "2026-04-12T10:15:00.000Z",
-        updatedAt: "2026-04-12T14:45:00.000Z",
-        note: "Customer requested express delivery as they need the support package by end of week. Account manager Leslie confirmed availability.",
-        notes: [
-            {
-                id: "n-1",
-                content: "Customer requested express delivery as they need the support package by end of week. Account manager Leslie confirmed availability.",
-                createdAt: "2026-04-12T10:15:00.000Z",
-                author: "Sarah Ahmed, Oct 24"
-            }
-        ],
+        note: "Customer requested express delivery as they need the support package by end of week.",
         orderItems: [
             {
                 id: "item-1",
-                orderId: "ORD-1245",
-                productId: "prod-1",
                 quantity: 2,
-                price: 450.00,
-                productName: "Software License - Annual",
-                productSku: "SL-ANL-24"
+                product: { id: "prod-1", name: "Software License - Annual", price: "450.00" },
             },
             {
                 id: "item-2",
-                orderId: "ORD-1245",
-                productId: "prod-2",
                 quantity: 2,
-                price: 450.00,
-                productName: "Software License - Annual",
-                productSku: "SL-ANL-24"
+                product: { id: "prod-2", name: "Software License - Annual", price: "450.00" },
             }
         ]
     },
     {
         id: "ORD-1246",
-        customerId: "cust-2",
-        customerName: "Ali Ibrahim",
         customer: {
             id: "cust-2",
             name: "Ali Ibrahim",
             email: "ali.ibrahim@example.com",
             phone: "+201145678901",
         },
-        shippingStatus: "processing",
+        fulfillmentStatus: "processing",
         paymentStatus: "paid",
         subtotal: 1999.00,
         discountAmount: 0.00,
         taxAmount: 169.92,
         shippingAmount: 0.00,
         totalAmount: 2168.92,
-        currency: "USD",
         source: "Web Store",
         createdAt: "2026-04-13T09:30:00.000Z",
-        updatedAt: "2026-04-13T09:30:00.000Z",
-        note: "",
         orderItems: [
             {
                 id: "item-3",
-                orderId: "ORD-1246",
-                productId: "prod-3",
                 quantity: 1,
-                price: 1999.00,
-                productName: "MacBook Pro M3 - 14\"",
-                productSku: "MBP-M3-14"
+                product: { id: "prod-3", name: "MacBook Pro M3 - 14\"", price: "1999.00" },
             }
         ]
     },
     {
         id: "ORD-1247",
-        customerId: "cust-3",
-        customerName: "Omar Sherif",
         customer: {
             id: "cust-3",
             name: "Omar Sherif",
             email: "omar.sherif@example.com",
             phone: "+201234567890",
         },
-        shippingStatus: "shipped",
+        fulfillmentStatus: "shipped",
         paymentStatus: "pending",
         subtotal: 390.30,
         discountAmount: 0.00,
         taxAmount: 31.22,
         shippingAmount: 15.00,
         totalAmount: 436.52,
-        currency: "USD",
         source: "Mobile App",
         createdAt: "2026-04-14T15:20:00.000Z",
-        updatedAt: "2026-04-14T17:40:00.000Z",
         note: "Leave package at reception.",
         orderItems: [
             {
                 id: "item-4",
-                orderId: "ORD-1247",
-                productId: "prod-4",
                 quantity: 1,
-                price: 390.30,
-                productName: "Generic Gold Table",
-                productSku: "WGI3B2D9"
+                product: { id: "prod-4", name: "Generic Gold Table", price: "390.30" },
             }
         ]
     }

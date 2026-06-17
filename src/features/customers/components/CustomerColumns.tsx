@@ -1,5 +1,5 @@
 import { type Column } from "@/core/components/DataTable";
-import type { Customer } from "../types";
+import type { Customer, CustomerEvent } from "../types";
 import { getAvatarColor, getInitials, getLifecycleClasses, TAG_COLORS } from "../utils";
 import { orderIcon } from "@/assets";
 import { Icon } from "@/core/components";
@@ -94,11 +94,25 @@ export const columns: Column<Customer>[] = [
         header: "Last Activity",
         align: "center",
         width: "min-w-[160px]",
-        render: (row) => (
-            <div className="text-center">
-                <p className="text-sm text-gray-700 leading-tight">{row.lastActivity || "—"}</p>
-                {row.lastActivityDate && <p className="text-xs text-gray-400">{row.lastActivityDate}</p>}
-            </div>
-        ),
+        render: (row) => {
+            const events = row.customerEvents ?? [];
+            const latest: CustomerEvent | undefined = events[0];
+            const fallback = row.lastActivity;
+            const fallbackDate = row.lastActivityDate;
+            return (
+                <div className="text-center">
+                    <p className="text-sm text-gray-700 leading-tight">
+                        {latest?.description || fallback || "—"}
+                    </p>
+                    {(latest?.occurredAt || fallbackDate) && (
+                        <p className="text-xs text-gray-400">
+                            {latest?.occurredAt
+                                ? new Date(latest.occurredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                                : fallbackDate}
+                        </p>
+                    )}
+                </div>
+            );
+        },
     },
 ];

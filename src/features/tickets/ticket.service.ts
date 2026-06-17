@@ -18,6 +18,7 @@ function normalizeTicket(t: any): Ticket {
         notes: (t.notes || []).map((n: any) => ({
             id: n.id,
             content: n.body || n.content,
+            body: n.body || n.content,
             createdAt: n.createdAt,
             author: n.author?.name || (typeof n.author === "string" ? n.author : undefined) || "Sarah Ahmed"
         }))
@@ -26,7 +27,9 @@ function normalizeTicket(t: any): Ticket {
 
 export const ticketService = {
     async getAll(): Promise<Ticket[]> {
-        const { data } = await apiClient.get(ENDPOINTS.TICKET.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.TICKET.GET_ALL, {
+            params: { limit: 1000 }
+        });
         const rawTickets = data?.data || data || [];
         return rawTickets.map(normalizeTicket);
     },

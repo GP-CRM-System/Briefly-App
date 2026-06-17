@@ -31,19 +31,19 @@ export const columns: Column<Order>[] = [
         width: "min-w-[200px]",
         render: (row) => (
             <span className="text-sm font-semibold text-gray-900">
-                {row.customerName || row.customer?.name || "—"}
+                {row.customer?.name || "—"}
             </span>
         ),
     },
     {
-        key: "shippingStatus",
-        header: "Shipping Status",
+        key: "fulfillmentStatus",
+        header: "Fulfillment",
         align: "center",
         render: (row) => {
-            const classes = getShippingStatusClasses(row.shippingStatus);
+            const classes = getShippingStatusClasses(row.fulfillmentStatus || "");
             return (
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${classes.bg} ${classes.text} ${classes.border} capitalize`}>
-                    {row.shippingStatus || "pending"}
+                    {row.fulfillmentStatus || "unfulfilled"}
                 </span>
             );
         },
@@ -69,14 +69,6 @@ export const columns: Column<Order>[] = [
             <span className="text-sm font-bold text-gray-900">
                 ${Number(row.totalAmount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
-        ),
-    },
-    {
-        key: "currency",
-        header: "Currency",
-        align: "center",
-        render: (row) => (
-            <span className="text-sm text-gray-500 uppercase">{row.currency || "USD"}</span>
         ),
     },
     {

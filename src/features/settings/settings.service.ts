@@ -95,7 +95,9 @@ export const settingsService = {
     // ─── Roles & Permissions ───
     async listRoles(): Promise<Role[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.ROLE.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.ROLE.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const rolesData = data?.data || data;
             const rolesList = Array.isArray(rolesData)
                 ? rolesData
@@ -272,7 +274,9 @@ export const settingsService = {
     // ─── Connections (Integrations) ───
     async getConnections(): Promise<ConnectionDetails[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const integrations = data?.data || data;
             if (Array.isArray(integrations) && integrations.length > 0) {
                 return integrations.map((i: BackendIntegration) => ({
@@ -331,7 +335,9 @@ export const settingsService = {
 
     async getSyncLogs(id: string): Promise<SyncLog[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id));
+            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id), {
+                params: { limit: 1000 }
+            });
             const logs = data?.data || data;
             if (Array.isArray(logs)) {
                 return logs.map((l: BackendSyncLog) => ({
@@ -355,7 +361,9 @@ export const settingsService = {
     // ─── Imports & Exports ───
     async getImportJobs(): Promise<ImportExportJob[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.IMPORT.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.IMPORT.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
                 return jobs.map((j: BackendImportExportJob) => ({
@@ -376,7 +384,9 @@ export const settingsService = {
 
     async getExportJobs(): Promise<ImportExportJob[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ALL);
+            const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ALL, {
+                params: { limit: 1000 }
+            });
             const jobs = data?.data || data;
             if (Array.isArray(jobs)) {
                 return jobs.map((j: BackendImportExportJob) => ({
@@ -416,8 +426,13 @@ export const settingsService = {
         return data?.data || data;
     },
 
-    async createExport(entityType: string, format: string = "csv"): Promise<unknown> {
+    async createExport(entityType: string, format: string = "csv"): Promise<{ id: string; status: string; [key: string]: any }> {
         const { data } = await apiClient.post(ENDPOINTS.EXPORT.CREATE, { entityType, format });
+        return data?.data || data;
+    },
+
+    async getExportJob(id: string): Promise<any> {
+        const { data } = await apiClient.get(ENDPOINTS.EXPORT.GET_ONE(id));
         return data?.data || data;
     },
 
@@ -429,14 +444,12 @@ export const settingsService = {
     // ─── Subscriptions & Billing ───
     async getPlans(): Promise<unknown[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS);
+            const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS, {
+                params: { limit: 1000 }
+            });
             return data?.data || data || [];
         } catch {
-            return [
-                { id: "plan-starter", name: "starter", displayName: "Starter", price: 19, billingCycle: "monthly", features: { users: 3, customers: 2000, emails: 10000, storageGB: 1 } },
-                { id: "plan-professional", name: "professional", displayName: "Professional", price: 49, billingCycle: "monthly", features: { users: 10, customers: 10000, emails: 50000, storageGB: 5 } },
-                { id: "plan-enterprise", name: "enterprise", displayName: "Enterprise", price: 149, billingCycle: "monthly", features: { users: -1, customers: -1, emails: -1, storageGB: 50 } },
-            ];
+            return [];
         }
     },
 
@@ -460,15 +473,7 @@ export const settingsService = {
     },
 
     async getBillingInvoices(): Promise<BillingInvoice[]> {
-        // The backend doesn't have a dedicated invoices endpoint yet,
-        // so we derive from subscription history. Return static for now.
-        return [
-            { id: "INV-8429-01", date: "May 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-02", date: "Apr 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-03", date: "Mar 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-04", date: "Feb 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-05", date: "Jan 01, 2024", amount: "$49.00", status: "paid" },
-            { id: "INV-8429-06", date: "Dec 01, 2023", amount: "$49.00", status: "paid" },
-        ];
+        // Backend doesn't have a dedicated invoices endpoint yet.
+        return [];
     }
 };

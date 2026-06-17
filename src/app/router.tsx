@@ -8,6 +8,7 @@ import ResetPassword from "@/pages/auth/ResetPassword";
 import LandingPage from "@/pages/landing/Landing";
 import Onboarding from "@/pages/onboarding/Onboarding";
 import NotFoundPage from "@/pages/NotFoundPage";
+import AuthCallback from "@/pages/auth/AuthCallback";
 
 export default function AppRouter() {
     return (
@@ -21,6 +22,7 @@ export default function AppRouter() {
                 <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
                 <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
                 <Route path="/reset-password" element={<GuestRoute><ResetPassword /></GuestRoute>} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
 
                 {/* Protected — unauthenticated users get redirected to /login */}
                 <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

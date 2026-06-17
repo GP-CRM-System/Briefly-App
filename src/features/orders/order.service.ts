@@ -4,7 +4,9 @@ import type { Order } from "./types";
 
 export const orderService = {
     async getAll(): Promise<Order[]> {
-        const { data } = await apiClient.get(ENDPOINTS.ORDER.GET_ALL);
+        const { data } = await apiClient.get(ENDPOINTS.ORDER.GET_ALL, {
+            params: { limit: 1000 }
+        });
         return data?.data || data || [];
     },
 

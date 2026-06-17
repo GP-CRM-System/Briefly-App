@@ -9,6 +9,8 @@ import Segments from "@/features/segments";
 import SegmentDetails from "@/features/segments/components/SegmentDetails";
 import Campaigns from "@/features/campaigns";
 import CampaignDetails from "@/features/campaigns/components/CampaignDetails";
+import Templates from "@/features/templates";
+import TemplateDetails from "@/features/templates/components/TemplateDetails";
 import Products from "@/features/products";
 import ProductDetails from "@/features/products/components/ProductDetails";
 import Orders from "@/features/orders";
@@ -20,6 +22,7 @@ import Employees from "@/features/employees";
 import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 import Settings from "@/features/settings";
 import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
+import AiDashboard from "@/features/ai";
 import { useSocketEvents } from "@/core/hooks";
 import { PermissionGuard, AccessDenied } from "@/core/components";
 import NotFoundPage from "@/pages/NotFoundPage";
@@ -94,24 +97,27 @@ const Dashboard = () => {
         <main className={`flex-grow flex flex-col min-h-0 p-4 md:p-6 lg:p-8 ${isConversations ? "overflow-hidden" : "overflow-y-auto"}`}>
           <Routes>
             <Route path="/" element={<DashboardHome />} />
-            <Route path="customers" element={<PermissionGuard permission="customers.read" fallback={<AccessDenied />}><Customers /></PermissionGuard>} />
-            <Route path="customers/:id" element={<PermissionGuard permission="customers.read" fallback={<AccessDenied />}><CustomerProfile /></PermissionGuard>} />
-            <Route path="segments" element={<PermissionGuard permission="segments.read" fallback={<AccessDenied />}><Segments /></PermissionGuard>} />
-            <Route path="segments/:id" element={<PermissionGuard permission="segments.read" fallback={<AccessDenied />}><SegmentDetails /></PermissionGuard>} />
-            <Route path="campaigns" element={<PermissionGuard permission="campaigns.read" fallback={<AccessDenied />}><Campaigns /></PermissionGuard>} />
-            <Route path="campaigns/:id" element={<PermissionGuard permission="campaigns.read" fallback={<AccessDenied />}><CampaignDetails /></PermissionGuard>} />
-            <Route path="products" element={<PermissionGuard permission="products.read" fallback={<AccessDenied />}><Products /></PermissionGuard>} />
-            <Route path="products/:id" element={<PermissionGuard permission="products.read" fallback={<AccessDenied />}><ProductDetails /></PermissionGuard>} />
-            <Route path="orders" element={<PermissionGuard permission="orders.read" fallback={<AccessDenied />}><Orders /></PermissionGuard>} />
-            <Route path="orders/:id" element={<PermissionGuard permission="orders.read" fallback={<AccessDenied />}><OrderDetails /></PermissionGuard>} />
-            <Route path="tickets" element={<PermissionGuard permission="supportTickets.read" fallback={<AccessDenied />}><Tickets /></PermissionGuard>} />
-            <Route path="tickets/:id" element={<PermissionGuard permission="supportTickets.read" fallback={<AccessDenied />}><TicketDetails /></PermissionGuard>} />
-            <Route path="conversations" element={<PermissionGuard permission="conversations.read" fallback={<AccessDenied />}><Conversations /></PermissionGuard>} />
-            <Route path="conversations/:id" element={<PermissionGuard permission="conversations.read" fallback={<AccessDenied />}><Conversations /></PermissionGuard>} />
-            <Route path="employees" element={<PermissionGuard permission="member.read" fallback={<AccessDenied />}><Employees /></PermissionGuard>} />
-            <Route path="employees/:id" element={<PermissionGuard permission="member.read" fallback={<AccessDenied />}><EmployeeProfile /></PermissionGuard>} />
-            <Route path="settings" element={<PermissionGuard permission="organization.read" fallback={<AccessDenied />}><Settings /></PermissionGuard>} />
-            <Route path="analytics" element={<PermissionGuard permission="reports.read" fallback={<AccessDenied />}><AnalyticsPage /></PermissionGuard>} />
+            <Route path="customers" element={<PermissionGuard permission="customers:read" fallback={<AccessDenied />}><Customers /></PermissionGuard>} />
+            <Route path="customers/:id" element={<PermissionGuard permission="customers:read" fallback={<AccessDenied />}><CustomerProfile /></PermissionGuard>} />
+            <Route path="segments" element={<PermissionGuard permission="segments:read" fallback={<AccessDenied />}><Segments /></PermissionGuard>} />
+            <Route path="segments/:id" element={<PermissionGuard permission="segments:read" fallback={<AccessDenied />}><SegmentDetails /></PermissionGuard>} />
+            <Route path="campaigns" element={<PermissionGuard permission="campaigns:read" fallback={<AccessDenied />}><Campaigns /></PermissionGuard>} />
+            <Route path="campaigns/:id" element={<PermissionGuard permission="campaigns:read" fallback={<AccessDenied />}><CampaignDetails /></PermissionGuard>} />
+            <Route path="templates" element={<PermissionGuard permission="campaigns:read" fallback={<AccessDenied />}><Templates /></PermissionGuard>} />
+            <Route path="templates/:id" element={<PermissionGuard permission="campaigns:read" fallback={<AccessDenied />}><TemplateDetails /></PermissionGuard>} />
+            <Route path="products" element={<PermissionGuard permission="products:read" fallback={<AccessDenied />}><Products /></PermissionGuard>} />
+            <Route path="products/:id" element={<PermissionGuard permission="products:read" fallback={<AccessDenied />}><ProductDetails /></PermissionGuard>} />
+            <Route path="orders" element={<PermissionGuard permission="orders:read" fallback={<AccessDenied />}><Orders /></PermissionGuard>} />
+            <Route path="orders/:id" element={<PermissionGuard permission="orders:read" fallback={<AccessDenied />}><OrderDetails /></PermissionGuard>} />
+            <Route path="tickets" element={<PermissionGuard permission="supportTickets:read" fallback={<AccessDenied />}><Tickets /></PermissionGuard>} />
+            <Route path="tickets/:id" element={<PermissionGuard permission="supportTickets:read" fallback={<AccessDenied />}><TicketDetails /></PermissionGuard>} />
+            <Route path="conversations" element={<PermissionGuard permission="conversations:read" fallback={<AccessDenied />}><Conversations /></PermissionGuard>} />
+            <Route path="conversations/:id" element={<PermissionGuard permission="conversations:read" fallback={<AccessDenied />}><Conversations /></PermissionGuard>} />
+            <Route path="employees" element={<PermissionGuard permission="member:read" fallback={<AccessDenied />}><Employees /></PermissionGuard>} />
+            <Route path="employees/:id" element={<PermissionGuard permission="member:read" fallback={<AccessDenied />}><EmployeeProfile /></PermissionGuard>} />
+            <Route path="settings" element={<PermissionGuard permission="organization:read" fallback={<AccessDenied />}><Settings /></PermissionGuard>} />
+            <Route path="analytics" element={<PermissionGuard permission="reports:read" fallback={<AccessDenied />}><AnalyticsPage /></PermissionGuard>} />
+            <Route path="ai" element={<PermissionGuard permission="ai:read" fallback={<AccessDenied />}><AiDashboard /></PermissionGuard>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

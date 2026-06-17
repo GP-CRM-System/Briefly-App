@@ -12,8 +12,8 @@ export const columns: Column<Product>[] = [
                 <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-semibold flex-shrink-0 ${getProductColor(row.name)}`}
                 >
-                    {row.image ? (
-                        <img src={row.image} alt={row.name} className="w-full h-full rounded-xl object-cover" />
+                    {(row.imageUrl || row.image) ? (
+                        <img src={row.imageUrl || row.image} alt={row.name} className="w-full h-full rounded-xl object-cover" />
                     ) : (
                         getProductInitials(row.name)
                     )}
@@ -56,11 +56,11 @@ export const columns: Column<Product>[] = [
         ),
     },
     {
-        key: "quantity",
+        key: "inventory",
         header: "Stock",
         align: "center",
         render: (row) => {
-            const qty = row.quantity ?? 0;
+            const qty = row.inventory ?? 0;
             const isLow = qty > 0 && qty <= 10;
             const isOut = qty === 0;
             return (

@@ -4,10 +4,9 @@ import { Icon } from "@/core/components";
 import { PermissionGuard } from "@/core/components/PermissionGuard";
 import { useUIStore } from "@/store/ui.store";
 import { useAuth } from "@/core/hooks";
-import { useCurrentSubscription } from "@/features/settings/settings.hooks";
 import { logout, logoSvg, letterLogo, tickets } from "@/assets/icons";
 import { 
-    dashboardIcon, 
+    dashboardIcon,
     customersIcon, 
     segmentsIcon, 
     campaignsIcon, 
@@ -18,6 +17,8 @@ import {
     settingsIcon,
     closeIcon
 } from "@/assets/new";
+import { SparklesIcon } from "hugeicons-react";
+import { useCurrentSubscription } from "@/features/settings/settings.hooks";
 
 import { Chatting01Icon } from "hugeicons-react";
 
@@ -31,15 +32,16 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { to: "/dashboard", label: "Dashboard", icon: dashboardIcon, end: true },
-    { to: "/dashboard/customers", label: "Customers", icon: customersIcon, permission: "customers.read" },
-    { to: "/dashboard/segments", label: "Segments", icon: segmentsIcon, permission: "segments.read" },
-    { to: "/dashboard/campaigns", label: "Campaigns", icon: campaignsIcon, permission: "campaigns.read" },
-    { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products.read" },
-    { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders.read" },
-    { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets.read" },
-    { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations.read" },
-    { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member.read" },
-    { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports.read" },
+    { to: "/dashboard/customers", label: "Customers", icon: customersIcon, permission: "customers:read" },
+    { to: "/dashboard/segments", label: "Segments", icon: segmentsIcon, permission: "segments:read" },
+    { to: "/dashboard/campaigns", label: "Campaigns", icon: campaignsIcon, permission: "campaigns:read" },
+    { to: "/dashboard/products", label: "Products", icon: productsIcon, permission: "products:read" },
+    { to: "/dashboard/orders", label: "Orders", icon: ordersIcon, permission: "orders:read" },
+    { to: "/dashboard/tickets", label: "Support Tickets", icon: tickets, permission: "supportTickets:read" },
+    { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations:read" },
+    { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member:read" },
+    { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports:read" },
+    { to: "/dashboard/ai", label: "Insights", icon: SparklesIcon, permission: "ai:read" },
 ];
 
 /* ───────────────────────── SidebarItem ───────────────────────── */

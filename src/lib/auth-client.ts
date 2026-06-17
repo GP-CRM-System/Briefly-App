@@ -1,14 +1,14 @@
 import { createAuthClient } from "better-auth/react";
+import { organizationClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
-    baseURL: import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, "") || "http://localhost:5000",
+    baseURL: import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "").replace(/\/+$/, "") || "http://localhost:6892",
     fetchOptions: {
-        credentials: "include" as RequestCredentials,
-        auth: {
-            type: "Bearer",
-            token: () => localStorage.getItem("auth_token") || ""
-        }
+        credentials: "include" as RequestCredentials
     },
+    plugins: [
+        organizationClient()
+    ]
 });
 
 // Export commonly used methods for convenience

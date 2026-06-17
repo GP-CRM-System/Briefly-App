@@ -17,7 +17,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
 
     const handleApply = () => {
         onApply({
-            shippingStatus: shipping,
+            fulfillmentStatus: shipping,
             paymentStatus: payment,
             source,
             search: "",
@@ -55,7 +55,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
             {/* Dialog */}
             <div className="relative w-80 max-w-full rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl z-10 flex flex-col gap-4" style={{ animation: "modalSlideIn 0.2s ease-out" }}>
                 <div>
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Shipping Status</h4>
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fulfillment Status</h4>
                     <div className="flex flex-wrap gap-2">
                         {["processing", "shipped", "delivered", "cancelled"].map((st) => {
                             const isSelected = shipping.has(st);

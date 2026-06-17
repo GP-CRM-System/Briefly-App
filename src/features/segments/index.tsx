@@ -53,8 +53,6 @@ const Segments = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [segmentToEdit, setSegmentToEdit] = useState<Segment | null>(null);
     const [viewMode, setViewMode] = useState<"standard" | "detailed">("detailed");
-
-    // Filters state
     const [filterOpen, setFilterOpen] = useState(false);
     const [creatorFilter, setCreatorFilter] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
@@ -63,7 +61,7 @@ const Segments = () => {
     const { data: segments = [], isLoading, isError } = useSegments();
     const deleteMutation = useDeleteSegment();
 
-    // Derive unique creators from real API data (no mock fallback)
+    // Derive unique creators from real API data
     const creatorOptions = useMemo(() => {
         const names = segments.map((s) => s.creator).filter(Boolean) as string[];
         return Array.from(new Set(names)).sort();
@@ -113,7 +111,7 @@ const Segments = () => {
         return matchesSearch && matchesCreator && matchesType;
     });
 
-    const activeFilterCount = (creatorFilter ? 1 : 0) + (typeFilter ? 1 : 0);
+    const activeFilterCount = [creatorFilter, typeFilter].filter(Boolean).length;
 
     return (
         <>
@@ -121,10 +119,10 @@ const Segments = () => {
                 searchValue={search}
                 searchPlaceholder="Search segments..."
                 onSearch={setSearch}
-                filterCount={activeFilterCount}
-                onFilter={() => setFilterOpen((p) => !p)}
                 onCreate={handleCreate}
                 createLabel="Create Segment"
+                filterCount={activeFilterCount}
+                onFilter={() => setFilterOpen((p) => !p)}
                 extraActions={
                     <ViewToggle mode={viewMode} onChange={setViewMode} />
                 }
@@ -147,13 +145,11 @@ const Segments = () => {
                                         className="bg-[#b3b3b3]/80 hover:bg-gray-400 rounded-full p-1 cursor-pointer transition-colors flex items-center justify-center size-[24px]"
                                     >
                                         <svg className="w-[12px] h-[12px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                                         </svg>
                                     </button>
                                 </div>
 
-                                {/* Divider */}
                                 <div className="bg-gray-200 h-px w-full" />
 
                                 {/* Filter inputs */}
@@ -200,14 +196,14 @@ const Segments = () => {
                                         Apply
                                     </button>
                                 </div>
-                            </div>
 
-                            <style>{`
-                                @keyframes modalSlideIn {
-                                    from { opacity: 0; transform: translateY(-8px); }
-                                    to { opacity: 1; transform: translateY(0); }
-                                }
-                            `}</style>
+                                <style>{`
+                                    @keyframes modalSlideIn {
+                                        from { opacity: 0; transform: translateY(-8px); }
+                                        to { opacity: 1; transform: translateY(0); }
+                                    }
+                                `}</style>
+                            </div>
                         </div>
                     )
                 }

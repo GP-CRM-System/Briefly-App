@@ -13,7 +13,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-query": "^5.100.6",
     "axios": "^1.15.2",
-    "better-auth": "^1.6.9",
+    "better-auth": "^1.6.11",
     "formik": "^2.4.9",
     "framer-motion": "^12.40.0",
     "hugeicons-react": "^0.4.0",

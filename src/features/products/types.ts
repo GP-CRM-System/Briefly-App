@@ -30,6 +30,7 @@ export interface Product {
     imageUrl?: string;
     inventory?: number;
     variants?: ProductVariant[];
+    orderItems?: ProductOrderItem[];
 }
 
 export interface ProductVariant {
@@ -44,6 +45,17 @@ export interface ProductVariant {
     status?: string | null;
     createdAt?: string;
     updatedAt?: string;
+}
+
+export interface ProductOrderItem {
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+    price: string;
+    createdAt: string;
+    updatedAt: string;
+
 }
 
 export type ProductStatus = "active" | "draft" | "archived";

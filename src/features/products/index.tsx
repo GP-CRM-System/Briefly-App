@@ -7,13 +7,13 @@ import DataTable from "@/core/components/DataTable";
 
 import type { Product, ProductFilterState } from "./types";
 import { useProducts, useDeleteProduct } from "./product.hooks";
-import { useCreateImport } from "@/features/settings/settings.hooks";
 import { freshProductFilters, filterProducts, countActiveProductFilters } from "./utils";
 
 import { columns } from "./components/ProductColumns";
 import ActionMenu from "./components/ActionMenu";
 import FilterPanel from "./components/FilterPanel";
 import ProductFormModal from "./components/ProductFormModal";
+import ImportExportModal from "@/features/imports/ImportExportModal";
 
 const Products = () => {
     const navigate = useNavigate();
@@ -25,69 +25,14 @@ const Products = () => {
     /* Modal state */
     const [modalOpen, setModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
 
     /* ── Data ── */
     const { data: products = [], isLoading, isError } = useProducts();
     const deleteMutation = useDeleteProduct();
-    const createImportMutation = useCreateImport();
 
-    const handleExport = () => {
-        if (!filtered.length) {
-            toast.error("No products to export");
-            return;
-        }
-        
-        const csvData = filtered.map(p => ({
-            ID: p.id,
-            Name: p.name,
-            SKU: p.sku || "",
-            Price: p.price || 0,
-            Stock: p.quantity ?? 0,
-            Status: p.status || "",
-            CreatedAt: p.createdAt
-        }));
 
-        const headers = Object.keys(csvData[0]);
-        const csvRows = [
-            headers.join(","),
-            ...csvData.map(row =>
-                headers.map(h => {
-                    const val = row[h as keyof typeof row];
-                    const escaped = ('' + (val ?? '')).replace(/"/g, '""');
-                    return `"${escaped}"`;
-                }).join(",")
-            )
-        ];
-
-        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `products_export_${new Date().toISOString().split('T')[0]}.csv`;
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        toast.success("Products exported successfully!");
-    };
-
-    const handleImport = () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".csv";
-        input.onchange = (e: any) => {
-            const file = e.target.files?.[0];
-            if (file) {
-                createImportMutation.mutate({ file, entityType: "product" }, {
-                    onSuccess: () => {
-                        toast.success("Products import job created! You can check progress in Settings -> Imports & Exports.");
-                    }
-                });
-            }
-        };
-        input.click();
-    };
 
     if (isError) {
         return (
@@ -124,8 +69,8 @@ const Products = () => {
                 onSearch={setSearch}
                 filterCount={countActiveProductFilters(activeFilters)}
                 onFilter={() => setFilterOpen((p) => !p)}
-                onExport={handleExport}
-                onImport={handleImport}
+                onExport={() => setExportOpen(true)}
+                onImport={() => setImportOpen(true)}
                 onCreate={handleCreate}
                 createLabel="Create Product"
                 filterContent={
@@ -159,6 +104,19 @@ const Products = () => {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 product={productToEdit}
+            />
+
+            <ImportExportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                mode="import"
+                entityType="product"
+            />
+            <ImportExportModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                mode="export"
+                entityType="product"
             />
         </>
     );

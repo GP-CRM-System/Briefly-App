@@ -5,14 +5,8 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import toast from "react-hot-toast";
-import { useDashboardData, useAuditLogs } from "../dashboard.hooks";
-import type { TicketBreakdown, AuditLogEntry } from "../types";
-
-/* ═══════════════════════════════════════════════════
-   Fallback ticket values — only used if the API returns
-   nothing at all. Prefer showing real zeros over fake numbers.
-   ═══════════════════════════════════════════════════ */
-const EMPTY_TICKETS: TicketBreakdown = { open: 0, pending: 0, closed: 0 };
+import { useDashboardData } from "../dashboard.hooks";
+import type { SalesDataPoint, TicketBreakdown, DashboardCustomerEvent } from "../types";
 
 /* ── Donut chart palette ── */
 const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
@@ -23,7 +17,7 @@ const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
 interface StatCardProps {
     label: string;
     value: string | number;
-    change?: number;          // e.g. 7 = +7%, -3 = –3%
+    change?: number;
     iconBg?: string;
 }
 
@@ -77,8 +71,14 @@ const DonutLegend = ({ payload }: any) => (
 );
 
 /* ══════════════════════════════════════════════════════
-   Activity Row
+   Helpers
    ══════════════════════════════════════════════════════ */
+const formatSalesDate = (d: string) => {
+    try {
+        return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } catch { return d; }
+};
+
 const formatDate = (d: string) => {
     try {
         return new Date(d).toLocaleDateString("en-US", {
@@ -96,12 +96,20 @@ const formatTime = (d: string) => {
 };
 
 /* ══════════════════════════════════════════════════════
+   Empty state
+   ══════════════════════════════════════════════════════ */
+const EmptyChart = ({ title }: { title: string }) => (
+    <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+        No data available for {title}
+    </div>
+);
+
+/* ══════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════ */
 const DashboardHome = () => {
     const navigate = useNavigate();
     const { data: dashboard, isLoading } = useDashboardData();
-    const { data: auditRaw = [] } = useAuditLogs();
 
     useEffect(() => {
         const showWelcome = sessionStorage.getItem("briefly_show_welcome");
@@ -156,12 +164,18 @@ const DashboardHome = () => {
         }
     }, []);
 
-    /* Safely extract sub-objects — no fake data, show real values or 0 */
+    /* Safely extract sub-objects — no hardcoded fallbacks */
     const stats = dashboard?.stats;
-    const hasSalesData = (dashboard?.salesOverview?.length ?? 0) > 0;
-    const salesData = hasSalesData && dashboard?.salesOverview ? dashboard.salesOverview : [];
-    const tickets = dashboard?.ticketBreakdown ?? EMPTY_TICKETS;
-    const auditLogs: AuditLogEntry[] = Array.isArray(auditRaw) ? auditRaw : [];
+    const rawSales = dashboard?.salesOverview;
+    const salesData = useMemo(() => {
+        if (!rawSales?.length) return [];
+        return rawSales.map((pt) => ({
+            ...pt,
+            date: formatSalesDate(pt.date),
+        }));
+    }, [rawSales]);
+    const tickets: TicketBreakdown = dashboard?.ticketBreakdown ?? { open: 0, pending: 0, closed: 0 };
+    const customerEvents: DashboardCustomerEvent[] = stats?.customerEvents ?? [];
 
     /* Donut chart data */
     const donutData = useMemo(() => {
@@ -294,12 +308,12 @@ const DashboardHome = () => {
             {/* ── Recent Activities ── */}
             <div className="bg-white rounded-xl border border-gray-100">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-base font-semibold text-gray-900">Recent Activities</h2>
+                    <h2 className="text-base font-semibold text-gray-900">Recent Customer Events</h2>
                     <button
-                        onClick={() => navigate("/dashboard/analytics")}
+                        onClick={() => navigate("/dashboard/customers")}
                         className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] transition-colors"
                     >
-                        View all
+                        View all customers
                     </button>
                 </div>
 
@@ -308,53 +322,55 @@ const DashboardHome = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-50">
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Activity Type</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Performed By</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Related To</th>
-                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Details</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Event Type</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Customer</th>
+                                <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Description</th>
                                 <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Date</th>
                                 <th className="text-left px-6 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {auditLogs.length === 0 ? (
+                            {customerEvents.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                                        No recent activities
+                                    <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
+                                        No recent customer events
                                     </td>
                                 </tr>
                             ) : (
-                                auditLogs.slice(0, 8).map((log) => (
-                                    <tr key={log.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                customerEvents.slice(0, 8).map((ev) => (
+                                    <tr key={ev.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-3.5">
                                             <div className="flex items-center gap-2">
                                                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                                    log.action?.toLowerCase().includes("create") ? "bg-emerald-400" :
-                                                    log.action?.toLowerCase().includes("delete") ? "bg-red-400" :
-                                                    log.action?.toLowerCase().includes("update") ? "bg-amber-400" :
-                                                    "bg-blue-400"
+                                                    ev.eventType === "order_placed" ? "bg-emerald-400" :
+                                                    ev.eventType === "cart_abandoned" ? "bg-red-400" :
+                                                    ev.eventType === "review_submitted" ? "bg-blue-400" :
+                                                    ev.eventType === "support_ticket_resolved" ? "bg-amber-400" :
+                                                    "bg-purple-400"
                                                 }`} />
-                                                <span className="text-gray-700 capitalize">{log.action?.replace(/_/g, " ") || "—"}</span>
+                                                <span className="text-gray-700 capitalize">{ev.eventType?.replace(/_/g, " ") || "—"}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3.5 text-gray-600">{log.performedByName || log.performedBy || "—"}</td>
-                                        <td className="px-6 py-3.5 text-gray-600 capitalize">{log.entityType || log.relatedTo || "—"}</td>
-                                        <td className="px-6 py-3.5 text-gray-500 max-w-[200px] truncate">{log.details || "—"}</td>
+                                        <td className="px-6 py-3.5 text-gray-600">
+                                            <button
+                                                onClick={() => navigate(`/dashboard/customers/${ev.customer.id}`)}
+                                                className="text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
+                                            >
+                                                {ev.customer.name}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-3.5 text-gray-500 max-w-[200px] truncate">{ev.description || "—"}</td>
                                         <td className="px-6 py-3.5 text-gray-500 whitespace-nowrap">
-                                            <div>{formatDate(log.createdAt)}</div>
-                                            <div className="text-[11px] text-gray-300">{formatTime(log.createdAt)}</div>
+                                            <div>{formatDate(ev.occurredAt)}</div>
+                                            <div className="text-[11px] text-gray-300">{formatTime(ev.occurredAt)}</div>
                                         </td>
                                         <td className="px-6 py-3.5">
-                                            {log.entityId && log.entityType ? (
-                                                <button
-                                                    onClick={() => navigate(`/dashboard/${log.entityType.toLowerCase()}s/${log.entityId}`)}
-                                                    className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
-                                                >
-                                                    View
-                                                </button>
-                                            ) : (
-                                                <span className="text-xs text-gray-300">—</span>
-                                            )}
+                                            <button
+                                                onClick={() => navigate(`/dashboard/customers/${ev.customer.id}`)}
+                                                className="text-xs font-medium text-[var(--color-primary-500)] hover:text-[var(--color-primary-700)] hover:underline transition-colors"
+                                            >
+                                                View
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
