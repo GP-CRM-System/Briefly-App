@@ -1,6 +1,6 @@
 export { default as essam } from "./essam.png";
 export { default as seif } from "./seif.png";
-export { default as pierre } from "./pierre.png";
+export { default as pierre } from "./PIERRE.png";
 export { default as abdelrahman } from "./abdelrahman.png";
 export { default as mennaF } from "./mennaF.png";
 export { default as mennaA } from "./mennaA.png";
