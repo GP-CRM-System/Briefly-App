@@ -26,7 +26,7 @@ const pricingCards: PricingCard[] = [
         features: ["Small teams", "Contact management", "Basic sales tracking", "Lead organization"],
         buttonClassName: "text-[#4A90E2] border-[#9DC0FF] hover:bg-[#4A90E2] hover:text-white",
         cardClassName:
-            "w-full max-w-[399px] h-[507px] rounded-[16px] border-2 border-[#D6D6D6] flex flex-col px-[25px] pt-[24px] pb-[24px] bg-white shrink-0",
+            "w-full lg:w-1/3 max-w-[340px] sm:max-w-[399px] h-auto lg:min-h-[480px] xl:min-h-[507px] rounded-[16px] border-2 border-[#D6D6D6] flex flex-col px-[20px] sm:px-[25px] pt-[24px] pb-[24px] bg-white transition-all",
     },
     {
         title: "Growth",
@@ -37,7 +37,7 @@ const pricingCards: PricingCard[] = [
         features: ["Up to 5 users", "Everything in Starter", "AI-driven social media moderation", "sentiment analysis"],
         buttonClassName: "text-white bg-[#4A90E2] border-[#4A90E2] hover:bg-[#3a7bc8]",
         cardClassName:
-            "w-full max-w-[399px] h-[599px] rounded-[16px] border-2 border-[#4A90E2] flex flex-col px-[25px] pt-[44px] pb-[44px] bg-white shadow-lg relative lg:-top-[24px] shrink-0",
+            "w-full lg:w-1/3 max-w-[340px] sm:max-w-[399px] h-auto lg:min-h-[540px] xl:min-h-[599px] rounded-[16px] border-2 border-[#4A90E2] flex flex-col px-[20px] sm:px-[25px] pt-[44px] pb-[44px] bg-white shadow-lg relative lg:-top-[12px] xl:-top-[24px] z-10 mt-4 lg:mt-0 transition-all",
         titleClassName: "text-[#4A90E2]",
         priceClassName: "mt-8 sm:mt-10",
     },
@@ -49,7 +49,7 @@ const pricingCards: PricingCard[] = [
         features: ["unlimited users", "Everything in Growth", "Full API access", "Advanced analytics dashboards"],
         buttonClassName: "text-[#4A90E2] border-[#9DC0FF] hover:bg-[#4A90E2] hover:text-white",
         cardClassName:
-            "w-full max-w-[399px] h-[507px] rounded-[16px] border-2 border-[#D6D6D6] flex flex-col px-[25px] pt-[24px] pb-[24px] bg-white shadow-md shrink-0",
+            "w-full lg:w-1/3 max-w-[340px] sm:max-w-[399px] h-auto lg:min-h-[480px] xl:min-h-[507px] rounded-[16px] border-2 border-[#D6D6D6] flex flex-col px-[20px] sm:px-[25px] pt-[24px] pb-[24px] bg-white shadow-md mt-4 lg:mt-0 transition-all",
     },
 ];
 
@@ -68,7 +68,7 @@ const Pricing: React.FC = () => {
                 Choose the Perfect <span className="text-[#4A90E2]">Plan</span> For Your Business
             </h1>
 
-            <div className="flex flex-col lg:flex-row gap-5 sm:gap-6 justify-center mt-8 sm:mt-12 md:mt-16 lg:mt-20 items-center lg:items-start">
+            <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-4 xl:gap-6 justify-center mt-8 sm:mt-12 md:mt-16 lg:mt-20 items-center lg:items-center">
                 {pricingCards.map((card) => (
                     <div key={card.title} className={`${card.cardClassName} transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl`}>
                         {card.badge ? (
