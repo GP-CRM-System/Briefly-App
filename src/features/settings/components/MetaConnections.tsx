@@ -132,7 +132,7 @@ const ChannelCard = ({ channel }: { channel: ChannelDef }) => {
     const handleCancel = () => {
         setShowForm(false);
         if (channelIntegration) {
-            setMetadataValue(channelIntegration.metadata?.[channel.metadataField] || "");
+            setMetadataValue((channelIntegration.metadata as any)?.[channel.metadataField] || "");
             setName(channelIntegration.name || channel.label);
         }
         setAccessToken("");
@@ -140,7 +140,7 @@ const ChannelCard = ({ channel }: { channel: ChannelDef }) => {
 
     const openEdit = () => {
         if (!channelIntegration) return;
-        setMetadataValue(channelIntegration.metadata?.[channel.metadataField] || "");
+        setMetadataValue((channelIntegration.metadata as any)?.[channel.metadataField] || "");
         setName(channelIntegration.name || channel.label);
         setAccessToken("");
         setShowForm(true);
@@ -174,7 +174,7 @@ const ChannelCard = ({ channel }: { channel: ChannelDef }) => {
                                 </span>
                             </div>
                             <p className="text-sm text-gray-400 mt-0.5">
-                                {channel.metadataLabel}: {channelIntegration.metadata?.[channel.metadataField]}
+                                {channel.metadataLabel}: {(channelIntegration.metadata as any)?.[channel.metadataField]}
                             </p>
                         </div>
                     </div>
@@ -321,3 +321,4 @@ const MetaConnections = () => {
 };
 
 export default MetaConnections;
+

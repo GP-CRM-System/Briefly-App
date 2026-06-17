@@ -421,8 +421,8 @@ const MyProfileTab = () => {
                                     <button
                                         onClick={() => {
                                             const googleAcc = linkedAccounts.find((acc: any) => acc.provider === "google");
-                                            if (googleAcc?.id) {
-                                                unlinkAccountMutation.mutate(googleAcc.id);
+                                            if ((googleAcc as any)?.id) {
+                                                unlinkAccountMutation.mutate((googleAcc as any).id);
                                             }
                                         }}
                                         disabled={unlinkAccountMutation.isPending}
@@ -473,3 +473,4 @@ const MyProfileTab = () => {
 };
 
 export default MyProfileTab;
+

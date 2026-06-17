@@ -38,7 +38,7 @@ const ProductDetails = () => {
     // Resolve recommended product IDs to full product objects (must be before any early returns)
     const recommendedProducts = useMemo(() => {
         if (!recommendations?.recommendations) return [];
-        const raw = recommendations.recommendations as Array<Record<string, unknown>>;
+        const raw = (recommendations.recommendations as unknown) as Array<Record<string, unknown>>;
         if (!Array.isArray(raw) || raw.length === 0) return [];
         const productMap = new Map(allProducts.map((p) => [p.id, p]));
         return raw
@@ -482,3 +482,4 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+

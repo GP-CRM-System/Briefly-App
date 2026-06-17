@@ -35,6 +35,7 @@ export interface Customer {
     supportTicketsCount?: number;
     lastSentimentScore?: number | null;
     priceSensitivityIndex?: number | null;
+    websiteVisitsLastMonth?: number | null;
     cohortMonth?: string | null;
     customerEvents?: CustomerEvent[];
     productInteractions?: CustomerProductInteraction[];

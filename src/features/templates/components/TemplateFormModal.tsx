@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Modal, { FormCard, FormField, FormRow, inputClasses } from "@/core/components/Modal";
+import Modal, { FormCard, FormField, inputClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
 import type { Template } from "../types";
 import { useCreateTemplate, useUpdateTemplate } from "../template.hooks";
@@ -103,3 +103,4 @@ const TemplateFormModal = ({ open, onClose, template }: TemplateFormModalProps) 
 };
 
 export default TemplateFormModal;
+

@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-
 import PageLayout from "@/core/components/PageLayout";
 import DataTable from "@/core/components/DataTable";
 
 import type { Customer, FilterState } from "./types";
 import { useCustomers, useDeleteCustomer } from "./customer.hooks";
-import { useCreateImport } from "@/features/settings/settings.hooks";
 import { freshFilters, filterCustomers, countActiveFilters } from "./utils";
 
 import { columns } from "./components/CustomerColumns";
@@ -32,67 +29,7 @@ const Customers = () => {
     /* ── Data ── */
     const { data: customers = [], isLoading, isError } = useCustomers();
     const deleteMutation = useDeleteCustomer();
-    const createImportMutation = useCreateImport();
 
-    const handleExport = () => {
-        if (!filtered.length) {
-            toast.error("No customers to export");
-            return;
-        }
-        
-        const csvData = filtered.map(c => ({
-            ID: c.id,
-            Name: c.name,
-            Email: c.email,
-            Phone: c.phone || "",
-            City: c.city || "",
-            LifecycleStage: c.lifecycleStage || "",
-            TotalSpent: c.totalSpent || 0,
-            OrderCount: c.totalOrders || 0,
-            CreatedAt: c.createdAt
-        }));
-
-        const headers = Object.keys(csvData[0]);
-        const csvRows = [
-            headers.join(","),
-            ...csvData.map(row =>
-                headers.map(h => {
-                    const val = row[h as keyof typeof row];
-                    const escaped = ('' + (val ?? '')).replace(/"/g, '""');
-                    return `"${escaped}"`;
-                }).join(",")
-            )
-        ];
-
-        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `customers_export_${new Date().toISOString().split('T')[0]}.csv`;
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        toast.success("Customers exported successfully!");
-    };
-
-    const handleImport = () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".csv";
-        input.onchange = (e: any) => {
-            const file = e.target.files?.[0];
-            if (file) {
-                createImportMutation.mutate({ file, entityType: "customer" }, {
-                    onSuccess: () => {
-                        toast.success("Customers import job created! You can check progress in Settings -> Imports & Exports.");
-                    }
-                });
-            }
-        };
-        input.click();
-    };
 
     if (isError) {
         return (
@@ -183,3 +120,4 @@ const Customers = () => {
 };
 
 export default Customers;
+

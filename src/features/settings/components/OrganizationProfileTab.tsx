@@ -16,9 +16,10 @@ const OrganizationProfileTab = () => {
 
     useEffect(() => {
         if (org) {
-            setOrgName(org.name || "");
-            setOrgSlug(org.slug || "");
-            setLogo(org.logo || null);
+            const o = org as any;
+            setOrgName(o.name || "");
+            setOrgSlug(o.slug || "");
+            setLogo(o.logo || null);
         }
     }, [org]);
 
@@ -189,3 +190,4 @@ const OrganizationProfileTab = () => {
 };
 
 export default OrganizationProfileTab;
+

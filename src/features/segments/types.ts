@@ -20,7 +20,17 @@ export interface Segment {
     description?: string | null;
     filter: SegmentFilter;
     size?: number;
+    customerCount?: number;
     creatorId?: string | null;
+    creator?: string | null;
+    creatorRole?: string | null;
+    creatorImage?: string | null;
+    status?: string | null;
+    type?: string | null;
+    sizeTrend?: string | null;
+    lastUpdated?: string | null;
+    rules?: Array<{ icon: string; category: string; description: string }> | null;
+    conditions?: Array<{ field: string; operator: string; value: string }> | null;
     createdAt: string;
     updatedAt: string;
 }

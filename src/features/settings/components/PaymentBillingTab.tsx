@@ -11,9 +11,11 @@ import { FileDownloadIcon, Loading01Icon, Cancel01Icon } from "hugeicons-react";
 
 const PaymentBillingTab = () => {
     // Queries
-    const { data: plans = [], isLoading: isLoadingPlans } = usePlans();
-    const { data: currentSubscription, isLoading: isLoadingSub } = useCurrentSubscription();
+    const { data: rawPlans = [], isLoading: isLoadingPlans } = usePlans();
+    const { data: rawSubscription, isLoading: isLoadingSub } = useCurrentSubscription();
     const { data: invoices = [], isLoading: isLoadingInvoices } = useBillingInvoices();
+    const plans = rawPlans as any[];
+    const currentSubscription = rawSubscription as any;
 
     // Mutations
     const initializeMutation = useInitializeSubscription();
@@ -354,3 +356,4 @@ Thank you for your business!
 };
 
 export default PaymentBillingTab;
+

@@ -146,14 +146,15 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     const [dismissed, setDismissed] = useState(false);
     const navigate = useNavigate();
     const { data: currentSubscription } = useCurrentSubscription();
+    const sub = currentSubscription as any;
 
-    const isFreeOrTrial = !currentSubscription || 
-        currentSubscription.status === "TRIALING" || 
-        currentSubscription.plan?.name === "free";
+    const isFreeOrTrial = !sub || 
+        sub.status === "TRIALING" || 
+        sub.plan?.name === "free";
 
     if (!sidebarOpen || dismissed || !isFreeOrTrial) return null;
 
-    const endDate = currentSubscription?.endDate ? new Date(currentSubscription.endDate) : null;
+    const endDate = sub?.endDate ? new Date(sub.endDate) : null;
     const today = new Date();
     
     let daysLeft = 5; // default fallback
@@ -164,7 +165,7 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
         const diffMs = endDate.getTime() - today.getTime();
         daysLeft = Math.max(0, Math.ceil(diffMs / msPerDay));
         
-        const startDate = currentSubscription?.startDate ? new Date(currentSubscription.startDate) : null;
+        const startDate = sub?.startDate ? new Date(sub.startDate) : null;
         if (startDate) {
             const totalMs = endDate.getTime() - startDate.getTime();
             percentLeft = totalMs > 0 ? (diffMs / totalMs) * 100 : 0;

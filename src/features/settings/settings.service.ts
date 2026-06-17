@@ -343,7 +343,7 @@ export const settingsService = {
                 return logs.map((l: BackendSyncLog) => ({
                     id: l.id,
                     timestamp: l.startedAt || l.createdAt || new Date().toISOString(),
-                    level: l.status === "failed" ? "error" as const : l.itemsFailed > 0 ? "warning" as const : "info" as const,
+                    level: l.status === "failed" ? "error" as const : (l.itemsFailed ?? 0) > 0 ? "warning" as const : "info" as const,
                     message: `${l.syncType} sync for ${l.entityType}: ${l.itemsProcessed} processed, ${l.itemsCreated} created, ${l.itemsUpdated} updated${l.itemsFailed ? `, ${l.itemsFailed} failed` : ""}. Status: ${l.status}`,
                 }));
             }
@@ -477,3 +477,4 @@ export const settingsService = {
         return [];
     }
 };
+

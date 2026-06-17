@@ -5,7 +5,6 @@ import {
     BarChart, Bar,
 } from "recharts";
 import { useAnalytics } from "../analytics.hooks";
-import type { AnalyticsData } from "../analytics.service";
 
 /* ══════════════════════════════════════════════════════
    Empty state
@@ -374,3 +373,4 @@ const AnalyticsPage = () => {
 };
 
 export default AnalyticsPage;
+

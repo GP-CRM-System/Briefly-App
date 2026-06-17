@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCampaign, useDeleteCampaign } from "../campaign.hooks";
@@ -327,3 +328,4 @@ const CampaignDetails = () => {
 };
 
 export default CampaignDetails;
+

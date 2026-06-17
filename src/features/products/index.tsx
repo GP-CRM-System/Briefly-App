@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 import PageLayout from "@/core/components/PageLayout";
 import DataTable from "@/core/components/DataTable";
@@ -123,3 +122,4 @@ const Products = () => {
 };
 
 export default Products;
+

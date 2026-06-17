@@ -50,15 +50,15 @@ const ConnectionsTab = () => {
             setInitializedId(activeConn.id);
             setAutoSync(activeConn.autoSync);
             if (activeConn.metadata?.syncDirection) {
-                setSyncDirection(activeConn.metadata.syncDirection);
+                setSyncDirection((activeConn.metadata as any).syncDirection);
             }
             if (activeConn.metadata?.selectedData) {
                 setSelectedData({
-                    customers: activeConn.metadata.selectedData.customers ?? true,
-                    orders: activeConn.metadata.selectedData.orders ?? true,
-                    products: activeConn.metadata.selectedData.products ?? true,
-                    revenue: activeConn.metadata.selectedData.revenue ?? true,
-                    refunds: activeConn.metadata.selectedData.refunds ?? false,
+                    customers: (activeConn.metadata as any).selectedData.customers ?? true,
+                    orders: (activeConn.metadata as any).selectedData.orders ?? true,
+                    products: (activeConn.metadata as any).selectedData.products ?? true,
+                    revenue: (activeConn.metadata as any).selectedData.revenue ?? true,
+                    refunds: (activeConn.metadata as any).selectedData.refunds ?? false,
                 });
             }
         }
@@ -529,3 +529,4 @@ const ConnectionsTab = () => {
 };
 
 export default ConnectionsTab;
+

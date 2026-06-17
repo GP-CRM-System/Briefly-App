@@ -115,7 +115,7 @@ export const useLinkSocial = () => {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (provider: string) => settingsService.linkSocial(provider),
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
             qc.invalidateQueries({ queryKey: settingsKeys.accounts() });
             // If the backend returns a redirect URL for OAuth, redirect the browser
             if (data?.url) {
@@ -283,7 +283,7 @@ export const useConnectShopify = () => {
 export const useTestConnection = () => {
     return useMutation({
         mutationFn: (id: string) => settingsService.testConnection(id),
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
             toast.success(data?.message || "Connection tested successfully!");
         },
         onError: (err: any) => {
@@ -428,7 +428,7 @@ export const useInitializeSubscription = () => {
     return useMutation({
         mutationFn: ({ planId, billingCycle }: { planId: string; billingCycle?: string }) =>
             settingsService.initializeSubscription(planId, billingCycle),
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
             qc.invalidateQueries({ queryKey: settingsKeys.subscription() });
             // If Paymob returns a payment URL, redirect to it
             const paymentUrl = data?.paymob?.paymentUrl || data?.paymentUrl || data?.redirectUrl;

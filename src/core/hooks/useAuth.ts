@@ -78,7 +78,7 @@ export function useAuth() {
                 return { error: error.message };
             }
             
-            const hydrated = await hydrateAuthState(data, Boolean(data?.session?.activeOrganizationId ?? data?.activeOrganizationId));
+            const hydrated = await hydrateAuthState(data, Boolean((data as any)?.session?.activeOrganizationId ?? (data as any)?.activeOrganizationId));
             if (!hydrated.ok) {
                 toast.error(hydrated.error);
                 return { error: hydrated.error };
@@ -157,3 +157,4 @@ export function useAuth() {
         logout,
     };
 }
+

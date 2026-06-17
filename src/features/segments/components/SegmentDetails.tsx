@@ -73,7 +73,7 @@ const SegmentDetails = () => {
 
         if (!segment || !segment.filter) return [];
 
-        const { field, operator, value } = segment.filter;
+        const { field, operator, value } = segment.filter as any;
         if (!field || !value) return MOCK_CUSTOMERS;
 
         return MOCK_CUSTOMERS.filter((customer) => {
@@ -395,7 +395,7 @@ const SegmentDetails = () => {
                                 // Derive from conditions array or single filter
                                 const conditionsList = (segment as any).conditions && (segment as any).conditions.length > 0
                                     ? (segment as any).conditions
-                                    : segment.filter?.field ? [segment.filter] : [];
+                                    : (segment.filter as any)?.field ? [segment.filter] : [];
 
                                 if (conditionsList.length === 0) {
                                     return (

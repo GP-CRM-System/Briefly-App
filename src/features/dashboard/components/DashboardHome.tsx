@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import toast from "react-hot-toast";
 import { useDashboardData } from "../dashboard.hooks";
-import type { SalesDataPoint, TicketBreakdown, DashboardCustomerEvent } from "../types";
+import type { TicketBreakdown, DashboardCustomerEvent } from "../types";
 
 /* ── Donut chart palette ── */
 const DONUT_COLORS = ["#4F8CFF", "#A78BFA", "#94A3B8"];
@@ -98,12 +98,6 @@ const formatTime = (d: string) => {
 /* ══════════════════════════════════════════════════════
    Empty state
    ══════════════════════════════════════════════════════ */
-const EmptyChart = ({ title }: { title: string }) => (
-    <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
-        No data available for {title}
-    </div>
-);
-
 /* ══════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════ */
@@ -384,3 +378,5 @@ const DashboardHome = () => {
 };
 
 export default DashboardHome;
+
+

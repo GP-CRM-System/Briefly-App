@@ -1,6 +1,7 @@
 export interface TicketNote {
     id: string;
     content: string;
+    body?: string;
     createdAt: string;
     author?: string;
 }

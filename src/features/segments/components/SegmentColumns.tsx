@@ -61,7 +61,7 @@ export const standardColumns: Column<Segment>[] = [
         width: "w-[110px]",
         render: (row) => {
             const isActive = !row.status || row.status.toLowerCase() === "active";
-            return <StatusBadge status={isActive ? "Active" : row.status} />;
+            return <StatusBadge status={isActive ? "Active" : (row.status ?? undefined)} />;
         },
     },
     {
@@ -131,7 +131,7 @@ export const detailedColumns: Column<Segment>[] = [
         width: "w-[110px]",
         render: (row) => {
             const isActive = !row.status || row.status.toLowerCase() === "active";
-            return <StatusBadge status={isActive ? "Active" : row.status} />;
+            return <StatusBadge status={isActive ? "Active" : (row.status ?? undefined)} />;
         },
     },
     {

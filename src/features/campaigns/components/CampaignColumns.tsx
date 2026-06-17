@@ -102,7 +102,7 @@ export const columns: Column<Campaign>[] = [
         width: "min-w-[160px]",
         render: (row) => {
             const dateStr = row.scheduledAt || row.createdAt;
-            const date = new Date(dateStr);
+            const date = new Date(dateStr!);
             if (isNaN(date.getTime())) return <span className="text-gray-400 font-medium">—</span>;
 
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -170,3 +170,4 @@ export const columns: Column<Campaign>[] = [
         ),
     },
 ];
+

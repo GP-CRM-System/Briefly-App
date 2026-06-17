@@ -9,6 +9,7 @@ export interface Campaign {
     description?: string | null;
     templateId?: string | null;
     segmentId?: string | null;
+    segmentName?: string | null;
     status: CampaignStatus;
     scheduledAt?: string | null;
     sentAt?: string | null;
