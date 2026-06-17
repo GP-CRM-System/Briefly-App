@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untitled Document.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<p class="has-line-data" data-line-start="0" data-line-end="1">Here is the same content restructured and styled for better readability, using clear headings, tables, lists, and consistent formatting in Markdown.</p>
+<hr>
+<h1 class="code-line has-line-data" data-line-start="4" data-line-end="5"><a id="Briefly_CRM_Complete_Project_Audit_Technical_Documentation_Report_4"></a>Briefly CRM: Complete Project Audit &amp; Technical Documentation Report</h1>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="8" data-line-end="9"><a id="1_Project_Overview_8"></a>1. Project Overview</h2>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Project Name</strong></td>
+<td style="text-align:left">Briefly CRM</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>One-Sentence Description</strong></td>
+<td style="text-align:left">A high-performance, multi-tenant E-Commerce Customer Relationship Management (CRM) platform designed to aggregate transactions, analyze customer telemetry (RFM, lifetime value, and churn risk), streamline ticket support, and centralize messaging.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Problem Being Solved</strong></td>
+<td style="text-align:left">Modern e-commerce merchants suffer from fragmented customer data isolated across storefront platforms (like Shopify), support ticketing systems, and social media messaging channels. This fragmentation prevents merchants from obtaining unified customer profiles, assessing behavioral metrics, detecting churn patterns, and executing targeted automated outreach.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="16" data-line-end="17"><a id="Target_Users_16"></a>👥 Target Users</h3>
+<ul>
+<li class="has-line-data" data-line-start="18" data-line-end="19"><strong>E-Commerce Merchants &amp; Store Owners:</strong> Need high-level dashboards, financial reports, integration configurations, billing, and subscription management.</li>
+<li class="has-line-data" data-line-start="19" data-line-end="20"><strong>Support &amp; Sales Agents (Employees):</strong> Need access to customer profiles, support ticket queues, message logs, and conversational inboxes to handle customer inquiries.</li>
+<li class="has-line-data" data-line-start="20" data-line-end="22"><strong>Administrators / Organization Owners (Root):</strong> Need complete control over organization settings, employee invitations, role mapping, data export queues, and billing.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="22" data-line-end="23"><a id="Business_Value_22"></a>💎 Business Value</h3>
+<ul>
+<li class="has-line-data" data-line-start="24" data-line-end="25"><strong>Reduced Churn Rate:</strong> By predicting churn risk scores and identifying “At Risk” and “Churned” cohorts, merchants can proactively launch targeted email/SMS campaigns to win back customers.</li>
+<li class="has-line-data" data-line-start="25" data-line-end="26"><strong>Operational Efficiency:</strong> Support and messaging channels (WhatsApp, Facebook Messenger, Instagram) are unified in a single, real-time chat console with assignment workflows, reducing response times.</li>
+<li class="has-line-data" data-line-start="26" data-line-end="28"><strong>Increased LTV (Lifetime Value):</strong> RFM segmentation (Champions, Loyal Customers, Potential Loyalists) empowers marketing teams to optimize promotions.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="28" data-line-end="29"><a id="Main_Differentiators_28"></a>✨ Main Differentiators</h3>
+<ul>
+<li class="has-line-data" data-line-start="30" data-line-end="31"><strong>Shopify Web Pixel Storefront Ingestion:</strong> Real-time event telemetry tracking (<code>page_viewed</code>, <code>product_viewed</code>, <code>product_added_to_cart</code>, <code>checkout_started</code>) resolved via customer email on the merchant storefront.</li>
+<li class="has-line-data" data-line-start="31" data-line-end="32"><strong>Pre-Deletion Protection:</strong> An anti-data-loss constraint where an organization cannot be deleted without first executing a full tenant data export, triggering automated admin notification emails.</li>
+<li class="has-line-data" data-line-start="32" data-line-end="34"><strong>Multi-Instance Real-Time Scalability:</strong> A WebSocket server using a Redis adapter to synchronize state across multiple server nodes, combined with BullMQ persistent background queues for resilient data pipelines.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="36" data-line-end="37"><a id="2_User_Types_Permissions_36"></a>2. User Types &amp; Permissions</h2>
+<h3 class="code-line has-line-data" data-line-start="38" data-line-end="39"><a id="Root_User_Organization_Owner_38"></a>👑 Root User (Organization Owner)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Permissions</strong></td>
+<td style="text-align:left">Complete permissions on all resources: <code>organization:read/update/delete</code>, <code>member:read/create/update/delete</code>, <code>invitation:read/create/cancel</code>, <code>team:read/create/update/delete</code>, <code>ac:create/read/update/delete</code>, <code>customers:read/write/delete</code>, <code>orders:read/write/delete</code>, <code>payments:read/write/delete</code>, <code>products:read/write/delete</code>, <code>imports:read/write</code>, <code>exports:read/write</code>, <code>integrations:read/write/delete</code>, <code>webhooks:read/write/delete</code>, <code>sync:read/write</code>, <code>segments:read/write/delete</code>, <code>campaigns:read/write/delete</code>, <code>supportTickets:read/write/delete</code>, <code>tags:read/write/delete</code>, <code>reports:read</code>, <code>notifications:read/write/delete</code>, <code>templates:read/write/delete</code>, <code>conversations:read/write/delete</code>, <code>subscriptions:read/write</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Capabilities</strong></td>
+<td style="text-align:left">Full system administration. Can change billing plans, view invoices, configure Shopify / Meta integrations, manage roles and permissions, delete the organization (subject to data export verification), invite and delete employee memberships, execute manual synchronization, import/export records, view full reports, and assign conversations.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Restrictions</strong></td>
+<td style="text-align:left">Limit of 1 organization creation. Cannot delete their own membership without deleting the organization or transferring ownership.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="46" data-line-end="47"><a id="Admin_User_Administrator_46"></a>🛡️ Admin User (Administrator)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Permissions</strong></td>
+<td style="text-align:left">Nearly identical to Root, excluding organization deletion. Has <code>organization:read/update</code>, <code>member:read/create/update/delete</code>, <code>invitation:read/create/cancel</code>, <code>team:read/create/update/delete</code>, <code>ac:read</code>, and full read/write/delete capabilities on business features.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Capabilities</strong></td>
+<td style="text-align:left">Manages day-to-day operations. Can invite members, update roles, configure connections, execute manual syncs, view billing metrics, and run RFM calculations.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Restrictions</strong></td>
+<td style="text-align:left">Cannot delete the organization. Cannot modify Root permissions.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="54" data-line-end="55"><a id="Member_User_Standard_Employee_Support_Agent_54"></a>👤 Member User (Standard Employee / Support Agent)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Permissions</strong></td>
+<td style="text-align:left">Restricted read/write access. Permissions include: <code>customers:read</code>, <code>orders:read</code>, <code>products:read</code>, <code>exports:read</code>, <code>integrations:read</code>, <code>segments:read</code>, <code>campaigns:read</code>, <code>supportTickets:read/write</code>, <code>tags:read</code>, <code>notifications:read</code>, <code>templates:read</code>, <code>conversations:read</code>, <code>subscriptions:read</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Capabilities</strong></td>
+<td style="text-align:left">Support tickets handling (read and write responses), chat inbox management (can read conversations, but can only claim unassigned conversations or respond to conversations assigned to them).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Restrictions</strong></td>
+<td style="text-align:left">Cannot modify settings, configure integrations, view financial reports, manage employees/members, run data imports, create segments, schedule campaigns, or access billing information.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="64" data-line-end="65"><a id="3_Complete_Feature_Inventory_64"></a>3. Complete Feature Inventory</h2>
+<h3 class="code-line has-line-data" data-line-start="66" data-line-end="67"><a id="Module_Authentication_Tenant_Isolation_66"></a>🔐 Module: Authentication &amp; Tenant Isolation</h3>
+<ul>
+<li class="has-line-data" data-line-start="68" data-line-end="78">
+<p class="has-line-data" data-line-start="68" data-line-end="69"><strong>Multi-Tenant Signup &amp; Onboarding</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="69" data-line-end="70"><strong>Description:</strong> Dual onboarding flow allowing users to sign up and establish a new organization (isolated workspace) or accept an active email invitation to join an existing organization.</li>
+<li class="has-line-data" data-line-start="70" data-line-end="71"><strong>Why it exists:</strong> To guarantee strict tenant isolation where database records, integrations, and users are segmented by organization.</li>
+<li class="has-line-data" data-line-start="71" data-line-end="72"><strong>User Roles:</strong> All.</li>
+<li class="has-line-data" data-line-start="72" data-line-end="73"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="73" data-line-end="74"><strong>Frontend Pages:</strong> <code>/login</code>, <code>/signup</code>, <code>/onboarding</code>, <code>/accept-invitation</code></li>
+<li class="has-line-data" data-line-start="74" data-line-end="75"><strong>Backend Services:</strong> Better Auth server instance and routes, <code>prismaAdapter</code>.</li>
+<li class="has-line-data" data-line-start="75" data-line-end="76"><strong>Database Tables:</strong> <code>User</code>, <code>Session</code>, <code>Account</code>, <code>Verification</code>, <code>Organization</code>, <code>Member</code>, <code>Invitation</code></li>
+<li class="has-line-data" data-line-start="76" data-line-end="78"><strong>APIs:</strong> <code>/api/auth/*</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="78" data-line-end="88">
+<p class="has-line-data" data-line-start="78" data-line-end="79"><strong>Granular Role-Based Access Control (RBAC)</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="79" data-line-end="80"><strong>Description:</strong> Permissions matrix in workspace settings that maps static roles (root, admin, member) and custom roles to CRUD actions on modules.</li>
+<li class="has-line-data" data-line-start="80" data-line-end="81"><strong>Why it exists:</strong> To restrict employee access to sensitive customer data, settings, and billing operations.</li>
+<li class="has-line-data" data-line-start="81" data-line-end="82"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="82" data-line-end="83"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="83" data-line-end="84"><strong>Frontend Pages:</strong> <code>/dashboard/settings</code> (Roles &amp; Permissions Tab)</li>
+<li class="has-line-data" data-line-start="84" data-line-end="85"><strong>Backend Services:</strong> <code>roles.router.ts</code>, Better Auth access control plugins.</li>
+<li class="has-line-data" data-line-start="85" data-line-end="86"><strong>Database Tables:</strong> <code>OrganizationRole</code>, <code>Member</code></li>
+<li class="has-line-data" data-line-start="86" data-line-end="88"><strong>APIs:</strong> <code>/api/roles/*</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="88" data-line-end="89"><a id="Module_Integrations_Synchronization_88"></a>🔌 Module: Integrations &amp; Synchronization</h3>
+<ul>
+<li class="has-line-data" data-line-start="90" data-line-end="100">
+<p class="has-line-data" data-line-start="90" data-line-end="91"><strong>Shopify Custom OAuth &amp; Settings</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="91" data-line-end="92"><strong>Description:</strong> Integration panel allowing organization administrators to connect their custom Shopify app using credentials (API Key, Secret Key, Access Token).</li>
+<li class="has-line-data" data-line-start="92" data-line-end="93"><strong>Why it exists:</strong> To establish a secure link for ingesting orders, products, and customer profiles from the storefront.</li>
+<li class="has-line-data" data-line-start="93" data-line-end="94"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="94" data-line-end="95"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="95" data-line-end="96"><strong>Frontend Pages:</strong> <code>/dashboard/settings</code> (Connections Tab)</li>
+<li class="has-line-data" data-line-start="96" data-line-end="97"><strong>Backend Services:</strong> <code>shopify.controller.ts</code>, <code>integration.service.ts</code></li>
+<li class="has-line-data" data-line-start="97" data-line-end="98"><strong>Database Tables:</strong> <code>Integration</code>, <code>SyncLog</code></li>
+<li class="has-line-data" data-line-start="98" data-line-end="100"><strong>APIs:</strong> <code>/api/integrations/*</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="100" data-line-end="109">
+<p class="has-line-data" data-line-start="100" data-line-end="101"><strong>Shopify Auto-Sync Pipeline</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="101" data-line-end="102"><strong>Description:</strong> Queue-based background worker that retrieves products, customers, and orders from Shopify REST APIs. Utilizes HTTP link-header pagination.</li>
+<li class="has-line-data" data-line-start="102" data-line-end="103"><strong>Why it exists:</strong> To synchronize storefront data into the CRM without triggering rate-limit blocks.</li>
+<li class="has-line-data" data-line-start="103" data-line-end="104"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="104" data-line-end="105"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="105" data-line-end="106"><strong>Backend Services:</strong> <code>sync.service.ts</code>, <code>shopify-sync.worker.ts</code>, BullMQ queues.</li>
+<li class="has-line-data" data-line-start="106" data-line-end="107"><strong>Database Tables:</strong> <code>Integration</code>, <code>SyncLog</code>, <code>Customer</code>, <code>Order</code>, <code>Product</code></li>
+<li class="has-line-data" data-line-start="107" data-line-end="109"><strong>APIs:</strong> <code>/api/integrations/sync/*</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="109" data-line-end="118">
+<p class="has-line-data" data-line-start="109" data-line-end="110"><strong>Shopify Storefront Web Pixel Ingestion</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="110" data-line-end="111"><strong>Description:</strong> Public ingest endpoint tracking real-time events (<code>product_viewed</code>, <code>product_added_to_cart</code>, <code>checkout_started</code>, <code>page_viewed</code>) on the storefront. Resolves anonymous users via email fields.</li>
+<li class="has-line-data" data-line-start="111" data-line-end="112"><strong>Why it exists:</strong> To capture customer behavioral telemetry directly from storefront interactions.</li>
+<li class="has-line-data" data-line-start="112" data-line-end="113"><strong>User Roles:</strong> All (triggered by storefront visitors).</li>
+<li class="has-line-data" data-line-start="113" data-line-end="114"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="114" data-line-end="115"><strong>Backend Services:</strong> <code>pixel.controller.ts</code>, Zod validation schemas.</li>
+<li class="has-line-data" data-line-start="115" data-line-end="116"><strong>Database Tables:</strong> <code>Integration</code>, <code>Customer</code>, <code>CustomerEvent</code></li>
+<li class="has-line-data" data-line-start="116" data-line-end="118"><strong>APIs:</strong> <code>POST /api/integrations/shopify/pixel-ingest</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="118" data-line-end="119"><a id="Module_Analytics_Intelligence_118"></a>📊 Module: Analytics &amp; Intelligence</h3>
+<ul>
+<li class="has-line-data" data-line-start="120" data-line-end="130">
+<p class="has-line-data" data-line-start="120" data-line-end="121"><strong>RFM Scoring Engine</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="121" data-line-end="122"><strong>Description:</strong> System that scores customer profiles based on Recency (1-5), Frequency (1-5), and Monetary (1-5) parameters. Groups them into cohorts (e.g. Champions, Cant Lose Them).</li>
+<li class="has-line-data" data-line-start="122" data-line-end="123"><strong>Why it exists:</strong> To evaluate customer value segments for marketing.</li>
+<li class="has-line-data" data-line-start="123" data-line-end="124"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="124" data-line-end="125"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="125" data-line-end="126"><strong>Frontend Pages:</strong> <code>/dashboard</code>, <code>/dashboard/customers</code>, <code>/dashboard/customers/:id</code></li>
+<li class="has-line-data" data-line-start="126" data-line-end="127"><strong>Backend Services:</strong> <code>rfm.queue.ts</code>, <code>rfm.processor.ts</code>, BullMQ.</li>
+<li class="has-line-data" data-line-start="127" data-line-end="128"><strong>Database Tables:</strong> <code>Customer</code>, <code>Order</code></li>
+<li class="has-line-data" data-line-start="128" data-line-end="130"><strong>APIs:</strong> <code>/api/cron/rfm</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="130" data-line-end="140">
+<p class="has-line-data" data-line-start="130" data-line-end="131"><strong>Customer Lifecycle &amp; Churn Risk Tracking</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="131" data-line-end="132"><strong>Description:</strong> Computes churn risk (0-1) and lifecycle stages (Prospect, Lead, One-Time, Returning, Loyal, VIP, At Risk, Churning, Winback) based on orders.</li>
+<li class="has-line-data" data-line-start="132" data-line-end="133"><strong>Why it exists:</strong> To flag churn risks and trigger warning notifications and emails.</li>
+<li class="has-line-data" data-line-start="133" data-line-end="134"><strong>User Roles:</strong> Root, Admin, Member.</li>
+<li class="has-line-data" data-line-start="134" data-line-end="135"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="135" data-line-end="136"><strong>Frontend Pages:</strong> <code>/dashboard/customers</code>, <code>/dashboard/customers/:id</code></li>
+<li class="has-line-data" data-line-start="136" data-line-end="137"><strong>Backend Services:</strong> <code>lifecycle.service.ts</code>, <code>notification.service.ts</code>, <code>email.util.ts</code></li>
+<li class="has-line-data" data-line-start="137" data-line-end="138"><strong>Database Tables:</strong> <code>Customer</code>, <code>Notification</code></li>
+<li class="has-line-data" data-line-start="138" data-line-end="140"><strong>APIs:</strong> <code>/api/cron/lifecycle</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="140" data-line-end="150">
+<p class="has-line-data" data-line-start="140" data-line-end="141"><strong>Customer Profile Timeline &amp; Activity Logs</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="141" data-line-end="142"><strong>Description:</strong> Centralizes customer transactions, notes, support tickets, and web pixel events into a chronological feed.</li>
+<li class="has-line-data" data-line-start="142" data-line-end="143"><strong>Why it exists:</strong> To give agents context on customer interactions.</li>
+<li class="has-line-data" data-line-start="143" data-line-end="144"><strong>User Roles:</strong> All.</li>
+<li class="has-line-data" data-line-start="144" data-line-end="145"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="145" data-line-end="146"><strong>Frontend Pages:</strong> <code>/dashboard/customers/:id</code> (Timeline View)</li>
+<li class="has-line-data" data-line-start="146" data-line-end="147"><strong>Backend Services:</strong> <code>timeline.service.ts</code></li>
+<li class="has-line-data" data-line-start="147" data-line-end="148"><strong>Database Tables:</strong> <code>Customer</code>, <code>CustomerEvent</code>, <code>Order</code>, <code>SupportTicket</code>, <code>Note</code></li>
+<li class="has-line-data" data-line-start="148" data-line-end="150"><strong>APIs:</strong> <code>GET /api/customers/:id/timeline</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="150" data-line-end="151"><a id="Module_Unified_Messaging_Center_150"></a>💬 Module: Unified Messaging Center</h3>
+<ul>
+<li class="has-line-data" data-line-start="152" data-line-end="162">
+<p class="has-line-data" data-line-start="152" data-line-end="153"><strong>Social Messaging Inbox</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="153" data-line-end="154"><strong>Description:</strong> Unified messaging console supporting WhatsApp, Facebook Messenger, and Instagram.</li>
+<li class="has-line-data" data-line-start="154" data-line-end="155"><strong>Why it exists:</strong> To centralize customer support chats.</li>
+<li class="has-line-data" data-line-start="155" data-line-end="156"><strong>User Roles:</strong> All (Subject to agent assignment rules).</li>
+<li class="has-line-data" data-line-start="156" data-line-end="157"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="157" data-line-end="158"><strong>Frontend Pages:</strong> <code>/dashboard/conversations/*</code></li>
+<li class="has-line-data" data-line-start="158" data-line-end="159"><strong>Backend Services:</strong> <code>messaging.service.ts</code>, <code>meta-webhook.router.ts</code>, BullMQ queues, <a href="http://Socket.io">Socket.io</a> presence events.</li>
+<li class="has-line-data" data-line-start="159" data-line-end="160"><strong>Database Tables:</strong> <code>Conversation</code>, <code>Message</code>, <code>Customer</code></li>
+<li class="has-line-data" data-line-start="160" data-line-end="162"><strong>APIs:</strong> <code>/api/messaging/*</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="162" data-line-end="172">
+<p class="has-line-data" data-line-start="162" data-line-end="163"><strong>Rich Media Attachments &amp; S3 Upload Session</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="163" data-line-end="164"><strong>Description:</strong> Secure media upload flow using Backblaze B2.</li>
+<li class="has-line-data" data-line-start="164" data-line-end="165"><strong>Why it exists:</strong> To allow agents and customers to exchange attachments.</li>
+<li class="has-line-data" data-line-start="165" data-line-end="166"><strong>User Roles:</strong> All.</li>
+<li class="has-line-data" data-line-start="166" data-line-end="167"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="167" data-line-end="168"><strong>Frontend Pages:</strong> <code>/dashboard/conversations/*</code> (MessageComposer)</li>
+<li class="has-line-data" data-line-start="168" data-line-end="169"><strong>Backend Services:</strong> <code>messaging.controller.ts</code>, <code>b2.config.ts</code></li>
+<li class="has-line-data" data-line-start="169" data-line-end="170"><strong>Database Tables:</strong> <code>Conversation</code>, <code>Message</code></li>
+<li class="has-line-data" data-line-start="170" data-line-end="172"><strong>APIs:</strong> <code>/api/messaging/conversations/:id/messages/upload-session</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="172" data-line-end="173"><a id="Module_Support_Center_172"></a>🎫 Module: Support Center</h3>
+<ul>
+<li class="has-line-data" data-line-start="174" data-line-end="184"><strong>Support Ticket Routing</strong>
+<ul>
+<li class="has-line-data" data-line-start="175" data-line-end="176"><strong>Description:</strong> Ticketing pipeline with priority (Low, Medium, High, Urgent), status (Open, Pending, Closed), and assignee fields.</li>
+<li class="has-line-data" data-line-start="176" data-line-end="177"><strong>Why it exists:</strong> To manage and assign incoming customer inquiries.</li>
+<li class="has-line-data" data-line-start="177" data-line-end="178"><strong>User Roles:</strong> All.</li>
+<li class="has-line-data" data-line-start="178" data-line-end="179"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="179" data-line-end="180"><strong>Frontend Pages:</strong> <code>/dashboard/tickets</code>, <code>/dashboard/tickets/:id</code></li>
+<li class="has-line-data" data-line-start="180" data-line-end="181"><strong>Backend Services:</strong> <code>ticket.router.ts</code>, controllers.</li>
+<li class="has-line-data" data-line-start="181" data-line-end="182"><strong>Database Tables:</strong> <code>SupportTicket</code>, <code>TicketNote</code>, <code>User</code>, <code>Customer</code>, <code>Order</code></li>
+<li class="has-line-data" data-line-start="182" data-line-end="184"><strong>APIs:</strong> <code>/api/tickets/*</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="184" data-line-end="185"><a id="Module_Marketing_Outreach_184"></a>📣 Module: Marketing &amp; Outreach</h3>
+<ul>
+<li class="has-line-data" data-line-start="186" data-line-end="196">
+<p class="has-line-data" data-line-start="186" data-line-end="187"><strong>Dynamic Segment Builder</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="187" data-line-end="188"><strong>Description:</strong> Rules-based builder filtering cohorts using logical operators (field, operator, value).</li>
+<li class="has-line-data" data-line-start="188" data-line-end="189"><strong>Why it exists:</strong> To generate target lists for campaigns.</li>
+<li class="has-line-data" data-line-start="189" data-line-end="190"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="190" data-line-end="191"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="191" data-line-end="192"><strong>Frontend Pages:</strong> <code>/dashboard/segments</code></li>
+<li class="has-line-data" data-line-start="192" data-line-end="193"><strong>Backend Services:</strong> <code>segment.router.ts</code>, <code>segment.utils.ts</code></li>
+<li class="has-line-data" data-line-start="193" data-line-end="194"><strong>Database Tables:</strong> <code>Segment</code>, <code>Customer</code></li>
+<li class="has-line-data" data-line-start="194" data-line-end="196"><strong>APIs:</strong> <code>/api/segments/*</code></li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="196" data-line-end="206">
+<p class="has-line-data" data-line-start="196" data-line-end="197"><strong>Marketing Campaigns &amp; Templates</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="197" data-line-end="198"><strong>Description:</strong> Visual campaign manager with custom HTML template builders.</li>
+<li class="has-line-data" data-line-start="198" data-line-end="199"><strong>Why it exists:</strong> To run automated promotions.</li>
+<li class="has-line-data" data-line-start="199" data-line-end="200"><strong>User Roles:</strong> Root, Admin.</li>
+<li class="has-line-data" data-line-start="200" data-line-end="201"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="201" data-line-end="202"><strong>Frontend Pages:</strong> <code>/dashboard/campaigns</code></li>
+<li class="has-line-data" data-line-start="202" data-line-end="203"><strong>Backend Services:</strong> <code>campaign.router.ts</code>, BullMQ queues.</li>
+<li class="has-line-data" data-line-start="203" data-line-end="204"><strong>Database Tables:</strong> <code>Campaign</code>, <code>EmailTemplate</code>, <code>CampaignRecipient</code></li>
+<li class="has-line-data" data-line-start="204" data-line-end="206"><strong>APIs:</strong> <code>/api/campaigns/*</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="206" data-line-end="207"><a id="Module_Financial_Billing_Payments_206"></a>💳 Module: Financial Billing &amp; Payments</h3>
+<ul>
+<li class="has-line-data" data-line-start="208" data-line-end="218"><strong>Paymob Subscription Gateway</strong>
+<ul>
+<li class="has-line-data" data-line-start="209" data-line-end="210"><strong>Description:</strong> Subscription workflow using Paymob Intention card payments.</li>
+<li class="has-line-data" data-line-start="210" data-line-end="211"><strong>Why it exists:</strong> To monetize the CRM system.</li>
+<li class="has-line-data" data-line-start="211" data-line-end="212"><strong>User Roles:</strong> Root.</li>
+<li class="has-line-data" data-line-start="212" data-line-end="213"><strong>Status:</strong> Completed.</li>
+<li class="has-line-data" data-line-start="213" data-line-end="214"><strong>Frontend Pages:</strong> <code>/dashboard/settings</code> (Billing Tab)</li>
+<li class="has-line-data" data-line-start="214" data-line-end="215"><strong>Backend Services:</strong> <code>subscriptions-payment.controller.ts</code>, <code>paymob.util.ts</code></li>
+<li class="has-line-data" data-line-start="215" data-line-end="216"><strong>Database Tables:</strong> <code>Subscription</code>, <code>Plan</code>, <code>Transaction</code></li>
+<li class="has-line-data" data-line-start="216" data-line-end="218"><strong>APIs:</strong> <code>/api/subscriptions/*</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="220" data-line-end="221"><a id="4_Frontend_Modules_220"></a>4. Frontend Modules</h2>
+<h3 class="code-line has-line-data" data-line-start="222" data-line-end="223"><a id="Module_Dashboard_Console_222"></a>📊 Module: Dashboard Console</h3>
+<ul>
+<li class="has-line-data" data-line-start="224" data-line-end="225"><strong>Purpose:</strong> The visual landing page for authenticated merchants, presenting system health metrics, support ticket summaries, and recent revenue stats.</li>
+<li class="has-line-data" data-line-start="225" data-line-end="226"><strong>Routes:</strong> <code>/dashboard</code></li>
+<li class="has-line-data" data-line-start="226" data-line-end="227"><strong>Pages:</strong> <code>DashboardHome.tsx</code></li>
+<li class="has-line-data" data-line-start="227" data-line-end="228"><strong>Components:</strong> <code>MetricCards</code>, <code>RevenueChart</code> (Recharts), <code>SupportSummaryCard</code>, <code>AuditLogsPanel</code>.</li>
+<li class="has-line-data" data-line-start="228" data-line-end="229"><strong>State Management:</strong> React Query (<code>useDashboardStats</code>), local state.</li>
+<li class="has-line-data" data-line-start="229" data-line-end="230"><strong>UI Libraries:</strong> Tailwind CSS v4, Lucide React / Hugeicons React, Framer Motion.</li>
+<li class="has-line-data" data-line-start="230" data-line-end="231"><strong>Charts Used:</strong> AreaChart (Recharts) for sales overview, PieChart for support ticket breakdown.</li>
+<li class="has-line-data" data-line-start="231" data-line-end="232"><strong>Real-time Updates:</strong> Listening to <code>presence:update</code> for active users and <code>inbox:updated</code> for live chat counts.</li>
+<li class="has-line-data" data-line-start="232" data-line-end="234"><strong>Special UX Features:</strong> Micro-animations for card entries using Framer Motion.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="234" data-line-end="235"><a id="Module_Unified_Inbox_conversations_234"></a>💬 Module: Unified Inbox (conversations)</h3>
+<ul>
+<li class="has-line-data" data-line-start="236" data-line-end="237"><strong>Purpose:</strong> Unified agent console for chats.</li>
+<li class="has-line-data" data-line-start="237" data-line-end="238"><strong>Routes:</strong> <code>/dashboard/conversations</code>, <code>/dashboard/conversations/:id</code></li>
+<li class="has-line-data" data-line-start="238" data-line-end="239"><strong>Pages:</strong> <code>Conversations</code> (<code>src/features/conversations/index.tsx</code>)</li>
+<li class="has-line-data" data-line-start="239" data-line-end="240"><strong>Components:</strong> <code>MessageThread.tsx</code>, <code>MessageComposer.tsx</code>, <code>NewConversationModal.tsx</code>.</li>
+<li class="has-line-data" data-line-start="240" data-line-end="241"><strong>State Management:</strong> Zustand (<code>usePresenceStore</code>), React Query.</li>
+<li class="has-line-data" data-line-start="241" data-line-end="242"><strong>Forms &amp; Validation:</strong> Zod validator.</li>
+<li class="has-line-data" data-line-start="242" data-line-end="243"><strong>UI Libraries:</strong> Tailwind CSS, Hugeicons.</li>
+<li class="has-line-data" data-line-start="243" data-line-end="244"><strong>Real-time Updates:</strong> Full <a href="http://Socket.io">Socket.io</a> connection (<code>message:created</code>, <code>message:status_updated</code>, <code>typing:status</code>, <code>upload:progress</code>).</li>
+<li class="has-line-data" data-line-start="244" data-line-end="246"><strong>Special UX Features:</strong> Real-time typing indicators, upload progress bar, drag-and-drop file composer.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="246" data-line-end="247"><a id="Module_Customer_Directory_customers_246"></a>👥 Module: Customer Directory (customers)</h3>
+<ul>
+<li class="has-line-data" data-line-start="248" data-line-end="249"><strong>Purpose:</strong> Searchable data grid and profile view.</li>
+<li class="has-line-data" data-line-start="249" data-line-end="250"><strong>Routes:</strong> <code>/dashboard/customers</code>, <code>/dashboard/customers/:id</code></li>
+<li class="has-line-data" data-line-start="250" data-line-end="251"><strong>Pages:</strong> <code>Customers</code>, <code>CustomerProfile</code></li>
+<li class="has-line-data" data-line-start="251" data-line-end="252"><strong>Components:</strong> <code>DataTable</code>, <code>CustomerFormModal</code>, <code>FilterPanel</code>, <code>ActionMenu</code>.</li>
+<li class="has-line-data" data-line-start="252" data-line-end="253"><strong>State Management:</strong> React Query caching.</li>
+<li class="has-line-data" data-line-start="253" data-line-end="254"><strong>Forms &amp; Validation:</strong> Formik with Yup validation.</li>
+<li class="has-line-data" data-line-start="254" data-line-end="255"><strong>UI Libraries:</strong> Tailwind CSS.</li>
+<li class="has-line-data" data-line-start="255" data-line-end="256"><strong>Charts Used:</strong> RFM radar and cohort charts in profile view.</li>
+<li class="has-line-data" data-line-start="256" data-line-end="258"><strong>Special UX Features:</strong> Responsive filter drawers, infinite scrolling timelines.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="258" data-line-end="259"><a id="Module_Campaign_Template_Manager_campaigns_258"></a>📈 Module: Campaign &amp; Template Manager (campaigns)</h3>
+<ul>
+<li class="has-line-data" data-line-start="260" data-line-end="261"><strong>Purpose:</strong> Marketing design and tracking.</li>
+<li class="has-line-data" data-line-start="261" data-line-end="262"><strong>Routes:</strong> <code>/dashboard/campaigns</code>, <code>/dashboard/campaigns/:id</code></li>
+<li class="has-line-data" data-line-start="262" data-line-end="263"><strong>Pages:</strong> <code>Campaigns</code>, <code>CampaignDetails</code></li>
+<li class="has-line-data" data-line-start="263" data-line-end="264"><strong>Components:</strong> <code>CampaignColumns</code>, <code>CampaignFormModal</code>, <code>TemplateEditor</code>, <code>FilterPanel</code>.</li>
+<li class="has-line-data" data-line-start="264" data-line-end="265"><strong>State Management:</strong> React Query.</li>
+<li class="has-line-data" data-line-start="265" data-line-end="266"><strong>Forms &amp; Validation:</strong> Formik/Yup.</li>
+<li class="has-line-data" data-line-start="266" data-line-end="267"><strong>UI Libraries:</strong> Tailwind CSS.</li>
+<li class="has-line-data" data-line-start="267" data-line-end="268"><strong>Charts Used:</strong> BarCharts for open, click, and bounce rates.</li>
+<li class="has-line-data" data-line-start="268" data-line-end="270"><strong>Special UX Features:</strong> Live HTML campaign previews.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="272" data-line-end="273"><a id="5_Backend_Modules_272"></a>5. Backend Modules</h2>
+<h3 class="code-line has-line-data" data-line-start="274" data-line-end="275"><a id="Module_Authentication_Permissions_274"></a>🔐 Module: Authentication &amp; Permissions</h3>
+<ul>
+<li class="has-line-data" data-line-start="276" data-line-end="277"><strong>Purpose:</strong> Handles signups, sessions, invitations, and permissions checks.</li>
+<li class="has-line-data" data-line-start="277" data-line-end="278"><strong>Controllers:</strong> Better Auth routes (<code>auth.ts</code>), <code>me.router.ts</code>, <code>roles.router.ts</code>.</li>
+<li class="has-line-data" data-line-start="278" data-line-end="279"><strong>Services:</strong> Prisma adapter, <code>AuditService</code>.</li>
+<li class="has-line-data" data-line-start="279" data-line-end="280"><strong>Middleware:</strong> <code>protect</code> (verifies session), <code>requirePermission</code> (handles permission checks).</li>
+<li class="has-line-data" data-line-start="280" data-line-end="281"><strong>Guards:</strong> <code>requirePermission('resource:action')</code> decorators.</li>
+<li class="has-line-data" data-line-start="281" data-line-end="282"><strong>Event Handlers:</strong> Better Auth database hooks.</li>
+<li class="has-line-data" data-line-start="282" data-line-end="284"><strong>Real-time Components:</strong> Authentication handshake in <a href="http://Socket.io">Socket.io</a>.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="284" data-line-end="285"><a id="Module_Integrations_Webhooks_284"></a>🔌 Module: Integrations &amp; Webhooks</h3>
+<ul>
+<li class="has-line-data" data-line-start="286" data-line-end="287"><strong>Purpose:</strong> Processes Shopify data syncs and webhooks.</li>
+<li class="has-line-data" data-line-start="287" data-line-end="288"><strong>Controllers:</strong> <code>shopify.controller.ts</code>, <code>webhook.controller.ts</code>, <code>sync.controller.ts</code>, <code>pixel.controller.ts</code>.</li>
+<li class="has-line-data" data-line-start="288" data-line-end="289"><strong>Services:</strong> <code>sync.service.ts</code>, <code>webhook.service.ts</code>.</li>
+<li class="has-line-data" data-line-start="289" data-line-end="290"><strong>Middleware:</strong> Signature verification check.</li>
+<li class="has-line-data" data-line-start="290" data-line-end="291"><strong>Guards:</strong> HMAC signature validator.</li>
+<li class="has-line-data" data-line-start="291" data-line-end="292"><strong>Background Jobs:</strong> <code>shopify-sync.worker.ts</code>, <code>shopify-webhook.worker.ts</code>.</li>
+<li class="has-line-data" data-line-start="292" data-line-end="293"><strong>Event Handlers:</strong> BullMQ event listeners.</li>
+<li class="has-line-data" data-line-start="293" data-line-end="295"><strong>Real-time Components:</strong> Ingest status broadcasts.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="295" data-line-end="296"><a id="Module_Analytics_Crons_295"></a>📈 Module: Analytics &amp; Crons</h3>
+<ul>
+<li class="has-line-data" data-line-start="297" data-line-end="298"><strong>Purpose:</strong> Computes RFM metrics and churn.</li>
+<li class="has-line-data" data-line-start="298" data-line-end="299"><strong>Controllers:</strong> <code>cron.controller.ts</code>.</li>
+<li class="has-line-data" data-line-start="299" data-line-end="300"><strong>Services:</strong> <code>lifecycle.service.ts</code>, <code>analytics.service.ts</code>.</li>
+<li class="has-line-data" data-line-start="300" data-line-end="301"><strong>Guards:</strong> API Cron secret token check.</li>
+<li class="has-line-data" data-line-start="301" data-line-end="302"><strong>Background Jobs:</strong> <code>rfm.processor.ts</code> worker.</li>
+<li class="has-line-data" data-line-start="302" data-line-end="304"><strong>Event Handlers:</strong> System health reports.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="306" data-line-end="307"><a id="6_Database_Design_Prisma_PostgreSQL_Schema_306"></a>6. Database Design (Prisma PostgreSQL Schema)</h2>
+<pre><code class="has-line-data language-mermaid" data-line-start="309" data-line-end="637">erDiagram
+    user {
+        string id PK
+        string name
+        string email UK
+        boolean emailVerified
+        string image
+        datetime createdAt
+        datetime updatedAt
+    }
+    session {
+        string id PK
+        datetime expiresAt
+        string token UK
+        string userId FK
+        string activeOrganizationId
+    }
+    account {
+        string id PK
+        string accountId
+        string providerId
+        string userId FK
+        string accessToken
+        string refreshToken
+    }
+    verification {
+        string id PK
+        string identifier
+        string value
+        datetime expiresAt
+    }
+    organization {
+        string id PK
+        string name
+        string slug UK
+        string logo
+        json settings
+        datetime createdAt
+    }
+    plan {
+        string id PK
+        string name
+        string displayName
+        decimal price
+        string billingCycle
+        json features
+        boolean isActive
+    }
+    subscription {
+        string id PK
+        string organizationId FK
+        string planId FK
+        string status
+        datetime startDate
+        datetime endDate
+        string paymobSubscriptionId
+    }
+    organizationRole {
+        string id PK
+        string organizationId FK
+        string role
+        json permission
+        string description
+    }
+    member {
+        string id PK
+        string organizationId FK
+        string userId FK
+        string role
+        datetime createdAt
+    }
+    invitation {
+        string id PK
+        string organizationId FK
+        string email
+        string role
+        string status
+        string inviterId FK
+    }
+    customer {
+        string id PK
+        string name
+        string phone
+        string email
+        string source
+        string lifecycleStage
+        string organizationId FK
+        string externalId
+        int totalOrders
+        decimal totalSpent
+        decimal totalRefunded
+        decimal avgOrderValue
+        datetime firstOrderAt
+        datetime lastOrderAt
+        float avgDaysBetweenOrders
+        float churnRiskScore
+        string rfmScore
+        string rfmSegment
+    }
+    note {
+        string id PK
+        string customerId FK
+        string authorId FK
+        string body
+        datetime createdAt
+    }
+    integration {
+        string id PK
+        string orgId FK
+        string provider
+        string shopDomain
+        string accessToken
+        string syncStatus
+        boolean isActive
+    }
+    webhookLog {
+        string id PK
+        string integrationId FK
+        string topic
+        string shopDomain
+        json payload
+        string status
+    }
+    webhookIdempotencyKey {
+        string id PK
+        string integrationId FK
+        string provider
+        string key
+        datetime expiresAt
+    }
+    customerEvent {
+        string id PK
+        string customerId FK
+        string eventType
+        string description
+        string source
+        datetime occurredAt
+    }
+    customerMetric {
+        string id PK
+        string customerId FK
+        float churnProbability
+        decimal avgOrderValue
+        int daysSinceLastPurchase
+    }
+    interaction {
+        string id PK
+        string customerId FK
+        string type
+        string content
+        float sentiment
+        json extractedInsights
+    }
+    tag {
+        string id PK
+        string name
+        string color
+        string organizationId FK
+    }
+    segment {
+        string id PK
+        string name
+        json filter
+        string organizationId FK
+        string creatorId FK
+    }
+    campaign {
+        string id PK
+        string name
+        string organizationId FK
+        string segmentId FK
+        string templateId FK
+        string status
+        json content
+    }
+    emailTemplate {
+        string id PK
+        string organizationId FK
+        string name
+        string subject
+        string htmlBody
+    }
+    campaignRecipient {
+        string id PK
+        string campaignId FK
+        string customerId FK
+        string status
+    }
+    product {
+        string id PK
+        string name
+        decimal price
+        string organizationId FK
+        string externalId
+        string sku
+        int inventory
+    }
+    productVariant {
+        string id PK
+        string productId FK
+        string name
+        decimal price
+        int inventory
+    }
+    order {
+        string id PK
+        string organizationId FK
+        string customerId FK
+        string shippingStatus
+        string paymentStatus
+        decimal totalAmount
+        string currency
+    }
+    orderItem {
+        string id PK
+        string orderId FK
+        string productId FK
+        int quantity
+        decimal price
+    }
+    transaction {
+        string id PK
+        string organizationId FK
+        string orderId FK
+        string externalId
+        decimal amount
+        string provider
+        string status
+    }
+    supportTicket {
+        string id PK
+        string organizationId FK
+        string customerId FK
+        string orderId FK
+        string subject
+        string description
+        string status
+        string priority
+        string assignedToId FK
+    }
+    ticketNote {
+        string id PK
+        string ticketId FK
+        string authorId FK
+        string body
+    }
+    auditLog {
+        string id PK
+        string organizationId FK
+        string userId FK
+        string action
+        string targetId
+        string targetType
+    }
+    importJob {
+        string id PK
+        string organizationId FK
+        string createdByUserId FK
+        string entityType
+        string fileName
+        string status
+    }
+    importJobError {
+        string id PK
+        string importJobId FK
+        int rowNumber
+        string message
+    }
+    exportJob {
+        string id PK
+        string organizationId FK
+        string createdByUserId FK
+        string entityType
+        string status
+    }
+
+    user ||--o{ session : &quot;creates&quot;
+    user ||--o{ account : &quot;links&quot;
+    user ||--o{ member : &quot;belongs&quot;
+    user ||--o{ invitation : &quot;sends&quot;
+    user ||--o{ auditLog : &quot;performs&quot;
+    user ||--o{ note : &quot;writes&quot;
+    user ||--o{ importJob : &quot;requests&quot;
+    user ||--o{ exportJob : &quot;requests&quot;
+    user ||--o{ supportTicket : &quot;assigned&quot;
+    user ||--o{ ticketNote : &quot;comments&quot;
+    user ||--o{ segment : &quot;creates&quot;
+    user ||--o{ conversation : &quot;manages&quot;
+
+    organization ||--o{ member : &quot;contains&quot;
+    organization ||--o{ invitation : &quot;issues&quot;
+    organization ||--o{ customer : &quot;owns&quot;
+    organization ||--o{ segment : &quot;configures&quot;
+    organization ||--o{ campaign : &quot;sends&quot;
+    organization ||--o{ product : &quot;catalogues&quot;
+    organization ||--o{ order : &quot;receives&quot;
+    organization ||--o{ supportTicket : &quot;handles&quot;
+    organization ||--o{ auditLog : &quot;tracks&quot;
+    organization ||--o{ tag : &quot;labels&quot;
+    organization ||--o{ integration : &quot;authorizes&quot;
+    organization ||--o{ organizationRole : &quot;defines&quot;
+    organization ||--o{ importJob : &quot;queues&quot;
+    organization ||--o{ exportJob : &quot;queues&quot;
+    organization ||--o{ notification : &quot;triggers&quot;
+    organization ||--o{ emailTemplate : &quot;stores&quot;
+    organization ||--o{ conversation : &quot;logs&quot;
+    organization ||--o{ transaction : &quot;logs&quot;
+    organization ||--o{ subscription : &quot;bills&quot;
+
+    plan ||--o{ subscription : &quot;defines&quot;
+    customer ||--o{ order : &quot;places&quot;
+    customer ||--o{ supportTicket : &quot;initiates&quot;
+    customer ||--o{ customerEvent : &quot;records&quot;
+    customer ||--o{ customerMetric : &quot;aggregates&quot;
+    customer ||--o{ interaction : &quot;interacts&quot;
+    customer ||--o{ campaignRecipient : &quot;targeted&quot;
+    customer ||--o{ conversation : &quot;chats&quot;
+
+    integration ||--o{ webhookLog : &quot;handles&quot;
+    integration ||--o{ syncLog : &quot;records&quot;
+    integration ||--o{ webhookIdempotencyKey : &quot;deduplicates&quot;
+
+    campaign ||--o{ campaignRecipient : &quot;delivers&quot;
+    product ||--o{ orderItem : &quot;includes&quot;
+    product ||--o{ productVariant : &quot;splits&quot;
+    order ||--o{ orderItem : &quot;contains&quot;
+    order ||--o{ transaction : &quot;bills&quot;
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="638" data-line-end="639"><a id="Relationship_Explanation_638"></a>🔍 Relationship Explanation</h3>
+<ul>
+<li class="has-line-data" data-line-start="640" data-line-end="641"><strong>Strict Database Tenancy:</strong> All business models (<code>Customer</code>, <code>Order</code>, <code>Product</code>, <code>Segment</code>, <code>Campaign</code>, <code>SupportTicket</code>, <code>Conversation</code>, <code>Integration</code>, <code>ImportJob</code>, <code>ExportJob</code>, <code>AuditLog</code>) maintain a direct, indexed foreign key to the <code>Organization</code> table.</li>
+<li class="has-line-data" data-line-start="641" data-line-end="643"><strong>Cross-Tenant Query Prevention:</strong> Join queries across different tenant scopes are blocked at the database level by composite indexes, such as <code>@@unique([organizationId, name])</code> on the <code>Segment</code> table and <code>@@unique([organizationId, externalId])</code> on the <code>Conversation</code> table.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="645" data-line-end="646"><a id="7_Authentication_Authorization_645"></a>7. Authentication &amp; Authorization</h2>
+<pre><code class="has-line-data language-mermaid" data-line-start="648" data-line-end="658">graph TD
+    A[Register/Login] --&gt; B[Better Auth Route]
+    B --&gt; C[Prisma Adapter]
+    C --&gt; D[Cookie Cache / JWT]
+    
+    E[API Request] --&gt; F[headers / cookies]
+    F --&gt; G[protect Middleware]
+    G --&gt; H[requirePermission Guard]
+    H --&gt; I[Handler]
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="659" data-line-end="660"><a id="Login_Flow_659"></a>🔄 Login Flow</h3>
+<p class="has-line-data" data-line-start="661" data-line-end="662">The frontend sends email/password payloads or Google OAuth redirects to the Better Auth endpoints. Better Auth verifies credentials, initializes session state, writes to the <code>Session</code> table, and sets cookies.</p>
+<h3 class="code-line has-line-data" data-line-start="663" data-line-end="664"><a id="Registration_Flow_663"></a>📝 Registration Flow</h3>
+<p class="has-line-data" data-line-start="665" data-line-end="666">User registers via <code>/signup</code>. Better Auth creates a new user, checks the organization limit (max 1), creates an organization record, assigns the creator as the root member, and invokes a database hook to automatically assign a free tier subscription plan (<code>assignFreePlanToOrg</code>).</p>
+<h3 class="code-line has-line-data" data-line-start="667" data-line-end="668"><a id="Session_Management_667"></a>🎫 Session Management</h3>
+<p class="has-line-data" data-line-start="669" data-line-end="670">Sessions are tracked in the database (<code>Session</code> model) and cached in cookies. The session expires in 7 days (<code>expiresIn: 60 * 60 * 24 * 7</code>) with a 1-day rolling update window.</p>
+<h3 class="code-line has-line-data" data-line-start="671" data-line-end="672"><a id="JWT_Token_Usage_671"></a>🔑 JWT &amp; Token Usage</h3>
+<p class="has-line-data" data-line-start="673" data-line-end="674">In addition to cookie authentication, the system supports header token verification (<code>Bearer</code> plugin) for API-first requests.</p>
+<h3 class="code-line has-line-data" data-line-start="675" data-line-end="676"><a id="RBAC_Permissions_675"></a>🛡️ RBAC &amp; Permissions</h3>
+<p class="has-line-data" data-line-start="677" data-line-end="678">Implemented via Better Auth’s organization access control (<code>createAccessControl</code>). The system defines three roles:</p>
+<ul>
+<li class="has-line-data" data-line-start="679" data-line-end="680"><strong><code>root</code>:</strong> Full organization permissions.</li>
+<li class="has-line-data" data-line-start="680" data-line-end="681"><strong><code>admin</code>:</strong> Full operational permissions, cannot delete the organization.</li>
+<li class="has-line-data" data-line-start="681" data-line-end="683"><strong><code>member</code>:</strong> Restricted to reading records and handling support tickets.</li>
+</ul>
+<p class="has-line-data" data-line-start="683" data-line-end="684"><strong>Permissions Checking:</strong> Checked via the <code>requirePermission('resource:action')</code> middleware using the <code>auth.api.hasPermission()</code> endpoint.</p>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="687" data-line-end="688"><a id="8_Messaging_RealTime_Features_687"></a>8. Messaging &amp; Real-Time Features</h2>
+<h3 class="code-line has-line-data" data-line-start="689" data-line-end="690"><a id="Messaging_Architecture_689"></a>📨 Messaging Architecture</h3>
+<pre><code class="has-line-data language-mermaid" data-line-start="692" data-line-end="700">graph TD
+    A[Meta App Webhook] --&gt; B[Express webhook Router]
+    B --&gt; C[verifySignature]
+    C --&gt; D[Queue Webhook Job (BullMQ)]
+    D --&gt; E[handleInboundMessage]
+    E --&gt; F[emitToOrg]
+    F --&gt; G[Socket.io Broadcast]
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="701" data-line-end="702"><a id="Inbound_Messaging_Flow_701"></a>⬇️ Inbound Messaging Flow</h3>
+<ol>
+<li class="has-line-data" data-line-start="703" data-line-end="704">A webhook arrives from Meta’s servers (WhatsApp, Messenger, or Instagram).</li>
+<li class="has-line-data" data-line-start="704" data-line-end="705">The webhook router validates the <code>x-hub-signature-256</code> signature using HMAC-SHA256.</li>
+<li class="has-line-data" data-line-start="705" data-line-end="706">The request payload is parsed against Zod schemas. If valid, the system immediately returns a <code>200 EVENT_RECEIVED</code> response.</li>
+<li class="has-line-data" data-line-start="706" data-line-end="707">The job is queued in BullMQ (<code>addWebhookJob</code>) to avoid connection timeouts.</li>
+<li class="has-line-data" data-line-start="707" data-line-end="709">The worker calls <code>handleInboundMessage()</code>, which resolves the customer, creates a conversation, logs the message, and broadcasts it to the organization’s socket room (<code>org_${orgId}</code>) via <code>message:created</code>.</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="709" data-line-end="710"><a id="Outbound_Messaging_Flow_709"></a>⬆️ Outbound Messaging Flow</h3>
+<ol>
+<li class="has-line-data" data-line-start="711" data-line-end="712">The agent types a message in the UI and sends it.</li>
+<li class="has-line-data" data-line-start="712" data-line-end="713">The API creates a pending message record and queues the delivery job in BullMQ (<code>addOutboundJob</code>).</li>
+<li class="has-line-data" data-line-start="713" data-line-end="714">The worker makes a POST request to Meta Graph API endpoints using the encrypted integration access token.</li>
+<li class="has-line-data" data-line-start="714" data-line-end="716">On success, the message status is updated to <code>SENT</code> or <code>DELIVERED</code>, and a <a href="http://Socket.io">Socket.io</a> broadcast updates the agent’s screen.</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="716" data-line-end="717"><a id="Realtime_Features_716"></a>⚡ Real-time Features</h3>
+<p class="has-line-data" data-line-start="718" data-line-end="719">Real-time updates are handled via <a href="http://Socket.io">Socket.io</a> with a Redis adapter for multi-instance sync. It handles online presence tracking, typing indicators, and upload progress.</p>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="722" data-line-end="723"><a id="9_File_Management_System_722"></a>9. File Management System</h2>
+<pre><code class="has-line-data language-mermaid" data-line-start="725" data-line-end="734">graph TD
+    A[UI Composer] --&gt; B[POST /upload-session]
+    B --&gt; C[Verify Extension]
+    C --&gt; D[optimistic Message &amp; B2 Key]
+    D --&gt; E[Presigned Upload URL]
+    E --&gt; F[Upload File]
+    F --&gt; G[POST /complete-upload]
+    G --&gt; H[Complete Msg]
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="735" data-line-end="736"><a id="Request_Session_735"></a>📤 Request Session</h3>
+<p class="has-line-data" data-line-start="737" data-line-end="738">The client requests an upload session by passing the file name, mime type, size, and category (<code>image</code>, <code>video</code>, <code>audio</code>, or <code>document</code>).</p>
+<h3 class="code-line has-line-data" data-line-start="739" data-line-end="740"><a id="Validation_739"></a>✅ Validation</h3>
+<p class="has-line-data" data-line-start="741" data-line-end="742">The system validates the file extension against an allowed list:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Category</strong></th>
+<th style="text-align:left"><strong>Allowed Extensions</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>image</strong></td>
+<td style="text-align:left">jpg, jpeg, png, webp, gif</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>video</strong></td>
+<td style="text-align:left">mp4, mov, webm</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>audio</strong></td>
+<td style="text-align:left">mp3, wav, m4a, ogg</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>document</strong></td>
+<td style="text-align:left">pdf, doc, docx, xls, xlsx, ppt, pptx, txt, zip, rar, csv</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="750" data-line-end="751"><a id="Placeholder_Record_750"></a>📝 Placeholder Record</h3>
+<p class="has-line-data" data-line-start="752" data-line-end="753">The system creates a placeholder message in the database with a <code>PENDING</code> status.</p>
+<h3 class="code-line has-line-data" data-line-start="754" data-line-end="755"><a id="Presigned_Upload_URL_754"></a>🔗 Presigned Upload URL</h3>
+<p class="has-line-data" data-line-start="756" data-line-end="757">The system generates a B2 storage key: <code>chat-[type]s/org_[orgId]/conv_[convId]/msg_[msgId]/[uuid].[ext]</code>. It returns a presigned upload URL from Backblaze B2.</p>
+<h3 class="code-line has-line-data" data-line-start="758" data-line-end="759"><a id="Direct_Upload_758"></a>⬆️ Direct Upload</h3>
+<p class="has-line-data" data-line-start="760" data-line-end="761">The client uploads the file directly to Backblaze B2.</p>
+<h3 class="code-line has-line-data" data-line-start="762" data-line-end="763"><a id="Complete_Upload_762"></a>✅ Complete Upload</h3>
+<p class="has-line-data" data-line-start="764" data-line-end="765">The client calls <code>/complete-upload</code>. The system verifies the upload, fetches a pre-signed download URL, updates the message content to the download URL, changes the status to <code>SENT</code>, and queues the outbound message job.</p>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="768" data-line-end="769"><a id="10_AI_Features_Planned_Deterministic_Implementation_768"></a>10. AI Features (Planned &amp; Deterministic Implementation)</h2>
+<p class="has-line-data" data-line-start="770" data-line-end="771">The system includes placeholders for AI features in the database schema:</p>
+<ul>
+<li class="has-line-data" data-line-start="772" data-line-end="773"><code>extractedInsights</code> (JSON) on the <code>Interaction</code> table.</li>
+<li class="has-line-data" data-line-start="773" data-line-end="774"><code>sentiment</code> (Float) on the <code>Interaction</code> table.</li>
+<li class="has-line-data" data-line-start="774" data-line-end="776"><code>churnRiskScore</code> (Float) on the <code>Customer</code> table.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="776" data-line-end="777"><a id="Current_Implementation_776"></a>📊 Current Implementation</h3>
+<p class="has-line-data" data-line-start="778" data-line-end="779">The calculations for these features in the current codebase are implemented as follows:</p>
+<ul>
+<li class="has-line-data" data-line-start="780" data-line-end="787"><strong>Churn Risk Score:</strong> Calculated deterministically in <code>rfm.queue.ts</code> based on order intervals:
+<ul>
+<li class="has-line-data" data-line-start="781" data-line-end="785">If no historical average order interval exists:
+<ul>
+<li class="has-line-data" data-line-start="782" data-line-end="783"><code>churnRiskScore = 0.8</code> if the last purchase was over 60 days ago.</li>
+<li class="has-line-data" data-line-start="783" data-line-end="784"><code>churnRiskScore = 0.5</code> if the last purchase was over 30 days ago.</li>
+<li class="has-line-data" data-line-start="784" data-line-end="785"><code>churnRiskScore = 0.1</code> otherwise.</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="785" data-line-end="787">If a historical average exists:
+<ul>
+<li class="has-line-data" data-line-start="786" data-line-end="787"><code>churnRiskScore = daysSinceLastOrder / avgDaysBetweenOrders</code> (capped between 0 and 1).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="787" data-line-end="789"><strong>Sentiment &amp; Insights:</strong> Structured in the database and seeded via <code>seed.script.ts</code> using random float distributions. Direct LLM integrations are ready to be connected to these fields.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="791" data-line-end="792"><a id="11_External_Integrations_791"></a>11. External Integrations</h2>
+<h3 class="code-line has-line-data" data-line-start="793" data-line-end="794"><a id="Shopify_Integration_793"></a>🛍️ Shopify Integration</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Purpose</strong></td>
+<td style="text-align:left">Sync products, orders, and customer data; track storefront events.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>APIs Used</strong></td>
+<td style="text-align:left">REST Admin API, Webhooks API, Storefront Web Pixel API.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Authentication</strong></td>
+<td style="text-align:left">Access Token-based authentication, with tokens encrypted at rest.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Data Exchanged</strong></td>
+<td style="text-align:left">Orders (payment/shipping statuses, lines, costs), Products (SKUs, variants, prices, inventory), Customers (profiles, marketing consents), Storefront Telemetry.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="802" data-line-end="803"><a id="Meta_Graph_API_Integration_802"></a>💬 Meta Graph API Integration</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Purpose</strong></td>
+<td style="text-align:left">Centralizes WhatsApp, Messenger, and Instagram communications.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>APIs Used</strong></td>
+<td style="text-align:left"><code>/messages</code> endpoint, Webhooks API.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Authentication</strong></td>
+<td style="text-align:left">OAuth System user tokens, verified via SHA-256 HMAC headers.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Data Exchanged</strong></td>
+<td style="text-align:left">Text, templates, audio, video, documents, read receipts, delivery statuses.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="811" data-line-end="812"><a id="Paymob_Integration_811"></a>💳 Paymob Integration</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Attribute</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Purpose</strong></td>
+<td style="text-align:left">Intention card payments and subscription management.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>APIs Used</strong></td>
+<td style="text-align:left">Paymob Intention API, Webhooks API.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Authentication</strong></td>
+<td style="text-align:left">Paymob API key, HMAC-SHA256 signature verification.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Data Exchanged</strong></td>
+<td style="text-align:left">Transaction totals, client email/phone, payment status, transaction reference IDs.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="822" data-line-end="823"><a id="12_API_Inventory_822"></a>12. API Inventory</h2>
+<h3 class="code-line has-line-data" data-line-start="824" data-line-end="825"><a id="Auth_Module_824"></a>🔐 Auth Module</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Endpoint</strong></th>
+<th style="text-align:left"><strong>Purpose</strong></th>
+<th style="text-align:left"><strong>Auth Required</strong></th>
+<th style="text-align:left"><strong>Request Body</strong></th>
+<th style="text-align:left"><strong>Response</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>POST /api/auth/signup</code></td>
+<td style="text-align:left">Create user and organization.</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left"><code>email</code>, <code>password</code>, <code>name</code>, <code>organizationName</code></td>
+<td style="text-align:left">User session payload.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST /api/auth/login</code></td>
+<td style="text-align:left">Authenticate user.</td>
+<td style="text-align:left">No</td>
+<td style="text-align:left"><code>email</code>, <code>password</code></td>
+<td style="text-align:left">Session cookies and user payload.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET /api/me</code></td>
+<td style="text-align:left">Fetch active session details.</td>
+<td style="text-align:left">Yes</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Current user, active organization, role, and permissions.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="832" data-line-end="833"><a id="Customers_Module_832"></a>👥 Customers Module</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Endpoint</strong></th>
+<th style="text-align:left"><strong>Purpose</strong></th>
+<th style="text-align:left"><strong>Auth Required</strong></th>
+<th style="text-align:left"><strong>Request Body</strong></th>
+<th style="text-align:left"><strong>Response</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>GET /api/customers</code></td>
+<td style="text-align:left">Paginated list of customer profiles.</td>
+<td style="text-align:left">Yes (<code>customers:read</code>)</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">List of customers, total count.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST /api/customers</code></td>
+<td style="text-align:left">Create a customer profile.</td>
+<td style="text-align:left">Yes (<code>customers:write</code>)</td>
+<td style="text-align:left"><code>name</code>, <code>email</code>, <code>phone</code>, <code>city</code>, <code>address</code>, <code>source</code>, <code>lifecycleStage</code></td>
+<td style="text-align:left">Created customer record.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET /api/customers/:id/timeline</code></td>
+<td style="text-align:left">Fetch customer timeline events.</td>
+<td style="text-align:left">Yes (<code>customers:read</code>)</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Chronological feed of orders, notes, and tickets.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="840" data-line-end="841"><a id="Unified_Messaging_Module_840"></a>💬 Unified Messaging Module</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Endpoint</strong></th>
+<th style="text-align:left"><strong>Purpose</strong></th>
+<th style="text-align:left"><strong>Auth Required</strong></th>
+<th style="text-align:left"><strong>Request Body</strong></th>
+<th style="text-align:left"><strong>Response</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>GET /api/messaging/conversations</code></td>
+<td style="text-align:left">Paginated list of organization conversations.</td>
+<td style="text-align:left">Yes (<code>conversations:read</code>)</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Conversations array, total counts.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST /api/messaging/conversations/:id/messages</code></td>
+<td style="text-align:left">Send outbound message.</td>
+<td style="text-align:left">Yes (<code>conversations:write</code>)</td>
+<td style="text-align:left"><code>content</code>, <code>type</code>, <code>metadata</code></td>
+<td style="text-align:left">Queued message.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST /api/messaging/conversations/:id/messages/upload-session</code></td>
+<td style="text-align:left">Create media upload session.</td>
+<td style="text-align:left">Yes (<code>conversations:write</code>)</td>
+<td style="text-align:left"><code>fileName</code>, <code>mimeType</code>, <code>fileSize</code>, <code>type</code></td>
+<td style="text-align:left">Presigned B2 upload URL, placeholder message.</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="848" data-line-end="849"><a id="Subscriptions_Module_848"></a>💳 Subscriptions Module</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Endpoint</strong></th>
+<th style="text-align:left"><strong>Purpose</strong></th>
+<th style="text-align:left"><strong>Auth Required</strong></th>
+<th style="text-align:left"><strong>Request Body</strong></th>
+<th style="text-align:left"><strong>Response</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>POST /api/subscriptions/paymob/initialize</code></td>
+<td style="text-align:left">Create subscription payment intention.</td>
+<td style="text-align:left">Yes (<code>subscriptions:write</code>)</td>
+<td style="text-align:left"><code>planId</code>, <code>billingCycle</code></td>
+<td style="text-align:left">Paymob payment redirection URL.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST /api/subscriptions/paymob/callback</code></td>
+<td style="text-align:left">Paymob payment callback.</td>
+<td style="text-align:left">Checksum Signature verified</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Status acknowledgement.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="857" data-line-end="858"><a id="13_Security_Features_857"></a>13. Security Features</h2>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Feature</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Authentication &amp; Authorization</strong></td>
+<td style="text-align:left">Handled via Better Auth sessions. Express middleware validates organization membership and checks permissions via the <code>requirePermission</code> guard.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Password Handling</strong></td>
+<td style="text-align:left">Passwords are encrypted using Argon2.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Data Encryption</strong></td>
+<td style="text-align:left">Sensitive integration tokens (e.g., Shopify, Meta) are encrypted at rest using AES-256-GCM.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Validation</strong></td>
+<td style="text-align:left">Inputs are validated on the backend using Zod schemas and on the frontend using Formik/Yup.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Rate Limiting</strong></td>
+<td style="text-align:left">Managed by Express Rate Limit configurations.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>CORS Configuration</strong></td>
+<td style="text-align:left">Rejects requests from unauthorized origins.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>File Upload Security</strong></td>
+<td style="text-align:left">Restricts uploads to permitted file extensions, handles uploads via B2 presigned URLs, and purges files on deletion.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Input Sanitization</strong></td>
+<td style="text-align:left">Structured inputs are parsed to prevent SQL injection (via Prisma) and XSS (via React routing).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Secrets Management</strong></td>
+<td style="text-align:left">Configuration parameters and credentials are loaded securely using environment variables (<code>.env</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="873" data-line-end="874"><a id="14_Infrastructure_873"></a>14. Infrastructure</h2>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Component</strong></th>
+<th style="text-align:left"><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Hosting</strong></td>
+<td style="text-align:left">Frontend: Vercel. Backend: Node.js on Render or AWS ECS.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Deployment</strong></td>
+<td style="text-align:left">Automated Git-triggered CI/CD pipelines.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Docker</strong></td>
+<td style="text-align:left">Supported with a multi-stage Dockerfile and a local <code>docker-compose.yml</code> defining services for PostgreSQL and Redis.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Monitoring &amp; Logging</strong></td>
+<td style="text-align:left">Sentry SDK integration, with custom Winston loggers.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Queues</strong></td>
+<td style="text-align:left">Redis-backed BullMQ instances for background jobs (sync, webhooks, imports, exports, RFM).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="885" data-line-end="886"><a id="15_Application_Flow_885"></a>15. Application Flow</h2>
+<h3 class="code-line has-line-data" data-line-start="887" data-line-end="888"><a id="User_Onboarding_Flow_887"></a>🚀 User Onboarding Flow</h3>
+<pre><code class="has-line-data language-mermaid" data-line-start="890" data-line-end="896">graph LR
+    A[User Signup] --&gt; B[Create Org]
+    B --&gt; C[Get Free Tier Plan]
+    C --&gt; D[Connect Shopify]
+    D --&gt; E[Auto-Sync Triggered]
+</code></pre>
+<ol>
+<li class="has-line-data" data-line-start="897" data-line-end="898"><strong>Register:</strong> User signs up with email/password.</li>
+<li class="has-line-data" data-line-start="898" data-line-end="899"><strong>Create Organization:</strong> The system creates a new organization workspace and sets the user as the root member.</li>
+<li class="has-line-data" data-line-start="899" data-line-end="900"><strong>Assign Subscription:</strong> A database hook automatically assigns a free-tier subscription plan.</li>
+<li class="has-line-data" data-line-start="900" data-line-end="901"><strong>Connect Shopify:</strong> User enters their Shopify credentials.</li>
+<li class="has-line-data" data-line-start="901" data-line-end="903"><strong>Trigger Sync:</strong> The system schedules a background sync job.</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="903" data-line-end="904"><a id="Customer_Intelligence_Automation_Flow_903"></a>🤖 Customer Intelligence &amp; Automation Flow</h3>
+<pre><code class="has-line-data language-mermaid" data-line-start="906" data-line-end="912">graph LR
+    A[Storefront Event] --&gt; B[Ingest Web Pixel]
+    B --&gt; C[Recalculate RFM]
+    C --&gt; D[Stage Transition]
+    D --&gt; E[Churn Notification]
+</code></pre>
+<ol>
+<li class="has-line-data" data-line-start="913" data-line-end="914"><strong>Storefront Event:</strong> Visitor triggers a storefront event (e.g., product viewed).</li>
+<li class="has-line-data" data-line-start="914" data-line-end="915"><strong>Ingest Event:</strong> The webhook receiver matches the visitor’s email and logs the event in the CRM.</li>
+<li class="has-line-data" data-line-start="915" data-line-end="916"><strong>Calculate RFM:</strong> A cron job runs RFM calculations.</li>
+<li class="has-line-data" data-line-start="916" data-line-end="917"><strong>Update Stage:</strong> The system updates the customer’s lifecycle stage (e.g., transitions to “At Risk”).</li>
+<li class="has-line-data" data-line-start="917" data-line-end="919"><strong>Alert Agent:</strong> The system generates an in-app notification and sends warning emails to organization administrators.</li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="921" data-line-end="922"><a id="16_Most_Important_Features_Business_Value_Ranking_921"></a>16. Most Important Features (Business Value Ranking)</h2>
+<ol>
+<li class="has-line-data" data-line-start="923" data-line-end="924"><strong>Shopify Data Synchronizer:</strong> Synchronizes orders, products, and customer profiles to populate the CRM.</li>
+<li class="has-line-data" data-line-start="924" data-line-end="925"><strong>Social Inbox:</strong> Unifies WhatsApp, Messenger, and Instagram communications.</li>
+<li class="has-line-data" data-line-start="925" data-line-end="926"><strong>RFM Scoring Engine:</strong> Classifies customers into action cohorts (e.g. Champions, Loyal).</li>
+<li class="has-line-data" data-line-start="926" data-line-end="927"><strong>Customer Lifecycle Tracker:</strong> Identifies customer progression stages.</li>
+<li class="has-line-data" data-line-start="927" data-line-end="928"><strong>Paymob Payment Gateway:</strong> Handles premium subscription billing.</li>
+<li class="has-line-data" data-line-start="928" data-line-end="929"><strong>Shopify Storefront Web Pixel:</strong> Tracks customer events directly from the storefront.</li>
+<li class="has-line-data" data-line-start="929" data-line-end="930"><strong>Support Tickets System:</strong> Routes customer support requests.</li>
+<li class="has-line-data" data-line-start="930" data-line-end="931"><strong>Audit Logs Ledger:</strong> Tracks workspace activities for security and compliance.</li>
+<li class="has-line-data" data-line-start="931" data-line-end="932"><strong>Organization Invite Flow:</strong> Allows administrators to invite team members.</li>
+<li class="has-line-data" data-line-start="932" data-line-end="933"><strong>Roles &amp; Permissions Matrix:</strong> Enforces granular RBAC access.</li>
+<li class="has-line-data" data-line-start="933" data-line-end="934"><strong>B2 Export Manager:</strong> Generates files for customer exports.</li>
+<li class="has-line-data" data-line-start="934" data-line-end="935"><strong>B2 Import Manager:</strong> Bulk imports customers, products, and orders via CSV/XLSX.</li>
+<li class="has-line-data" data-line-start="935" data-line-end="936"><strong>Storefront Event Timeline:</strong> Chronological feed of events for each customer.</li>
+<li class="has-line-data" data-line-start="936" data-line-end="937"><strong>Customer Notes:</strong> Allows agents to add internal comments to customer profiles.</li>
+<li class="has-line-data" data-line-start="937" data-line-end="938"><strong>Meta Webhook Deduplicator:</strong> Avoids duplicate webhook processes using idempotency keys.</li>
+<li class="has-line-data" data-line-start="938" data-line-end="939"><strong>Dynamic Segment Builder:</strong> Builds targeted filters for customer lists.</li>
+<li class="has-line-data" data-line-start="939" data-line-end="940"><strong>Campaign Scheduler:</strong> Schedules email outreach campaigns.</li>
+<li class="has-line-data" data-line-start="940" data-line-end="941"><strong>Campaign Metrics Dashboard:</strong> Monitors click, open, and bounce rates.</li>
+<li class="has-line-data" data-line-start="941" data-line-end="942"><strong>Presigned Media Uploads:</strong> Uploads chat attachments directly to B2.</li>
+<li class="has-line-data" data-line-start="942" data-line-end="944"><strong>Notifications Engine:</strong> Alerts administrators when customers are at risk of churning.</li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="946" data-line-end="947"><a id="17_Most_Complex_Technical_Features_946"></a>17. Most Complex Technical Features</h2>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th style="text-align:left"><strong>Feature</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Meta Webhook Broker</strong></td>
+<td style="text-align:left">Handled using Zod validation, HMAC signatures, BullMQ queues, and <a href="http://Socket.io">Socket.io</a> broadcasts.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Storefront Web Pixel Resolver</strong></td>
+<td style="text-align:left">Matches storefront pixel payloads to existing CRM customer records.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Redis-Adapter <a href="http://Socket.io">Socket.io</a> Server</strong></td>
+<td style="text-align:left">Synchronizes WebSocket events across multiple server nodes.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>BullMQ Queue Failover</strong></td>
+<td style="text-align:left">Automatically switches to inline synchronous processing if Redis goes offline.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Paymob Intention Payments</strong></td>
+<td style="text-align:left">Manages Paymob billing flows, signatures, and callbacks.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Pre-Deletion Protection Hook</strong></td>
+<td style="text-align:left">Blocks organization deletion until data is exported and uploaded to B2.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Shopify REST Link-Header Sync</strong></td>
+<td style="text-align:left">Syncs large merchant datasets using link-header pagination.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AES-256-GCM Encryption</strong></td>
+<td style="text-align:left">Encrypts and decrypts third-party integration tokens.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Presigned B2 Media Uploads</strong></td>
+<td style="text-align:left">Optimistic message creation, B2 upload URL generation, and download URL signing.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>RFM Aggregator</strong></td>
+<td style="text-align:left">Computes scores in batches using PostgreSQL aggregate functions.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Better Auth Custom Session Adapter</strong></td>
+<td style="text-align:left">Dynamically merges role memberships and permissions into active sessions.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>XLSX/CSV Import Mapping</strong></td>
+<td style="text-align:left">Applies dynamic column mappings to database structures.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PDF Invoice Generator</strong></td>
+<td style="text-align:left">Generates PDFs dynamically using <code>pdfkit-table</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dynamic Segment SQL Compiler</strong></td>
+<td style="text-align:left">Parses filter rules and translates them into Prisma queries.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Campaign Link Tracker</strong></td>
+<td style="text-align:left">Modifies HTML campaign links to track clicks, opens, and bounces.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>VIP Percentile Processor</strong></td>
+<td style="text-align:left">Evaluates and updates the top 5% of spenders in transactions.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Webhook Idempotency Layer</strong></td>
+<td style="text-align:left">Uses TTL verification records to deduplicate incoming webhooks.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Better Auth Invite Workflow</strong></td>
+<td style="text-align:left">Manages secure, link-based email invitations.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Sentry Context Logger</strong></td>
+<td style="text-align:left">Tracks and logs exceptions with transaction contexts.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Zustand Presence Store</strong></td>
+<td style="text-align:left">Tracks online user states using Socket presence events.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="973" data-line-end="974"><a id="18_Unique_Selling_Points_973"></a>18. Unique Selling Points</h2>
+<ul>
+<li class="has-line-data" data-line-start="975" data-line-end="976"><strong>Zero-Loss Deletion Safeguard:</strong> Prevents accidental deletion of organization data.</li>
+<li class="has-line-data" data-line-start="976" data-line-end="977"><strong>Direct Storefront Web Pixel Integration:</strong> Real-time event tracking on merchant websites.</li>
+<li class="has-line-data" data-line-start="977" data-line-end="978"><strong>Resilient Webhook Handlers:</strong> Queue-based webhook receivers prevent data loss.</li>
+<li class="has-line-data" data-line-start="978" data-line-end="979"><strong>Paymob Intention API Integration:</strong> Seamless, secure subscription upgrades.</li>
+<li class="has-line-data" data-line-start="979" data-line-end="981"><strong>Redis <a href="http://Socket.io">Socket.io</a> sync:</strong> Real-time collaborative agent messaging.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="983" data-line-end="984"><a id="19_Demo_Scenarios_983"></a>19. Demo Scenarios</h2>
+<h3 class="code-line has-line-data" data-line-start="985" data-line-end="986"><a id="Scenario_A_Workspace_Activation_Synchronization_985"></a>Scenario A: Workspace Activation &amp; Synchronization</h3>
+<ol>
+<li class="has-line-data" data-line-start="987" data-line-end="988"><strong>Signup:</strong> Administrator registers at <code>/signup</code> and creates the organization “Delta Retail”.</li>
+<li class="has-line-data" data-line-start="988" data-line-end="989"><strong>Add Shopify:</strong> Navigates to settings and enters their Shopify store credentials.</li>
+<li class="has-line-data" data-line-start="989" data-line-end="990"><strong>Sync:</strong> Clicks “Run Sync”. A background job imports 5,000 customers, 200 products, and 12,000 orders.</li>
+<li class="has-line-data" data-line-start="990" data-line-end="992"><strong>Verify:</strong> The dashboard displays updated stats (e.g., total sales, customer segments).</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="992" data-line-end="993"><a id="Scenario_B_Customer_Management_Churn_Prevention_992"></a>Scenario B: Customer Management &amp; Churn Prevention</h3>
+<ol>
+<li class="has-line-data" data-line-start="994" data-line-end="995"><strong>Identify:</strong> The dashboard notifies the administrator that “John Doe” has transitioned to “At Risk” with a 78% churn score.</li>
+<li class="has-line-data" data-line-start="995" data-line-end="996"><strong>Inspect:</strong> The administrator clicks the notification to view John’s profile, timeline, and order history.</li>
+<li class="has-line-data" data-line-start="996" data-line-end="998"><strong>Respond:</strong> The administrator assigns John to a “VIP Churn Segment” and schedules a promo campaign.</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="998" data-line-end="999"><a id="Scenario_C_Support_Collaboration_998"></a>Scenario C: Support Collaboration</h3>
+<ol>
+<li class="has-line-data" data-line-start="1000" data-line-end="1001"><strong>Incoming Chat:</strong> A customer sends a WhatsApp message.</li>
+<li class="has-line-data" data-line-start="1001" data-line-end="1002"><strong>Alert Agent:</strong> The inbox updates in real time, and the conversation is marked as Unassigned.</li>
+<li class="has-line-data" data-line-start="1002" data-line-end="1004"><strong>Assign &amp; Chat:</strong> An agent claims the conversation. The customer uploads an image, which appears in the chat thread. The agent resolves the issue and closes the ticket.</li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1006" data-line-end="1007"><a id="20_Presentation_Preparation_1006"></a>20. Presentation Preparation</h2>
+<h3 class="code-line has-line-data" data-line-start="1008" data-line-end="1009"><a id="Features_Worth_Presenting_1008"></a>✨ Features Worth Presenting</h3>
+<ul>
+<li class="has-line-data" data-line-start="1010" data-line-end="1011"><strong>Unified Messaging Console:</strong> Show real-time chats (WhatsApp/Messenger) and agent collaboration.</li>
+<li class="has-line-data" data-line-start="1011" data-line-end="1012"><strong>Customer Telemetry Timeline:</strong> Show order histories, notes, and storefront events in a single feed.</li>
+<li class="has-line-data" data-line-start="1012" data-line-end="1013"><strong>Dynamic Segment Builder:</strong> Show dynamic segment updates based on rules.</li>
+<li class="has-line-data" data-line-start="1013" data-line-end="1015"><strong>Connections Settings:</strong> Demonstrate the Shopify connection status and sync logs.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1015" data-line-end="1016"><a id="Features_to_Avoid_Presenting_BackendLow_Visuals_1015"></a>❌ Features to Avoid Presenting (Backend/Low Visuals)</h3>
+<ul>
+<li class="has-line-data" data-line-start="1017" data-line-end="1018">Argon2 hashing and cryptographic utilities.</li>
+<li class="has-line-data" data-line-start="1018" data-line-end="1019">Background Sentry handlers and logs.</li>
+<li class="has-line-data" data-line-start="1019" data-line-end="1021">BullMQ Redis queue configurations.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1021" data-line-end="1022"><a id="Media_Diagrams_Recommended_1021"></a>🖼️ Media &amp; Diagrams Recommended</h3>
+<ul>
+<li class="has-line-data" data-line-start="1023" data-line-end="1024"><strong>Screenshots:</strong> Unified Inbox, Settings Permissions matrix, Customer profile telemetry.</li>
+<li class="has-line-data" data-line-start="1024" data-line-end="1025"><strong>Architecture Diagram:</strong> Web pixel ingestion, real-time message routing.</li>
+<li class="has-line-data" data-line-start="1025" data-line-end="1027"><strong>Sequence Diagram:</strong> Paymob payment initialization and webhook verification.</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1029" data-line-end="1030"><a id="21_Graduation_Defense_Preparation_1029"></a>21. Graduation Defense Preparation</h2>
+<h3 class="code-line has-line-data" data-line-start="1031" data-line-end="1032"><a id="Expected_Examiner_Questions_Answers_1031"></a>❓ Expected Examiner Questions &amp; Answers</h3>
+<p class="has-line-data" data-line-start="1033" data-line-end="1034"><strong>Q: How does the application enforce tenant isolation?</strong></p>
+<blockquote>
+<p class="has-line-data" data-line-start="1034" data-line-end="1035"><strong>A:</strong> Strict separation is maintained at the database layer. All business tables reference <code>organizationId</code>. Composite unique constraints and index mappings prevent cross-tenant queries.</p>
+</blockquote>
+<p class="has-line-data" data-line-start="1036" data-line-end="1037"><strong>Q: What happens if the Redis server goes offline?</strong></p>
+<blockquote>
+<p class="has-line-data" data-line-start="1037" data-line-end="1038"><strong>A:</strong> The system falls back to inline synchronous operations, logging the exception to Sentry while maintaining service availability.</p>
+</blockquote>
+<p class="has-line-data" data-line-start="1039" data-line-end="1040"><strong>Q: Why use presigned upload URLs for chat media?</strong></p>
+<blockquote>
+<p class="has-line-data" data-line-start="1040" data-line-end="1041"><strong>A:</strong> Direct uploads to B2 bypass the backend server, reducing network load and improving security by using short-lived tokens.</p>
+</blockquote>
+<p class="has-line-data" data-line-start="1042" data-line-end="1043"><strong>Q: How is webhook security enforced?</strong></p>
+<blockquote>
+<p class="has-line-data" data-line-start="1043" data-line-end="1044"><strong>A:</strong> Meta webhooks verify signatures using HMAC-SHA256 headers. Webhooks are queued in BullMQ immediately to avoid timeouts.</p>
+</blockquote>
+<p class="has-line-data" data-line-start="1045" data-line-end="1046"><strong>Q: How are VIP segments calculated?</strong></p>
+<blockquote>
+<p class="has-line-data" data-line-start="1046" data-line-end="1047"><strong>A:</strong> The system runs a transaction calculation that identifies the top 5% of spenders and transitions them to the VIP stage.</p>
+</blockquote>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1050" data-line-end="1051"><a id="22_Architecture_Summary_1050"></a>22. Architecture Summary</h2>
+<h3 class="code-line has-line-data" data-line-start="1052" data-line-end="1053"><a id="Frontend_Architecture_1052"></a>🖥️ Frontend Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1054" data-line-end="1055"><strong>UI Engine:</strong> React 19 + Vite.</li>
+<li class="has-line-data" data-line-start="1055" data-line-end="1056"><strong>Styling:</strong> Tailwind CSS.</li>
+<li class="has-line-data" data-line-start="1056" data-line-end="1057"><strong>Routing:</strong> React Router v7.</li>
+<li class="has-line-data" data-line-start="1057" data-line-end="1059"><strong>State Management:</strong> TanStack Query (server state) and Zustand (client state).</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1059" data-line-end="1060"><a id="Backend_Architecture_1059"></a>⚙️ Backend Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1061" data-line-end="1062"><strong>Runtime:</strong> Bun.</li>
+<li class="has-line-data" data-line-start="1062" data-line-end="1063"><strong>Framework:</strong> Express.</li>
+<li class="has-line-data" data-line-start="1063" data-line-end="1064"><strong>Authentication:</strong> Better Auth.</li>
+<li class="has-line-data" data-line-start="1064" data-line-end="1065"><strong>Queuing:</strong> BullMQ.</li>
+<li class="has-line-data" data-line-start="1065" data-line-end="1067"><strong>Storage:</strong> Backblaze B2.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1067" data-line-end="1068"><a id="Database_Architecture_1067"></a>🗄️ Database Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1069" data-line-end="1070"><strong>Engine:</strong> PostgreSQL.</li>
+<li class="has-line-data" data-line-start="1070" data-line-end="1071"><strong>ORM:</strong> Prisma.</li>
+<li class="has-line-data" data-line-start="1071" data-line-end="1073"><strong>Isolation:</strong> Tenant ID scoping.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1073" data-line-end="1074"><a id="RealTime_Architecture_1073"></a>⚡ Real-Time Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1075" data-line-end="1076"><strong>Engine:</strong> <a href="http://Socket.io">Socket.io</a>.</li>
+<li class="has-line-data" data-line-start="1076" data-line-end="1077"><strong>Scalability:</strong> Redis Adapter.</li>
+<li class="has-line-data" data-line-start="1077" data-line-end="1079"><strong>Events:</strong> Inbound messages, typing status, upload progress.</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1079" data-line-end="1080"><a id="Integration_Architecture_1079"></a>🔌 Integration Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1081" data-line-end="1082"><strong>Shopify:</strong> Custom OAuth and Webhook receivers.</li>
+<li class="has-line-data" data-line-start="1082" data-line-end="1083"><strong>Meta Graph API:</strong> Inbound/outbound WhatsApp, Facebook, and Instagram messaging.</li>
+<li class="has-line-data" data-line-start="1083" data-line-end="1084"><strong>Paymob:</strong> Card payments via the Intention API.</li>
+</ul>
+
+</body>
+</html>
