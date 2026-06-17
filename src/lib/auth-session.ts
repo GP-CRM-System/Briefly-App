@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { useAuthStore } from "@/store/auth.store";
 import type { AuthUser } from "@/store/auth.store";
 
 export type RestoredAuthSession = {
@@ -27,8 +28,10 @@ function parseSessionPayload(session: unknown): RestoredAuthSession | null {
     const activeOrganizationId =
         payload.session?.activeOrganizationId ?? payload.activeOrganizationId ?? null;
 
+    const currentToken = useAuthStore.getState().token;
+
     return {
-        token: payload.session?.token ?? "",
+        token: payload.session?.token ?? currentToken ?? "",
         user: payload.user,
         role: payload.role ?? null,
         permissions: payload.permissions ?? null,

@@ -1,0 +1,11 @@
+export { default as essam } from "./essam.png";
+export { default as seif } from "./seif.png";
+export { default as pierre } from "./pierre.png";
+export { default as abdelrahman } from "./abdelrahman.png";
+export { default as mennaF } from "./mennaF.png";
+export { default as mennaA } from "./mennaA.png";
+export { default as zidan } from "./zidan.png";
+export { default as sultan } from "./sultan.png";
+export { default as samy } from "./samy.png";
+export { default as youssef } from "./youssef.png";
+export {default as roaa } from "./roaa.png";

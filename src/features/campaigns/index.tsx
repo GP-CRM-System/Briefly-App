@@ -85,6 +85,7 @@ const Campaigns = () => {
 
     return (
         <>
+            <div data-tour="campaigns-page">
             <PageLayout
                 searchValue={search}
                 searchPlaceholder="Search campaigns..."
@@ -122,6 +123,7 @@ const Campaigns = () => {
                     emptyMessage="No campaigns found"
                 />
             </PageLayout>
+            </div>
 
             <CampaignFormModal
                 open={modalOpen}

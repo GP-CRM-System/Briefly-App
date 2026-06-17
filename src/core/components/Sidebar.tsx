@@ -17,10 +17,10 @@ import {
     settingsIcon,
     closeIcon
 } from "@/assets/new";
-import { SparklesIcon } from "hugeicons-react";
+
 import { useCurrentSubscription } from "@/features/settings/settings.hooks";
 
-import { Chatting01Icon } from "hugeicons-react";
+import { Chatting01Icon, AiChat02Icon} from "hugeicons-react";
 
 interface NavItem {
     to: string;
@@ -41,7 +41,7 @@ const navItems: NavItem[] = [
     { to: "/dashboard/conversations", label: "Conversations", icon: Chatting01Icon, permission: "conversations:read" },
     { to: "/dashboard/employees", label: "Employees", icon: employeesIcon, permission: "member:read" },
     { to: "/dashboard/analytics", label: "Analytics", icon: analyticsIcon, permission: "reports:read" },
-    { to: "/dashboard/ai", label: "Insights", icon: SparklesIcon, permission: "ai:read" },
+    { to: "/dashboard/ai", label: "Insights", icon: AiChat02Icon , permission: "ai:read" },
 ];
 
 /* ───────────────────────── SidebarItem ───────────────────────── */
@@ -259,6 +259,7 @@ const Sidebar = () => {
                  On mobile it's a fixed-width overlay drawer.
                  On collapsed desktop it's a slim icon-rail. */}
             <aside
+                data-tour="sidebar-nav"
                 className={`
                     fixed lg:static inset-y-0 left-0 z-30
                     flex h-[100dvh] flex-col justify-between bg-white

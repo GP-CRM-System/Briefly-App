@@ -21,6 +21,7 @@ export type AuthUser = {
     image: string | null;
     createdAt: string | Date;
     updatedAt: string | Date;
+    last_password_change?: string | null;
 };
 
 type AuthState = {

@@ -192,7 +192,7 @@ const DashboardHome = () => {
     return (
         <div className="space-y-6">
             {/* ── Stats Cards ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Customers" value={stats?.totalCustomers ?? 0} change={stats?.customerChange} />
                 <StatCard label="Active Campaigns" value={stats?.activeCampaigns ?? 0} change={stats?.campaignChange} />
                 <StatCard label="Total Products" value={stats?.totalProducts ?? 0} change={stats?.productChange} />

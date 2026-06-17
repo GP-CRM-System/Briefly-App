@@ -24,16 +24,25 @@ import Settings from "@/features/settings";
 import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
 import AiDashboard from "@/features/ai";
 import { useSocketEvents } from "@/core/hooks";
-import { PermissionGuard, AccessDenied } from "@/core/components";
+import { PermissionGuard, AccessDenied, TourOverlay } from "@/core/components";
 import NotFoundPage from "@/pages/NotFoundPage";
 import apiClient from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints";
 import { useAuthStore } from "@/store/auth.store";
+import { useTourStore } from "@/store/tour.store";
 
 const Dashboard = () => {
   useSocketEvents();
   const { pathname } = useLocation();
   const isConversations = pathname.includes("/conversations");
+  const { tourCompleted, startTour } = useTourStore();
+
+  useEffect(() => {
+    if (!tourCompleted) {
+      const timer = setTimeout(() => startTour(), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [tourCompleted, startTour]);
 
   useEffect(() => {
     const checkAndFixSession = async () => {
@@ -90,6 +99,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">
+      <TourOverlay />
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
         <Navbar />

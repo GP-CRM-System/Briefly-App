@@ -9,6 +9,7 @@ const Navbar: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const location = useLocation();
     const isHome = location.pathname === '/';
+    const isTeam = location.pathname === '/team';
     const desktopButtonClass =
         "cursor-pointer rounded-xl px-6 py-2 font-medium transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90E2]/20";
 
@@ -30,24 +31,33 @@ const Navbar: React.FC = () => {
                 <ul className="hidden lg:flex space-x-10 items-center font-medium">
                     <HashLink
                         smooth
-                        to="#home"
+                        to="/"
                         className={`hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300 ${
                             isHome ? 'text-[#4A90E2]' : 'text-(--color-text-subtitle)'
                         }`}
                     >
                         Home
                     </HashLink>
-                    <HashLink smooth to="#about" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
+                    <HashLink smooth to="/#about" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
                         About
                     </HashLink>
-                    <HashLink smooth to="#features" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
+                    <HashLink smooth to="/#features" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
                         Features
                     </HashLink>
-                    <HashLink smooth to="#pricing" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
+                    <HashLink smooth to="/#pricing" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
                         Pricing
                     </HashLink>
-                    <HashLink smooth to="#footer" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
+                    <HashLink smooth to="/#footer" className="text-(--color-text-subtitle) hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300">
                         Contact
+                    </HashLink>
+                    <HashLink
+                        smooth
+                        to="/team"
+                        className={`hover:text-[#4A90E2] hover:-translate-y-0.75 duration-300 ${
+                            isTeam ? 'text-[#4A90E2]' : 'text-(--color-text-subtitle)'
+                        }`}
+                    >
+                        Team
                     </HashLink>
                 </ul>
 
@@ -87,20 +97,30 @@ const Navbar: React.FC = () => {
 
                     <nav className="flex-1 py-4 px-4">
                         <div className="flex flex-col space-y-1">
-                            <HashLink smooth to="#home" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
+                            <HashLink smooth to="/" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
                                 Home
                             </HashLink>
-                            <HashLink smooth to="#about" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
+                            <HashLink smooth to="/#about" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
                                 About
                             </HashLink>
-                            <HashLink smooth to="#features" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
+                            <HashLink smooth to="/#features" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
                                 Features
                             </HashLink>
-                            <HashLink smooth to="#pricing" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
+                            <HashLink smooth to="/#pricing" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
                                 Pricing
                             </HashLink>
-                            <HashLink smooth to="#footer" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
+                            <HashLink smooth to="/#footer" onClick={closeMenu} className="text-base font-medium py-3 px-4 rounded-lg transition-colors text-gray-700 hover:text-[#4A90E2] hover:bg-blue-50">
                                 Contact
+                            </HashLink>
+                            <HashLink
+                                smooth
+                                to="/team"
+                                onClick={closeMenu}
+                                className={`text-base font-medium py-3 px-4 rounded-lg transition-colors hover:text-[#4A90E2] hover:bg-blue-50 ${
+                                    isTeam ? 'text-[#4A90E2] bg-blue-50' : 'text-gray-700'
+                                }`}
+                            >
+                                Team
                             </HashLink>
                         </div>
                     </nav>

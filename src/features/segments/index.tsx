@@ -115,6 +115,7 @@ const Segments = () => {
 
     return (
         <>
+            <div data-tour="segments-page">
             <PageLayout
                 searchValue={search}
                 searchPlaceholder="Search segments..."
@@ -226,6 +227,7 @@ const Segments = () => {
                     emptyMessage="No segments found"
                 />
             </PageLayout>
+            </div>
 
             <SegmentFormModal
                 open={modalOpen}

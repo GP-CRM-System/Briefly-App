@@ -41,6 +41,17 @@ const Conversations = () => {
     const [newModalOpen, setNewModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"all" | "mine" | "unassigned">("all");
     const [assignOpen, setAssignOpen] = useState(false);
+    const [agentEnabledMap, setAgentEnabledMap] = useState<Record<string, boolean>>({});
+
+    const agentEnabled = activeId ? (agentEnabledMap[activeId] ?? true) : true;
+    const toggleAgent = () => {
+        if (activeId) {
+            setAgentEnabledMap((prev) => ({
+                ...prev,
+                [activeId]: !agentEnabled,
+            }));
+        }
+    };
 
     const currentUserId = useAuthStore((state) => state.user?.id);
     const onlineUserIds = usePresenceStore((state) => state.onlineUsers);
@@ -342,6 +353,31 @@ const Conversations = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                {/* Customer Profile Link */}
+                                {activeConversation.customerId && (
+                                    <button
+                                        onClick={() => navigate(`/dashboard/customers/${activeConversation.customerId}`)}
+                                        className="text-xs font-semibold border px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 transition-colors shadow-xs flex items-center gap-1.5 text-gray-700 cursor-pointer"
+                                        title="View Customer Profile"
+                                    >
+                                        <User02Icon className="h-4 w-4 text-gray-500" />
+                                        <span className="hidden sm:inline">Profile</span>
+                                    </button>
+                                )}
+
+                                {/* Agent Toggle UI */}
+                                <button
+                                    onClick={toggleAgent}
+                                    className={`text-xs font-semibold border px-3 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+                                        agentEnabled 
+                                            ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/50" 
+                                            : "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100"
+                                    }`}
+                                >
+                                    <span className={`w-2 h-2 rounded-full ${agentEnabled ? "bg-emerald-500 animate-pulse" : "bg-gray-400"}`}></span>
+                                    <span>Agent: {agentEnabled ? "ON" : "OFF"}</span>
+                                </button>
+
                                 {/* Assignment Selector */}
                                 <div className="relative">
                                     <button

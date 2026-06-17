@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import MyProfileTab from "./components/MyProfileTab";
 import OrganizationProfileTab from "./components/OrganizationProfileTab";
@@ -15,21 +14,11 @@ const Settings = () => {
     
     const validTabs = ["profile", "org", "roles", "connections", "imports", "audit", "billing"] as const;
     const queryTab = searchParams.get("tab") || (location.state as any)?.tab;
-    const initialTab = (queryTab && validTabs.includes(queryTab as any)) 
+    const activeTab = (queryTab && validTabs.includes(queryTab as any)) 
         ? (queryTab as typeof validTabs[number]) 
         : "profile";
 
-    const [activeTab, setActiveTab] = useState<typeof validTabs[number]>(initialTab);
-
-    useEffect(() => {
-        const currentTab = searchParams.get("tab") || (location.state as any)?.tab;
-        if (currentTab && validTabs.includes(currentTab as any)) {
-            setActiveTab(currentTab as any);
-        }
-    }, [searchParams, location.state]);
-
     const handleTabChange = (tabId: typeof validTabs[number]) => {
-        setActiveTab(tabId);
         setSearchParams({ tab: tabId });
     };
 
@@ -67,13 +56,14 @@ const Settings = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
             {/* Sidebar Navigation */}
-            <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-1">
+            <div data-tour="settings-nav" className="lg:col-span-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-1">
                 {menuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
                     return (
                         <button
                             key={item.id}
+                            data-tour={`settings-tab-${item.id}`}
                             onClick={() => handleTabChange(item.id)}
                             className={`w-full flex items-center gap-3.5 px-4.5 py-3.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${
                                 isActive

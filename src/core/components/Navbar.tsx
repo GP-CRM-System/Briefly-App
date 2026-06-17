@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Icon } from "@/core/components";
 import { useAuthStore } from "@/store/auth.store";
 import { notification } from "@/assets/icons/navbar/navbar";
@@ -88,21 +88,27 @@ const Navbar = () => {
                     </div>
 
                     {/* User Avatar + Info */}
-                    <div className="flex items-center gap-3 cursor-pointer group">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary-400)] to-[var(--color-primary-600)] flex items-center justify-center text-white text-sm font-semibold overflow-hidden ring-2 ring-white shadow-sm">
-                            {user?.image ? (
-                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-                            ) : (
-                                <span>{user?.name?.charAt(0)?.toUpperCase() || "U"}</span>
-                            )}
+                    <NavLink
+                        to="/dashboard/settings"
+                        end={true}
+                    >
+                        <div className="flex items-center gap-3 cursor-pointer group">
+                            <div className="w-10 h-10 rounded-full  border-1 border-blue-200 flex items-center justify-center text-white text-sm font-semibold overflow-hidden ring-2 ring-white shadow-sm">
+                                {user?.image ? (
+                                    <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <img src="/profile.jpg" alt="" />
+                                )}
+                            </div>
+                            <div className="hidden sm:block">
+                                <p className="text-sm font-semibold text-gray-900 leading-tight group-hover:text-[var(--color-primary-500)] transition-colors">
+                                    Hello, {user?.name?.split(" ")[0] || "User"}
+                                </p>
+                                <p className="text-xs text-gray-400 capitalize">{role || "Member"}</p>
+                            </div>
                         </div>
-                        <div className="hidden sm:block">
-                            <p className="text-sm font-semibold text-gray-900 leading-tight group-hover:text-[var(--color-primary-500)] transition-colors">
-                                Hello, {user?.name?.split(" ")[0] || "User"}
-                            </p>
-                            <p className="text-xs text-gray-400 capitalize">{role || "Member"}</p>
-                        </div>
-                    </div>
+                    </NavLink>
+
                 </div>
             </div>
         </header>

@@ -11,4 +11,5 @@ export type { Column } from './DataTable'
 export { default as Modal, FormCard, FormSection, FormField, FormRow, inputClasses, selectClasses } from './Modal'
 export { default as ActionMenu } from './ActionMenu'
 export type { ActionMenuItem } from './ActionMenu'
+export { default as TourOverlay } from './TourOverlay'
 

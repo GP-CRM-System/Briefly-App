@@ -15,7 +15,7 @@ const AiDashboard = () => {
     const isLoading = churnMutation.isPending || segmentMutation.isPending || recMutation.isPending;
 
     return (
-        <div className="space-y-6 max-w-[1200px]">
+        <div data-tour="ai-page" className="space-y-6 max-w-[1200px]">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

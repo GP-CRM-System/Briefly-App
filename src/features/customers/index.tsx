@@ -60,6 +60,7 @@ const Customers = () => {
 
     return (
         <>
+            <div data-tour="customers-page">
             <PageLayout
                 searchValue={search}
                 searchPlaceholder="Search"
@@ -96,6 +97,7 @@ const Customers = () => {
                     emptyMessage="No customers found"
                 />
             </PageLayout>
+            </div>
 
             <CustomerFormModal
                 open={modalOpen}

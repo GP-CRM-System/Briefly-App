@@ -197,7 +197,7 @@ const AnalyticsPage = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div data-tour="analytics-page" className="space-y-6">
             {/* ── Stats Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Customers" value={analytics?.summary.customers.total ?? 0} change={analytics?.summary.customers.change} icon={icons.customers} />
