@@ -54,7 +54,12 @@ const OrganizationProfileTab = () => {
                     {
                         onSuccess: (data) => {
                             setLogo(data.url);
-                            toast.success("Logo uploaded successfully!");
+                            // Immediately persist the new logo URL to the org via Better Auth
+                            updateOrgMutation.mutate({
+                                name: orgName,
+                                slug: orgSlug,
+                                logo: data.url
+                            });
                         }
                     }
                 );
@@ -65,7 +70,11 @@ const OrganizationProfileTab = () => {
 
     const handleRemoveLogo = () => {
         setLogo(null);
-        toast.success("Logo removed");
+        updateOrgMutation.mutate({
+            name: orgName,
+            slug: orgSlug,
+            logo: null
+        });
     };
 
     if (isLoading) {

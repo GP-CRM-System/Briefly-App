@@ -33,5 +33,12 @@ export const orderService = {
         // Fallback to local storage or patch note in update if not supported explicitly in backend endpoints
         const { data } = await apiClient.patch(ENDPOINTS.ORDER.UPDATE(id), { note: content });
         return data?.data || data;
+    },
+
+    async downloadInvoice(id: string): Promise<Blob> {
+        const { data } = await apiClient.get(ENDPOINTS.ORDER.INVOICE(id), {
+            responseType: 'blob',
+        });
+        return data;
     }
 };

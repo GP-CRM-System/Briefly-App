@@ -99,6 +99,7 @@ export const ENDPOINTS = {
     GET_ONE: (id: string) => `/orders/${id}`,
     UPDATE: (id: string) => `/orders/${id}`,
     DELETE: (id: string) => `/orders/${id}`,
+    INVOICE: (id: string) => `/orders/${id}/invoice`,
   },
 
   // ─── Products ───
