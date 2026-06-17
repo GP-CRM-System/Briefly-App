@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import apiClient from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
@@ -11,37 +10,52 @@ type InviteTeamProps = {
 
 export default function InviteTeam({ onNext }: InviteTeamProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
-    // In a real app, you'd get this link from your backend
-    const inviteLink = "Generated link will appear her"; 
+    const [emails, setEmails] = useState<string[]>([]);
+    const [emailInput, setEmailInput] = useState('');
 
-    const initialValues = {
-        email: '',
-    };
-
-    const validationSchema = Yup.object({
-        email: Yup.string().email('Invalid email').required('Email is required'),
-    });
-
-    const handleSubmit = async (values: typeof initialValues) => {
-        setIsSubmitting(true);
-        try {
-            await apiClient.post(ENDPOINTS.ORGANIZATION.INVITE_MEMBER, {
-                email: values.email,
-                role: "member"
-            });
-            toast.success("Invitation sent!");
-            onNext();
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to send invitation");
-        } finally {
-            setIsSubmitting(false);
+    const addEmail = (email: string) => {
+        const trimmed = email.trim();
+        if (trimmed && Yup.string().email().isValidSync(trimmed) && !emails.includes(trimmed)) {
+            setEmails((prev) => [...prev, trimmed]);
         }
     };
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText("https://your-crm.com/invite/12345"); // Replace with real link logic
-        toast.success("Link copied to clipboard!");
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addEmail(emailInput);
+            setEmailInput('');
+        }
+    };
+
+    const removeEmail = (email: string) => {
+        setEmails((prev) => prev.filter((e) => e !== email));
+    };
+
+    const handleSubmit = async () => {
+        const allEmails = emailInput.trim() ? [...emails, emailInput.trim()] : emails;
+        if (allEmails.length === 0) {
+            toast.error('Please enter at least one email address');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await Promise.all(
+                allEmails.map((email) =>
+                    apiClient.post(ENDPOINTS.ORGANIZATION.INVITE_MEMBER, {
+                        email,
+                        role: 'member',
+                    })
+                )
+            );
+            toast.success(`${allEmails.length} invitation(s) sent!`);
+            onNext();
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || 'Failed to send invitation');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -53,35 +67,51 @@ export default function InviteTeam({ onNext }: InviteTeamProps) {
                 Add team members and assign their roles
             </p>
 
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-            >
-                {() => (
-                    <Form className="space-y-4">
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[var(--color-text-title)] font-medium text-sm">E-mail Address</label>
-                            <Field
-                                type="email"
-                                name="email"
-                                placeholder="Enter team member email"
-                                className="w-full py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:border-transparent outline-none transition duration-300 bg-white"
-                            />
-                            <p className="text-[10px] text-gray-400 mt-1">Press Enter to add multiple emails</p>
-                            <ErrorMessage name="email" component="div" className="text-xs text-[var(--color-error)]" />
-                        </div>
+            <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                    <label className="text-[var(--color-text-title)] font-medium text-sm">E-mail Address</label>
+                    <input
+                        type="email"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Enter team member email"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:border-transparent outline-none transition duration-300 bg-white"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">Press Enter to add multiple emails</p>
+                </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full bg-[var(--color-primary-500)] text-white font-bold py-3 px-4 rounded-lg hover:bg-[var(--color-primary-600)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-                        >
-                            {isSubmitting ? 'Sending...' : 'Send Invite'}
-                        </button>
-                    </Form>
+                {emails.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {emails.map((email) => (
+                            <span
+                                key={email}
+                                className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
+                            >
+                                {email}
+                                <button
+                                    type="button"
+                                    onClick={() => removeEmail(email)}
+                                    className="text-blue-400 hover:text-blue-600"
+                                >
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </span>
+                        ))}
+                    </div>
                 )}
-            </Formik>
+
+                <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit}
+                    className="w-full bg-[var(--color-primary-500)] text-white font-bold py-3 px-4 rounded-lg hover:bg-[var(--color-primary-600)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                >
+                    {isSubmitting ? 'Sending...' : `${emails.length > 0 || emailInput.trim() ? `Send Invite${emails.length > 0 ? `s (${emails.length + (emailInput.trim() ? 1 : 0)})` : ''}` : 'Send Invite'}`}
+                </button>
+            </div>
 
             <div className="text-center my-8">
                 <div className="flex items-center w-full">
@@ -91,26 +121,14 @@ export default function InviteTeam({ onNext }: InviteTeamProps) {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-1">
-                <label className="text-[var(--color-text-title)] font-medium text-sm">Invite via link</label>
-                <div className="flex items-center gap-2">
-                    <div className="flex-grow py-3 px-4 bg-[#F8FAFC] border border-gray-200 rounded-lg text-sm text-gray-500 truncate select-none">
-                        {inviteLink}
-                    </div>
-                    <button 
-                        onClick={copyToClipboard}
-                        className="flex items-center gap-2 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 whitespace-nowrap"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Copy
-                    </button>
-                </div>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                <p className="text-sm text-gray-500">
+                    Team members will receive an email invitation with a link to join your organization.
+                </p>
             </div>
 
             <div className="mt-8 text-center">
-                <button 
+                <button
                     onClick={onNext}
                     className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
                 >
