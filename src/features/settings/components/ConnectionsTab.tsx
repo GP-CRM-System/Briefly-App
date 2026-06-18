@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useConnections, useConnectShopify, useDeleteIntegration, useTestConnection, useSyncConnection, useSyncLogs, useUpdateIntegration } from "../settings.hooks";
 import { inputClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
@@ -6,6 +7,24 @@ import { ShopifyIcon, Settings01Icon, Unlink01Icon, ArrowDown01Icon, ArrowUp01Ic
 import MetaConnections from "./MetaConnections";
 
 const ConnectionsTab = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Detect OAuth callback result from URL params
+    useEffect(() => {
+        const shopifyParam = searchParams.get("shopify");
+        if (shopifyParam === "connected") {
+            toast.success("Shopify store connected successfully!");
+        } else if (shopifyParam === "error") {
+            toast.error("Failed to connect Shopify store. Please try again.");
+        }
+        if (shopifyParam) {
+            setSearchParams((prev) => {
+                prev.delete("shopify");
+                return prev;
+            }, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
+
     const { data: connections = [], isLoading } = useConnections();
     const connectShopifyMutation = useConnectShopify();
     const deleteIntegrationMutation = useDeleteIntegration();
@@ -143,6 +162,13 @@ const ConnectionsTab = () => {
         });
     };
 
+    const handleOAuthConnect = () => {
+        const shop = prompt("Enter your Shopify store domain (e.g., my-store.myshopify.com):");
+        if (!shop) return;
+        const baseApi = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/g, "") || "/api";
+        window.location.href = `${baseApi}/integrations/shopify/auth?shop=${encodeURIComponent(shop)}`;
+    };
+
     if (isLoading) {
         return <div className="text-center py-12 text-gray-400 animate-pulse font-semibold">Loading integration details...</div>;
     }
@@ -200,7 +226,19 @@ const ConnectionsTab = () => {
                         className="w-full py-3 rounded-lg bg-green-600 text-white text-sm font-bold hover:bg-green-700 shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         <ShopifyIcon size={16} />
-                        {connectShopifyMutation.isPending ? "Connecting..." : "Connect Shopify Store"}
+                        {connectShopifyMutation.isPending ? "Connecting..." : "Connect with Access Token"}
+                    </button>
+                    <div className="relative flex items-center gap-2">
+                        <div className="flex-1 border-t border-gray-200" />
+                        <span className="text-xs font-semibold text-gray-400">OR</span>
+                        <div className="flex-1 border-t border-gray-200" />
+                    </div>
+                    <button
+                        onClick={handleOAuthConnect}
+                        className="w-full py-3 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                        <ShopifyIcon size={16} />
+                        Connect via OAuth
                     </button>
                 </div>
             </div>

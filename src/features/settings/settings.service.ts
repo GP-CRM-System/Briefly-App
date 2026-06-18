@@ -319,7 +319,7 @@ export const settingsService = {
     },
 
     async syncConnection(id: string): Promise<unknown> {
-        const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.FULL_SYNC(id));
+        const { data } = await apiClient.post(ENDPOINTS.INTEGRATION.FULL_SYNC(id), {});
         return data?.data || data;
     },
 
@@ -334,28 +334,19 @@ export const settingsService = {
     },
 
     async getSyncLogs(id: string): Promise<SyncLog[]> {
-        try {
-            const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id), {
-                params: { limit: 1000 }
-            });
-            const logs = data?.data || data;
-            if (Array.isArray(logs)) {
-                return logs.map((l: BackendSyncLog) => ({
-                    id: l.id,
-                    timestamp: l.startedAt || l.createdAt || new Date().toISOString(),
-                    level: l.status === "failed" ? "error" as const : (l.itemsFailed ?? 0) > 0 ? "warning" as const : "info" as const,
-                    message: `${l.syncType} sync for ${l.entityType}: ${l.itemsProcessed} processed, ${l.itemsCreated} created, ${l.itemsUpdated} updated${l.itemsFailed ? `, ${l.itemsFailed} failed` : ""}. Status: ${l.status}`,
-                }));
-            }
-        } catch (err) {
-            console.warn("API getSyncLogs failed, using mock sync logs", err);
+        const { data } = await apiClient.get(ENDPOINTS.INTEGRATION.SYNC_LOGS(id), {
+            params: { limit: 1000 }
+        });
+        const logs = data?.data || data;
+        if (Array.isArray(logs)) {
+            return logs.map((l: BackendSyncLog) => ({
+                id: l.id,
+                timestamp: l.startedAt || l.createdAt || new Date().toISOString(),
+                level: l.status === "failed" ? "error" as const : (l.itemsFailed ?? 0) > 0 ? "warning" as const : "info" as const,
+                message: `${l.syncType} sync for ${l.entityType}: ${l.itemsProcessed} processed, ${l.itemsCreated} created, ${l.itemsUpdated} updated${l.itemsFailed ? `, ${l.itemsFailed} failed` : ""}. Status: ${l.status}`,
+            }));
         }
-
-        return [
-            { id: "log-1", timestamp: new Date().toISOString(), level: "info", message: "Webhooks verified and healthy." },
-            { id: "log-2", timestamp: new Date(Date.now() - 1200000).toISOString(), level: "info", message: "Incremental sync started: 14 customers updated, 8 orders synced." },
-            { id: "log-3", timestamp: new Date(Date.now() - 3600000).toISOString(), level: "info", message: "Incremental sync completed successfully." },
-        ];
+        return logs as SyncLog[];
     },
 
     // ─── Imports & Exports ───

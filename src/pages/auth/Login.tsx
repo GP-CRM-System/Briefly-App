@@ -9,12 +9,16 @@ import {
 } from '@assets';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/core/hooks';
+import { authClient } from '@/lib/auth-client';
 import { Icon, Image } from '@/core/components';
+import toast from 'react-hot-toast';
 
 const Login = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [searchParams] = useSearchParams();
+    const invitationId = searchParams.get('invitationId');
     const { login, loginWithGoogle, isPending } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,7 +31,17 @@ const Login = () => {
 
     const handleSubmit = async (values: typeof initialValues) => {
         setIsSubmitting(true);
-        await login({ email: values.email, password: values.password });
+        const result = await login({ email: values.email, password: values.password });
+        if (!result?.error && invitationId) {
+            const { error } = await authClient.organization.acceptInvitation({
+                invitationId,
+            });
+            if (error) {
+                toast.error(error.message || 'Failed to accept invitation');
+            } else {
+                toast.success('You\'ve joined the organization!');
+            }
+        }
         setIsSubmitting(false);
     };
 

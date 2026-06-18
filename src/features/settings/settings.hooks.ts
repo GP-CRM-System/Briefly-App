@@ -296,8 +296,10 @@ export const useSyncConnection = () => {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (id: string) => settingsService.syncConnection(id),
-        onSuccess: () => {
+        onSuccess: (_data, id) => {
             qc.invalidateQueries({ queryKey: settingsKeys.connections() });
+            qc.invalidateQueries({ queryKey: settingsKeys.syncLogs(id) });
+            qc.refetchQueries({ queryKey: settingsKeys.syncLogs(id) });
             toast.success("Synchronization triggered successfully!");
         },
         onError: (err: any) => {
@@ -340,6 +342,7 @@ export const useSyncLogs = (id: string, enabled = false) => {
         queryKey: settingsKeys.syncLogs(id),
         queryFn: () => settingsService.getSyncLogs(id),
         enabled: enabled && !!id,
+        refetchInterval: enabled ? 5000 : false,
     });
 };
 
