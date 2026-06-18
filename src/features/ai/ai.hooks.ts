@@ -8,6 +8,9 @@ export const aiKeys = {
     segments: () => [...aiKeys.all, "segments"] as const,
     recommendations: () => [...aiKeys.all, "recommendations"] as const,
     health: () => [...aiKeys.all, "health"] as const,
+    products: () => [...aiKeys.all, "products"] as const,
+    customers: () => [...aiKeys.all, "customers"] as const,
+    customerDetail: (id: string) => [...aiKeys.all, "customer", id] as const,
 };
 
 /* ═══════════════════════════════════════════
@@ -42,6 +45,28 @@ export const useProductRecommendations = (productId: string) =>
         queryKey: [...aiKeys.recommendations(), productId] as const,
         queryFn: () => aiService.getProductRecommendations(productId),
         enabled: !!productId,
+    });
+
+/** Get all products for catalog view */
+export const useAiProducts = () =>
+    useQuery({
+        queryKey: aiKeys.products(),
+        queryFn: aiService.getAllProducts,
+    });
+
+/** Get all customers for the dropdown */
+export const useAiCustomers = () =>
+    useQuery({
+        queryKey: aiKeys.customers(),
+        queryFn: aiService.getAllCustomers,
+    });
+
+/** Get a single customer detail */
+export const useAiCustomer = (id: string | undefined) =>
+    useQuery({
+        queryKey: aiKeys.customerDetail(id!),
+        queryFn: () => aiService.getCustomerDetail(id!),
+        enabled: !!id,
     });
 
 /* ═══════════════════════════════════════════

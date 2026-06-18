@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { 
     register as registerIllustration, 
     google, 
-    facebook, 
-    twitter,
+    facebook,
     eye,
     eyeOff
 } from '@assets';
@@ -16,7 +15,7 @@ import { Icon, Image } from '@/core/components';
 const Signup = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    const { register, loginWithGoogle, isPending } = useAuth();
+    const { register, loginWithGoogle, loginWithFacebook, isPending } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const initialValues = { name: '', email: '', password: '', confirmPassword: '', terms: false };
@@ -156,11 +155,12 @@ const Signup = () => {
                             >
                                 <Icon icon={google} className="h-6 w-6" />
                             </button>
-                            <button type="button" className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300">
+                            <button
+                                type="button"
+                                onClick={loginWithFacebook}
+                                className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300"
+                            >
                                 <Icon icon={facebook} className="h-8 w-8" />
-                            </button>
-                            <button type="button" className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-400 transition-all duration-300">
-                                <Icon icon={twitter} className="h-6 w-6" />
                             </button>
                         </div>
                     </div>

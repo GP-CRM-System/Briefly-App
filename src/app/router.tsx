@@ -11,6 +11,7 @@ import Onboarding from "@/pages/onboarding/Onboarding";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AuthCallback from "@/pages/auth/AuthCallback";
 import AcceptInvitation from "@/pages/auth/AcceptInvitation";
+import VerifyEmail from "@/pages/auth/VerifyEmail";
 import TeamPage from "@/pages/team/page";
 
 /**
@@ -43,6 +44,7 @@ export default function AppRouter() {
                 <Route path="/reset-password" element={<GuestRoute><ResetPassword /></GuestRoute>} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/accept-invitation" element={<AcceptInvitation />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
 
                 {/* Protected — unauthenticated users get redirected to /login */}
                 <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

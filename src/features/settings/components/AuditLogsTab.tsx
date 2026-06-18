@@ -1,8 +1,38 @@
 import { useState } from "react";
+import {
+    Add01Icon,
+    Edit01Icon,
+    Delete01Icon,
+    LockPasswordIcon,
+    DoorIcon,
+    MailOpenIcon,
+    ArrowDataTransferHorizontalIcon,
+    Download01Icon,
+    SentIcon,
+    ClipboardIcon,
+} from "hugeicons-react";
 import { useAuditLogs } from "@/features/audit/audit.hooks";
 import { getActionIcon, fmtDate } from "@/features/audit/audit.utils";
 import type { AuditLogEntry } from "@/features/audit/audit.service";
 import { selectClasses } from "@/core/components/Modal";
+
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+    add: Add01Icon,
+    edit: Edit01Icon,
+    delete: Delete01Icon,
+    key: LockPasswordIcon,
+    logout: DoorIcon,
+    mail: MailOpenIcon,
+    transfer: ArrowDataTransferHorizontalIcon,
+    download: Download01Icon,
+    send: SentIcon,
+    clipboard: ClipboardIcon,
+};
+
+const ActionIcon = ({ name }: { name: string }) => {
+    const Icon = ICON_MAP[name as keyof typeof ICON_MAP];
+    return Icon ? <Icon size={14} className="-ml-0.5" /> : null;
+};
 
 const AuditLogsTab = () => {
     const [page, setPage] = useState(1);
@@ -87,7 +117,7 @@ const AuditLogsTab = () => {
                                         <tr key={log.id} className="hover:bg-slate-50/50">
                                             <td className="py-4 px-6">
                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${style.bg} ${style.text} border ${style.border}`}>
-                                                    {style.icon} {log.action.replace(/_/g, " ")}
+                                                    <ActionIcon name={style.icon} /> {log.action.replace(/_/g, " ")}
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-gray-700 font-semibold">{log.targetType}</td>

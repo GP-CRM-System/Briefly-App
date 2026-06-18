@@ -13,6 +13,7 @@ export interface Employee {
     name?: string;
     email: string;
     phone?: string;
+    image?: string;
     role: string;
     location?: string;
     status?: "active" | "pending" | "inactive";

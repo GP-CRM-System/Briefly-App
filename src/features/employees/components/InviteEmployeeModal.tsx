@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal, { FormCard, FormField, inputClasses, selectClasses } from "@/core/components/Modal";
-import { useInviteEmployee } from "../employee.hooks";
+import { useInviteEmployee, useOrgRoles } from "../employee.hooks";
 import toast from "react-hot-toast";
 
 interface InviteEmployeeModalProps {
@@ -24,6 +24,7 @@ const RoleIcon = () => (
 
 const InviteEmployeeModal = ({ open, onClose }: InviteEmployeeModalProps) => {
     const inviteMutation = useInviteEmployee();
+    const { data: orgRoles = [] } = useOrgRoles();
 
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("");
@@ -95,8 +96,17 @@ const InviteEmployeeModal = ({ open, onClose }: InviteEmployeeModalProps) => {
                         required
                     >
                         <option value="">Select a Role</option>
-                        <option value="admin">Administrator</option>
-                        <option value="member">Member</option>
+                        {orgRoles.length === 0 && (
+                            <option value="" disabled>Loading roles...</option>
+                        )}
+                        {orgRoles
+                            .filter((r) => r.name !== 'owner')
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((r) => (
+                                <option key={r.id} value={r.name}>
+                                    {r.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                </option>
+                            ))}
                     </select>
                 </FormField>
             </FormCard>

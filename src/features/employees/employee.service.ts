@@ -8,6 +8,7 @@ const normalizeMember = (item: Record<string, any>): Employee => ({
     name: item.user?.name || item.name,
     email: item.user?.email || item.email,
     phone: item.phone,
+    image: item.user?.image,
     role: item.role,
     createdAt: item.createdAt,
     status: item.status,
@@ -26,6 +27,17 @@ export const employeeService = {
     async invite(payload: { email: string; role: string }): Promise<any> {
         const { data } = await apiClient.post(ENDPOINTS.ORGANIZATION.INVITE_MEMBER, payload);
         return data;
+    },
+
+    async listOrgRoles(): Promise<{ id: string; name: string; description?: string }[]> {
+        const { data } = await apiClient.get(ENDPOINTS.ORGANIZATION.LIST_ROLES);
+        const roles = data?.data?.roles || data?.roles || data || [];
+        if (!Array.isArray(roles)) return [];
+        return roles.map((r: any) => ({
+            id: r.id,
+            name: r.name || r.role,
+            description: r.description || "",
+        }));
     },
 
     async updateRole(id: string, role: string): Promise<any> {
