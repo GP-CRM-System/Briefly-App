@@ -180,12 +180,29 @@ const MessageComposer = ({
             const cacheKey = ["conversations", "messages", conversationId];
             queryClient.setQueryData(cacheKey, (oldData: any) => {
                 if (!oldData) {
-                    return { data: [tempMessage], total: 1 };
+                    return {
+                        pages: [
+                            {
+                                data: [tempMessage],
+                                total: 1,
+                                page: 1,
+                                pageSize: 50
+                            }
+                        ],
+                        pageParams: [1]
+                    };
+                }
+                const newPages = [...oldData.pages];
+                if (newPages[0]) {
+                    newPages[0] = {
+                        ...newPages[0],
+                        data: [...newPages[0].data, tempMessage],
+                        total: (newPages[0].total || 0) + 1
+                    };
                 }
                 return {
                     ...oldData,
-                    data: [...oldData.data, tempMessage],
-                    total: (oldData.total || 0) + 1
+                    pages: newPages
                 };
             });
 
@@ -320,8 +337,8 @@ const MessageComposer = ({
             mediaRecorder.onstop = async () => {
                 if (audioChunksRef.current.length === 0) return;
                 
-                const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: "audio/webm" });
+                const audioBlob = new Blob(audioChunksRef.current, { type: "audio/ogg" });
+                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.ogg`, { type: "audio/ogg" });
                 
                 stream.getTracks().forEach(track => track.stop());
 
@@ -339,10 +356,10 @@ const MessageComposer = ({
                     type: "audio" as any,
                     status: "PENDING" as any,
                     metadata: {
-                        fileName: `Voice Note (${formatTime(recordingTimeRef.current)}).webm`,
-                        mimeType: "audio/webm",
+                        fileName: `Voice Note (${formatTime(recordingTimeRef.current)}).ogg`,
+                        mimeType: "audio/ogg",
                         size: audioFile.size,
-                        originalName: `Voice Note (${formatTime(recordingTimeRef.current)}).webm`,
+                        originalName: `Voice Note (${formatTime(recordingTimeRef.current)}).ogg`,
                         localPreviewUrl: URL.createObjectURL(audioFile)
                     },
                     createdAt: new Date().toISOString()
@@ -350,11 +367,30 @@ const MessageComposer = ({
 
                 const cacheKey = ["conversations", "messages", conversationId];
                 queryClient.setQueryData(cacheKey, (oldData: any) => {
-                    if (!oldData) return { data: [tempMessage], total: 1 };
+                    if (!oldData) {
+                        return {
+                            pages: [
+                                {
+                                    data: [tempMessage],
+                                    total: 1,
+                                    page: 1,
+                                    pageSize: 50
+                                }
+                            ],
+                            pageParams: [1]
+                        };
+                    }
+                    const newPages = [...oldData.pages];
+                    if (newPages[0]) {
+                        newPages[0] = {
+                            ...newPages[0],
+                            data: [...newPages[0].data, tempMessage],
+                            total: (newPages[0].total || 0) + 1
+                        };
+                    }
                     return {
                         ...oldData,
-                        data: [...oldData.data, tempMessage],
-                        total: (oldData.total || 0) + 1
+                        pages: newPages
                     };
                 });
 
@@ -569,7 +605,7 @@ const MessageComposer = ({
                         type="button"
                         disabled={disabled}
                         onClick={handleAttachmentClick}
-                        className="h-[44px] w-[44px] rounded-xl hover:bg-gray-50 border border-gray-100 text-gray-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer"
+                        className="h-[44px] w-[44px] rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer"
                         title="Attach File (Max 25MB)"
                     >
                         <AttachmentIcon className="h-5 w-5" />
@@ -580,10 +616,10 @@ const MessageComposer = ({
                         type="button"
                         disabled={disabled}
                         onClick={() => setTemplateOpen(!templateOpen)}
-                        className={`h-[44px] w-[44px] rounded-xl border flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer ${
+                        className={`h-[44px] w-[44px] rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer ${
                             templateOpen
-                                ? "bg-blue-50 border-blue-200 text-blue-600"
-                                : "hover:bg-gray-50 border-gray-100 text-gray-500"
+                                ? "bg-blue-50 text-blue-600"
+                                : "bg-slate-50 hover:bg-slate-100 text-slate-500"
                         }`}
                         title={provider === "whatsapp" ? "Send WhatsApp Template" : "Send Quick Template"}
                     >
@@ -598,7 +634,7 @@ const MessageComposer = ({
                         placeholder={placeholder}
                         rows={1}
                         disabled={disabled}
-                        className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[var(--color-primary-400)] focus:ring-2 focus:ring-[var(--color-primary-100)] focus:bg-white transition-all disabled:opacity-50"
+                        className="flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all disabled:opacity-50 shadow-2xs"
                         style={{ minHeight: "44px", maxHeight: "120px" }}
                     />
 
@@ -607,7 +643,7 @@ const MessageComposer = ({
                         type="button"
                         disabled={disabled}
                         onClick={startRecording}
-                        className="h-[44px] w-[44px] rounded-xl hover:bg-gray-50 border border-gray-100 text-gray-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer"
+                        className="h-[44px] w-[44px] rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 cursor-pointer"
                         title="Record Voice Note"
                     >
                         <MicIcon className="h-5 w-5" />
@@ -617,7 +653,7 @@ const MessageComposer = ({
                     <button
                         type="submit"
                         disabled={disabled || !text.trim()}
-                        className="h-[44px] w-[44px] rounded-xl bg-[var(--color-primary-500)] text-white flex items-center justify-center hover:bg-[var(--color-primary-600)] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 shadow-xs cursor-pointer"
+                        className="h-[44px] w-[44px] rounded-xl bg-blue-500 text-white flex items-center justify-center hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
                     >
                         <SentIcon className="h-5 w-5" />
                     </button>

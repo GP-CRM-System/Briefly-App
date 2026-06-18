@@ -454,8 +454,17 @@ export const settingsService = {
     },
 
     async initializeSubscription(planId: string, billingCycle: string = "monthly"): Promise<unknown> {
-        const { data } = await apiClient.post(ENDPOINTS.SUBSCRIPTION.INITIALIZE, { planId, billingCycle });
-        return data?.data || data;
+        try {
+            const { data } = await apiClient.post(ENDPOINTS.SUBSCRIPTION.INITIALIZE, { planId, billingCycle });
+            return data?.data || data;
+        } catch (err: any) {
+            // 402 Payment Required is expected — it contains the Paymob payment URL
+            if (err?.response?.status === 402) {
+                const data = err.response.data;
+                return data?.data || data;
+            }
+            throw err;
+        }
     },
 
     async cancelSubscription(immediately: boolean = false): Promise<unknown> {

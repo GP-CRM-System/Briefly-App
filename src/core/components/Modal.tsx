@@ -145,14 +145,18 @@ interface FormCardProps {
     title: string;
     icon?: ReactNode;
     children: ReactNode;
+    headerActions?: ReactNode;
 }
 
-export const FormCard = ({ title, icon, children }: FormCardProps) => (
+export const FormCard = ({ title, icon, children, headerActions }: FormCardProps) => (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         {/* Card header */}
-        <div className="flex items-center gap-2.5 px-6 py-4 border-b border-gray-100">
-            {icon && <span className="text-gray-500">{icon}</span>}
-            <h3 className="text-[15px] font-semibold text-gray-900">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center gap-2.5">
+                {icon && <span className="text-gray-500">{icon}</span>}
+                <h3 className="text-[15px] font-semibold text-gray-900">{title}</h3>
+            </div>
+            {headerActions && <div>{headerActions}</div>}
         </div>
         {/* Card body */}
         <div className="px-6 py-5 space-y-5">

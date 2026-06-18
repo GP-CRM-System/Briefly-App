@@ -2,6 +2,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { customerService } from "./customer.service";
 import toast from "react-hot-toast";
 
+/** Formats detailed error message from response data */
+const getErrorMessage = (err: any, fallback: string): string => {
+    const errorData = err?.response?.data;
+    if (errorData?.details && typeof errorData.details === "object") {
+        const detailsStr = Object.entries(errorData.details)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(", ");
+        if (detailsStr) {
+            return `${errorData.message || fallback} (${detailsStr})`;
+        }
+    }
+    return errorData?.message || fallback;
+};
+
 /** Query key factory — keeps keys consistent and enables targeted invalidation */
 export const customerKeys = {
     all:    ["customers"] as const,
@@ -42,7 +56,7 @@ export const useCreateCustomer = () => {
             toast.success("Customer created!");
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to create customer");
+            toast.error(getErrorMessage(err, "Failed to create customer"));
         },
     });
 };
@@ -58,7 +72,7 @@ export const useUpdateCustomer = () => {
             toast.success("Customer updated!");
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to update customer");
+            toast.error(getErrorMessage(err, "Failed to update customer"));
         },
     });
 };
@@ -73,7 +87,7 @@ export const useDeleteCustomer = () => {
             toast.success("Customer deleted");
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to delete customer");
+            toast.error(getErrorMessage(err, "Failed to delete customer"));
         },
     });
 };
@@ -87,8 +101,8 @@ export const useAddCustomerNote = (customerId: string | undefined) => {
             if (customerId) qc.invalidateQueries({ queryKey: customerKeys.detail(customerId) });
             toast.success("Note added");
         },
-        onError: () => {
-            toast.error("Failed to add note");
+        onError: (err: any) => {
+            toast.error(getErrorMessage(err, "Failed to add note"));
         },
     });
 };

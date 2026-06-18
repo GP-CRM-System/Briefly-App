@@ -93,8 +93,16 @@ Thank you for your business!
         initializeMutation.mutate(
             { planId, billingCycle: "monthly" },
             {
-                onSuccess: () => {
-                    setUpgradeModalOpen(false);
+                onSuccess: (data: any) => {
+                    const paymentUrl = data?.paymob?.paymentUrl || data?.paymentUrl;
+                    if (paymentUrl) {
+                        setUpgradeModalOpen(false);
+                        toast.loading("Redirecting to payment...", { duration: 3000 });
+                        window.location.href = paymentUrl;
+                    } else {
+                        setUpgradeModalOpen(false);
+                        toast.success("Subscription updated!");
+                    }
                 },
             }
         );
@@ -116,7 +124,7 @@ Thank you for your business!
                 <div className="flex items-center justify-between border-b border-gray-50 pb-3">
                     <div>
                         <h3 className="text-base font-bold text-gray-900">Current Plan</h3>
-                        <p className="text-xs text-gray-400 mt-0.5">Manage your subscription and usage limits</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Manage your subscription and usage limits.</p>
                     </div>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                         currentSubscription?.status === "canceled" 
@@ -136,7 +144,7 @@ Thank you for your business!
                             </span>
                             <div className="flex items-baseline gap-1 text-gray-900">
                                 <span className="text-3xl font-extrabold">
-                                    ${Number(activePlan.price ?? 0).toFixed(2)}
+                                    EGP {Number(activePlan.price ?? 0).toFixed(2)}
                                 </span>
                                 <span className="text-sm font-semibold text-gray-400">/ month</span>
                             </div>
@@ -284,7 +292,7 @@ Thank you for your business!
                         {/* Header */}
                         <div className="flex items-start justify-between px-6 py-4.5 border-b border-gray-50">
                             <div>
-                                <h3 className="text-base font-bold text-gray-900">Upgrade Subscription Plan</h3>
+                                <h3 className="text-base font-semibold text-gray-900">Upgrade Subscription Plan</h3>
                                 <p className="text-xs text-gray-400 mt-0.5">Select the plan that fits your growing CRM operation scale</p>
                             </div>
                             <button
@@ -307,7 +315,7 @@ Thank you for your business!
                                         }`}
                                     >
                                         {isCurrent && (
-                                            <span className="absolute -top-3 right-4 px-2 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-md uppercase tracking-wider">
+                                            <span className="absolute -top-3 right-4 px-2 py-0.5 bg-blue-500 text-white text-[9px] font-black rounded-md uppercase tracking-wider font-semibold">
                                                 Current Plan
                                             </span>
                                         )}
@@ -315,12 +323,12 @@ Thank you for your business!
                                             <span className={`text-xs uppercase font-bold ${isCurrent ? "text-blue-500" : "text-gray-400"}`}>
                                                 {plan.displayName || plan.name}
                                             </span>
-                                            <p className="text-sm font-bold text-gray-800">
+                                            <p className="text-sm font-semibold text-gray-800">
                                                 {plan.name === "starter" && "Ideal for small organizations. Up to 2,000 contacts."}
                                                 {plan.name === "professional" && "Ideal for growing teams. Up to 10,000 contacts."}
                                                 {plan.name === "enterprise" && "For large scale operations. Unlimited contacts."}
                                             </p>
-                                            <p className="text-lg font-black text-gray-900">${Number(plan.price ?? 0).toFixed(2)} / month</p>
+                                            <p className="text-md font-semibold text-gray-900">EGP {Number(plan.price ?? 0).toFixed(2)} / month</p>
                                         </div>
                                         {isCurrent ? (
                                             <span className="px-4 py-2 text-xs font-bold text-blue-500">Active</span>
@@ -328,7 +336,7 @@ Thank you for your business!
                                             <button
                                                 onClick={() => handleSelectPlan(plan.id)}
                                                 disabled={initializeMutation.isPending}
-                                                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg cursor-pointer transition-all disabled:opacity-50 flex items-center gap-1.5"
+                                                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg cursor-pointer transition-all disabled:opacity-50 flex items-center gap-1.5"
                                             >
                                                 {initializeMutation.isPending && <Loading01Icon className="animate-spin" size={14} />}
                                                 Choose {plan.displayName || plan.name}

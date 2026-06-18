@@ -3,6 +3,37 @@ import { useNavigate } from "react-router-dom";
 import { useTourStore } from "@/store/tour.store";
 import { TOUR_STEPS } from "./TourSteps";
 import type { TourStep } from "./TourSteps";
+import {
+    Sparkles,
+    LayoutDashboard,
+    Users,
+    Target,
+    Megaphone,
+    TrendingUp,
+    Bot,
+    Settings,
+    Building2,
+    Shield,
+    Link,
+    CreditCard,
+    X,
+    ArrowRight
+} from "lucide-react";
+
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string }>> = {
+    Sparkles,
+    LayoutDashboard,
+    Users,
+    Target,
+    Megaphone,
+    TrendingUp,
+    Bot,
+    Settings,
+    Building2,
+    Shield,
+    Link,
+    CreditCard,
+};
 
 /* ─── helpers ─────────────────────────────────────────────────── */
 
@@ -15,8 +46,8 @@ interface Rect {
 
 const EMPTY_RECT: Rect = { top: 0, left: 0, width: 0, height: 0 };
 const PAD = 14; // spotlight padding around element
-const TOOLTIP_W = 340;
-const TOOLTIP_H = 220; // approx
+const TOOLTIP_W = 380;
+const TOOLTIP_H = 320; // approx
 
 function getTooltipPosition(rect: Rect, placement: TourStep["placement"]) {
     const vw = window.innerWidth;
@@ -87,13 +118,13 @@ const Arrow = ({ fromRect, tooltipPos, placement }: ArrowProps) => {
         >
             <defs>
                 <marker id="tour-arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                    <path d="M0,0 L0,6 L8,3 z" fill="rgba(99,179,237,0.9)" />
+                    <path d="M0,0 L0,6 L8,3 z" fill="#0056C6" />
                 </marker>
             </defs>
             <path
                 d={path}
                 fill="none"
-                stroke="rgba(99,179,237,0.9)"
+                stroke="#0056C6"
                 strokeWidth="2"
                 strokeDasharray="6 4"
                 markerEnd="url(#tour-arrowhead)"
@@ -118,6 +149,7 @@ const TourOverlay = () => {
     stepRef.current = currentStep;
 
     const step = TOUR_STEPS[currentStep];
+    const IconComponent = step ? ICON_MAP[step.icon] : null;
 
     // ── Navigate and find element ──────────────────────────────
     const resolveTarget = useCallback(
@@ -212,8 +244,8 @@ const TourOverlay = () => {
             {/* Global tour CSS */}
             <style>{`
                 @keyframes tourPulse {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(66,153,225,0.55), 0 0 0 4px rgba(66,153,225,0.18); }
-                    50% { box-shadow: 0 0 0 8px rgba(66,153,225,0.15), 0 0 0 14px rgba(66,153,225,0.06); }
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(0,86,198,0.55), 0 0 0 4px rgba(0,86,198,0.18); }
+                    50% { box-shadow: 0 0 0 8px rgba(0,86,198,0.15), 0 0 0 14px rgba(0,86,198,0.06); }
                 }
                 @keyframes tourFadeIn {
                     from { opacity: 0; transform: scale(0.94) translateY(6px); }
@@ -270,7 +302,7 @@ const TourOverlay = () => {
                         width: spotlight.width,
                         height: spotlight.height,
                         borderRadius: 12,
-                        border: "2px solid rgba(99,179,237,0.85)",
+                        border: "2px solid rgba(0, 86, 198, 0.85)",
                         zIndex: 10000,
                         pointerEvents: "none",
                     }}
@@ -305,139 +337,225 @@ const TourOverlay = () => {
                 >
                     <div
                         style={{
-                            background: "linear-gradient(145deg, #1a2035 0%, #111827 100%)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                            borderRadius: 18,
-                            padding: "20px 22px 18px",
-                            boxShadow: "0 24px 60px rgba(0,0,0,0.55), 0 4px 16px rgba(66,153,225,0.12), inset 0 1px 0 rgba(255,255,255,0.06)",
-                            backdropFilter: "blur(14px)",
+                            background: "#ffffff",
+                            border: "1px solid #E2E8F0",
+                            borderRadius: 20,
+                            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+                            overflow: "hidden", // clip the top section's background
+                            display: "flex",
+                            flexDirection: "column",
                         }}
                     >
-                        {/* Step counter + Skip */}
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                            <span style={{
-                                fontSize: 11,
-                                fontWeight: 600,
-                                letterSpacing: "0.06em",
-                                color: "rgba(255,255,255,0.35)",
-                                textTransform: "uppercase",
-                                fontFamily: "var(--font-body, system-ui)",
-                            }}>
-                                Step {currentStep + 1} of {TOUR_STEPS.length}
-                            </span>
+                        {/* Top Section */}
+                        <div
+                            style={{
+                                background: "#F1F3F5",
+                                padding: "24px",
+                                position: "relative",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                borderBottom: "1px solid #E2E8F0",
+                                height: 130,
+                            }}
+                        >
+                            {/* Close button x */}
                             <button
                                 onClick={skipTour}
                                 style={{
+                                    position: "absolute",
+                                    top: 16,
+                                    left: 16,
                                     background: "none",
                                     border: "none",
-                                    color: "rgba(255,255,255,0.3)",
-                                    fontSize: 11,
-                                    fontWeight: 600,
+                                    color: "#94A3B8",
                                     cursor: "pointer",
-                                    padding: "2px 6px",
-                                    borderRadius: 6,
-                                    transition: "color 0.15s",
+                                    padding: 4,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "color 0.2s",
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+                            >
+                                <X size={16} />
+                            </button>
+
+                            {/* Step badge */}
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: 16,
+                                    right: 16,
+                                    background: "#000000",
+                                    borderRadius: 99,
+                                    padding: "4px 10px",
+                                    color: "#FFFFFF",
+                                    fontSize: 9,
+                                    fontWeight: 800,
+                                    letterSpacing: "0.08em",
+                                    textTransform: "uppercase",
                                     fontFamily: "var(--font-body, system-ui)",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
                             >
-                                Skip intro
-                            </button>
+                                STEP {currentStep + 1} OF {TOUR_STEPS.length}
+                            </div>
+
+                            {/* Preview Card */}
+                            <div
+                                style={{
+                                    background: "#FFFFFF",
+                                    borderRadius: 12,
+                                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
+                                    padding: "12px 18px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 12,
+                                    width: "80%",
+                                    maxWidth: 240,
+                                }}
+                            >
+                                {/* Blue Icon container */}
+                                <div
+                                    style={{
+                                        background: "#0056C6", // premium blue
+                                        borderRadius: 10,
+                                        width: 40,
+                                        height: 40,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#FFFFFF",
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    {IconComponent ? <IconComponent size={20} strokeWidth={2.2} /> : null}
+                                </div>
+                                {/* Skeleton text lines */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: 6, width: "100%" }}>
+                                    <div style={{ height: 8, background: "#E2E8F0", borderRadius: 4, width: "70%" }} />
+                                    <div style={{ height: 8, background: "#E2E8F0", borderRadius: 4, width: "45%" }} />
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Progress bar */}
-                        <div style={{
-                            height: 3,
-                            background: "rgba(255,255,255,0.07)",
-                            borderRadius: 99,
-                            marginBottom: 18,
-                            overflow: "hidden",
-                        }}>
-                            <div style={{
-                                height: "100%",
-                                width: `${progressPct}%`,
-                                background: "linear-gradient(90deg, #4299e1, #63b3ed)",
-                                borderRadius: 99,
-                                transition: "width 0.4s cubic-bezier(0.4,0,0.2,1)",
-                            }} />
-                        </div>
-
-                        {/* Emoji + Title */}
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                            <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0, marginTop: 2 }}>{step.icon}</span>
-                            <h3 style={{
-                                margin: 0,
-                                fontSize: 16,
-                                fontWeight: 700,
-                                color: "#fff",
-                                lineHeight: 1.3,
-                                fontFamily: "var(--font-body, system-ui)",
-                            }}>
+                        {/* Bottom Section */}
+                        <div style={{ padding: "24px", display: "flex", flexDirection: "column", background: "#FFFFFF" }}>
+                            {/* Title */}
+                            <h3
+                                style={{
+                                    margin: "0 0 8px 0",
+                                    fontSize: 20,
+                                    fontWeight: 700,
+                                    color: "#0F172A",
+                                    fontFamily: "var(--font-body, system-ui)",
+                                }}
+                            >
                                 {step.title}
                             </h3>
-                        </div>
 
-                        {/* Description */}
-                        <p style={{
-                            margin: "0 0 20px",
-                            fontSize: 13.5,
-                            lineHeight: 1.6,
-                            color: "rgba(255,255,255,0.58)",
-                            fontFamily: "var(--font-body, system-ui)",
-                        }}>
-                            {step.description}
-                        </p>
-
-                        {/* Nav buttons */}
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                            <button
-                                onClick={() => prevStep()}
-                                disabled={isFirst}
+                            {/* Description */}
+                            <p
                                 style={{
-                                    background: "rgba(255,255,255,0.06)",
-                                    border: "1px solid rgba(255,255,255,0.09)",
-                                    color: isFirst ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.65)",
-                                    borderRadius: 10,
-                                    padding: "8px 16px",
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    cursor: isFirst ? "not-allowed" : "pointer",
-                                    transition: "all 0.15s",
+                                    margin: "0 0 20px 0",
+                                    fontSize: 14,
+                                    lineHeight: 1.5,
+                                    color: "#475569",
                                     fontFamily: "var(--font-body, system-ui)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 6,
+                                    minHeight: 60, // ensure alignment
                                 }}
-                                onMouseEnter={(e) => { if (!isFirst) e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
                             >
-                                ← Back
-                            </button>
+                                {step.description}
+                            </p>
 
-                            <button
-                                onClick={() => nextStep(TOUR_STEPS.length)}
+                            {/* Progress bar */}
+                            <div
                                 style={{
-                                    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                                    border: "none",
-                                    color: "#fff",
-                                    borderRadius: 10,
-                                    padding: "8px 20px",
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    boxShadow: "0 4px 14px rgba(59,130,246,0.4)",
-                                    transition: "all 0.15s",
-                                    fontFamily: "var(--font-body, system-ui)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 6,
+                                    height: 4,
+                                    background: "#F1F5F9",
+                                    borderRadius: 99,
+                                    marginBottom: 20,
+                                    overflow: "hidden",
+                                    width: "100%",
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 6px 20px rgba(59,130,246,0.55)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(59,130,246,0.4)"; e.currentTarget.style.transform = "translateY(0)"; }}
                             >
-                                {isLast ? "🎉 Finish!" : "Next →"}
-                            </button>
+                                <div
+                                    style={{
+                                        height: "100%",
+                                        width: `${progressPct}%`,
+                                        background: "#0056C6",
+                                        borderRadius: 99,
+                                        transition: "width 0.4s cubic-bezier(0.4,0,0.2,1)",
+                                    }}
+                                />
+                            </div>
+
+                            {/* Navigation buttons */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <button
+                                    onClick={() => prevStep()}
+                                    disabled={isFirst}
+                                    style={{
+                                        background: "#FFFFFF",
+                                        border: "1px solid #D1D5DB",
+                                        color: isFirst ? "#9CA3AF" : "#374151",
+                                        borderRadius: 8,
+                                        padding: "8px 16px",
+                                        fontSize: 13,
+                                        fontWeight: 600,
+                                        cursor: isFirst ? "not-allowed" : "pointer",
+                                        transition: "all 0.15s",
+                                        fontFamily: "var(--font-body, system-ui)",
+                                        opacity: isFirst ? 0.5 : 1,
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!isFirst) {
+                                            e.currentTarget.style.background = "#F9FAFB";
+                                            e.currentTarget.style.borderColor = "#9CA3AF";
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!isFirst) {
+                                            e.currentTarget.style.background = "#FFFFFF";
+                                            e.currentTarget.style.borderColor = "#D1D5DB";
+                                        }
+                                    }}
+                                >
+                                    Back
+                                </button>
+
+                                <button
+                                    onClick={() => nextStep(TOUR_STEPS.length)}
+                                    style={{
+                                        background: "#0056C6",
+                                        border: "none",
+                                        color: "#FFFFFF",
+                                        borderRadius: 8,
+                                        padding: "8px 20px",
+                                        fontSize: 13,
+                                        fontWeight: 600,
+                                        cursor: "pointer",
+                                        transition: "all 0.15s",
+                                        fontFamily: "var(--font-body, system-ui)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 6,
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = "#024CAE";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = "#0056C6";
+                                    }}
+                                >
+                                    {isLast ? "Finish" : (
+                                        <>
+                                            Next <ArrowRight size={14} />
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -450,7 +568,7 @@ const TourOverlay = () => {
                         width: 200,
                         height: 200,
                         borderRadius: "50%",
-                        background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
+                        background: "radial-gradient(circle, rgba(0,86,198,0.12) 0%, transparent 70%)",
                         pointerEvents: "none",
                         zIndex: -1,
                     }} />

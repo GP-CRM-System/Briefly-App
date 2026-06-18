@@ -18,17 +18,26 @@ interface Template {
 
 const InfoIcon = () => (
     <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-        <path d="M12 16v-4" />
-        <path d="M12 8h.01" />
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
     </svg>
 );
 
 const TargetIcon = () => (
     <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="6" />
-        <circle cx="12" cy="12" r="2" />
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+    </svg>
+);
+
+const ContentIcon = () => (
+    <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
     </svg>
 );
 
@@ -41,7 +50,6 @@ const ScheduleIcon = () => (
     </svg>
 );
 
-// Fallback Mock Templates if API returns empty
 const MOCK_TEMPLATES: Template[] = [
     { id: "tmpl-1", name: "Welcome Email Template", subject: "Welcome to Briefly!" },
     { id: "tmpl-2", name: "Monthly Newsletter", subject: "Briefly Monthly Digest" },
@@ -55,7 +63,9 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
     const [subject, setSubject] = useState("");
     const [segmentId, setSegmentId] = useState("");
     const [templateId, setTemplateId] = useState("");
-    const [scheduledAt, setScheduledAt] = useState("");
+    const [type, setType] = useState<"EMAIL" | "SMS">("EMAIL");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
     // Queries
     const { data: apiTemplates } = useTemplates();
@@ -76,26 +86,28 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
                 setSubject(campaign.subject || "");
                 setSegmentId(campaign.segmentId || "");
                 setTemplateId(campaign.templateId || "");
+                setType(campaign.type === "SMS" ? "SMS" : "EMAIL");
                 
-                // Format date for datetime-local input (YYYY-MM-DDThh:mm)
                 if (campaign.scheduledAt) {
                     try {
                         const date = new Date(campaign.scheduledAt);
-                        const formatted = date.toISOString().slice(0, 16);
-                        setScheduledAt(formatted);
+                        const formatted = date.toISOString().slice(0, 10);
+                        setStartDate(formatted);
                     } catch {
-                        setScheduledAt("");
+                        setStartDate("");
                     }
                 } else {
-                    setScheduledAt("");
+                    setStartDate("");
                 }
+                setEndDate("");
             } else {
                 setName("");
                 setSubject("");
-                // Set default selections
+                setType("EMAIL");
                 setSegmentId(segments[0]?.id || "");
                 setTemplateId(templates[0]?.id || "");
-                setScheduledAt("");
+                setStartDate("");
+                setEndDate("");
             }
         }
     }, [open, campaign, segments, templates]);
@@ -105,24 +117,34 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
             toast.error("Campaign name is required");
             return;
         }
-        if (!subject.trim()) {
-            toast.error("Email subject line is required");
-            return;
-        }
 
-        const payload = {
+        const payload: Record<string, any> = {
             name,
-            subject,
-            segmentId,
-            templateId,
-            status: scheduledAt ? "scheduled" : "draft",
-            scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : null,
+            subject: subject.trim() || "No Subject",
+            segmentId: segmentId || null,
+            templateId: templateId || null,
+            type,
+            status: startDate ? "SCHEDULED" : "DRAFT",
         };
 
+        if (startDate) {
+            payload.scheduledAt = new Date(startDate).toISOString();
+        }
+
         if (isEditing) {
-            updateMutation.mutate({ id: campaign!.id, payload }, { onSuccess: onClose });
+            updateMutation.mutate({ id: campaign!.id, payload }, {
+                onSuccess: onClose,
+                onError: (err: any) => {
+                    toast.error(err?.response?.data?.message || "Failed to update campaign");
+                }
+            });
         } else {
-            createMutation.mutate(payload, { onSuccess: onClose });
+            createMutation.mutate(payload, {
+                onSuccess: onClose,
+                onError: (err: any) => {
+                    toast.error(err?.response?.data?.message || "Failed to create campaign");
+                }
+            });
         }
     };
 
@@ -130,46 +152,51 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
         <Modal
             open={open}
             onClose={onClose}
-            title={isEditing ? "Edit Campaign" : "Create New Campaign"}
-            subtitle={isEditing ? "Update details of this email campaign." : "Launch a targeted email campaign to your selected segment."}
+            title={isEditing ? "Edit Campaign" : "Create New Campaigns"}
+            subtitle={isEditing ? "Update details of this email campaign." : "create a new campaigns to your database."}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? "Save Changes" : "Create"}
             loading={isPending}
+            width="max-w-[750px]"
         >
-            {/* Campaign Info Card */}
-            <FormCard title="Campaign Details" icon={<InfoIcon />}>
-                <FormField label="Campaign Name" required>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Summer Promo, June Newsletter"
-                        className={inputClasses}
-                    />
-                </FormField>
-                <FormField label="Email Subject Line" required>
-                    <input
-                        type="text"
-                        value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
-                        placeholder="e.g. Save 20% on all orders this weekend!"
-                        className={inputClasses}
-                    />
-                </FormField>
-            </FormCard>
-
-            {/* Targeting Card */}
-            <FormCard title="Targeting & Template" icon={<TargetIcon />}>
+            {/* ── Basic Information Card ── */}
+            <FormCard title="Basic Information" icon={<InfoIcon />}>
                 <FormRow>
-                    <FormField label="Target Segment">
+                    <FormField label="Campaigns Name" required>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Campaigns name"
+                            className={inputClasses}
+                        />
+                    </FormField>
+                    <FormField label="Segments">
                         <select
                             value={segmentId}
                             onChange={(e) => setSegmentId(e.target.value)}
                             className={selectClasses}
                         >
+                            <option value="">Select Segment</option>
                             {segments.map((seg) => (
                                 <option key={seg.id} value={seg.id}>{seg.name}</option>
                             ))}
+                        </select>
+                    </FormField>
+                </FormRow>
+            </FormCard>
+
+            {/* ── Campaigns Setup Card ── */}
+            <FormCard title="Campaigns Setup" icon={<TargetIcon />}>
+                <FormRow>
+                    <FormField label="Type">
+                        <select
+                            value={type}
+                            onChange={(e) => setType(e.target.value as "EMAIL" | "SMS")}
+                            className={selectClasses}
+                        >
+                            <option value="EMAIL">E-mail</option>
+                            <option value="SMS">SMS</option>
                         </select>
                     </FormField>
                     <FormField label="Email Template">
@@ -177,6 +204,7 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
                             value={templateId}
                             onChange={(e) => setTemplateId(e.target.value)}
                             className={selectClasses}
+                            disabled={type === "SMS"}
                         >
                             {templates.map((tmpl) => (
                                 <option key={tmpl.id} value={tmpl.id}>{tmpl.name}</option>
@@ -184,21 +212,58 @@ const CampaignFormModal = ({ open, onClose, campaign }: CampaignFormModalProps) 
                         </select>
                     </FormField>
                 </FormRow>
+                {type === "EMAIL" && (
+                    <div className="mt-4">
+                        <FormField label="Email Subject Line">
+                            <input
+                                type="text"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                                placeholder="e.g. Save 20% on all orders this weekend!"
+                                className={inputClasses}
+                            />
+                        </FormField>
+                    </div>
+                )}
             </FormCard>
 
-            {/* Scheduling Card */}
-            <FormCard title="Schedule Dispatch" icon={<ScheduleIcon />}>
-                <FormField label="Schedule Date & Time (Optional)">
-                    <input
-                        type="datetime-local"
-                        value={scheduledAt}
-                        onChange={(e) => setScheduledAt(e.target.value)}
-                        className={inputClasses}
-                    />
-                </FormField>
-                <p className="text-xs text-gray-400 mt-2">
-                    Leave blank to save as a draft. You can launch drafts manually at any time.
-                </p>
+            {/* ── Content Card ── */}
+            {type === "EMAIL" && (
+                <FormCard title="Content" icon={<ContentIcon />}>
+                    <FormField label="Template">
+                        <div className="border border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50/50 cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                            <div className="p-3 bg-blue-50 text-blue-500 rounded-full mb-3">
+                                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                            </div>
+                            <span className="text-sm font-semibold text-blue-600">Upload Image</span>
+                            <span className="text-xs text-gray-400 mt-1">or drop and drop</span>
+                        </div>
+                    </FormField>
+                </FormCard>
+            )}
+
+            {/* ── Scheduled Time Card ── */}
+            <FormCard title="Scheduled Time" icon={<ScheduleIcon />}>
+                <div className="space-y-2">
+                    <span className="text-xs font-semibold text-gray-400 tracking-wider">Date</span>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className={`${inputClasses} flex-1`}
+                        />
+                        <span className="text-gray-400">—</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className={`${inputClasses} flex-1`}
+                        />
+                    </div>
+                </div>
             </FormCard>
         </Modal>
     );

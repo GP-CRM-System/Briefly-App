@@ -56,11 +56,18 @@ export const useSendMessage = (conversationId: string | undefined) => {
             // Snapshot the previous value
             const previousMessages = qc.getQueryData(conversationKeys.messages(conversationId));
 
+            const tempId = `temp-${Date.now()}`;
+
+            // Inject tempId into metadata of the payload sent to the server
+            newMessage.metadata = {
+                ...(newMessage.metadata || {}),
+                tempId
+            };
+
             // Optimistically update to the new value
             qc.setQueryData(
                 conversationKeys.messages(conversationId),
                 (oldData: any) => {
-                    const tempId = `temp-${Date.now()}`;
                     const tempMessage = {
                         id: tempId,
                         conversationId: conversationId,
@@ -68,7 +75,7 @@ export const useSendMessage = (conversationId: string | undefined) => {
                         direction: "OUTBOUND",
                         type: newMessage.type || "text",
                         status: "PENDING",
-                        metadata: newMessage.metadata || {},
+                        metadata: newMessage.metadata,
                         createdAt: new Date().toISOString()
                     };
 
@@ -102,23 +109,100 @@ export const useSendMessage = (conversationId: string | undefined) => {
                 }
             );
 
-            // Return a context object with the snapshotted value
-            return { previousMessages };
+            // Return a context object with the snapshotted value and tempId
+            return { previousMessages, tempId };
         },
         onError: (err: any, _variables, context) => {
             toast.error(err?.response?.data?.message || "Failed to send message");
-            if (conversationId && context?.previousMessages) {
-                qc.setQueryData(conversationKeys.messages(conversationId), context.previousMessages);
+            if (conversationId && context?.tempId) {
+                // Mark the specific message as FAILED rather than reverting the entire list
+                qc.setQueryData(
+                    conversationKeys.messages(conversationId),
+                    (oldData: any) => {
+                        if (!oldData || !oldData.pages) return oldData;
+                        const newPages = oldData.pages.map((page: any) => {
+                            const pendingIndex = page.data.findIndex((m: any) => m.id === context.tempId);
+                            if (pendingIndex > -1) {
+                                const newData = [...page.data];
+                                newData[pendingIndex] = {
+                                    ...newData[pendingIndex],
+                                    status: "FAILED",
+                                    errorMessage: err?.response?.data?.message || "Failed to send"
+                                };
+                                return { ...page, data: newData };
+                            }
+                            return page;
+                        });
+                        return { ...oldData, pages: newPages };
+                    }
+                );
             }
         },
-        onSuccess: () => {
-            if (conversationId) {
-                qc.invalidateQueries({ queryKey: conversationKeys.all });
+        onSuccess: (savedMessage, _variables, context) => {
+            if (conversationId && savedMessage && context?.tempId) {
+                // 1. Replace the temporary/optimistic message with the saved message
+                qc.setQueryData(
+                    conversationKeys.messages(conversationId),
+                    (oldData: any) => {
+                        if (!oldData || !oldData.pages) return oldData;
+                        const newPages = oldData.pages.map((page: any) => {
+                            let pendingIndex = page.data.findIndex((m: any) => m.id === context.tempId);
+                            if (pendingIndex === -1) {
+                                pendingIndex = page.data.findIndex((m: any) => m.id === savedMessage.id);
+                            }
+                            if (pendingIndex > -1) {
+                                const newData = [...page.data];
+                                const existingMsg = newData[pendingIndex];
+                                // Preserve status and error message if already updated by socket
+                                const mergedStatus = (existingMsg.status !== 'PENDING' && existingMsg.status !== 'UPLOADING' && existingMsg.status !== 'PROCESSING')
+                                    ? existingMsg.status
+                                    : savedMessage.status;
+                                newData[pendingIndex] = {
+                                    ...savedMessage,
+                                    status: mergedStatus,
+                                    errorMessage: existingMsg.errorMessage || savedMessage.errorMessage
+                                };
+                                return { ...page, data: newData };
+                            }
+                            return page;
+                        });
+                        return { ...oldData, pages: newPages };
+                    }
+                );
+
+                // 2. Also update the conversation list to move this conversation to the top and update its last message
+                qc.setQueryData(
+                    conversationKeys.list(),
+                    (oldConversations: any) => {
+                        if (!oldConversations) return [];
+                        const updated = oldConversations.map((c: any) => {
+                            if (c.id === conversationId) {
+                                return {
+                                    ...c,
+                                    lastMessage: savedMessage,
+                                    lastMessageAt: savedMessage.createdAt,
+                                    updatedAt: savedMessage.createdAt
+                                };
+                            }
+                            return c;
+                        });
+                        // Sort conversations by lastMessageAt descending
+                        return [...updated].sort((a: any, b: any) => {
+                            const dateA = new Date(a.lastMessageAt || a.createdAt).getTime();
+                            const dateB = new Date(b.lastMessageAt || b.createdAt).getTime();
+                            return dateB - dateA;
+                        });
+                    }
+                );
             }
         },
         onSettled: () => {
             if (conversationId) {
-                qc.invalidateQueries({ queryKey: conversationKeys.messages(conversationId) });
+                // Only refresh conversation list (sidebar). Do NOT invalidate messages here —
+                // the message cache is already precisely updated by onSuccess + socket events.
+                // Invalidating messages causes a refetch race that can overwrite socket updates,
+                // making outbound messages appear to vanish.
+                qc.invalidateQueries({ queryKey: conversationKeys.list() });
             }
         }
     });
@@ -137,5 +221,21 @@ export const useAssignConversation = () => {
         onError: (err: any) => {
             toast.error(err?.response?.data?.message || "Failed to assign conversation");
         },
+    });
+};
+
+export const useMarkAsRead = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (conversationId: string) =>
+            conversationService.markAsRead(conversationId),
+        onSuccess: (_, conversationId) => {
+            qc.setQueryData(conversationKeys.list(), (oldConversations: any) => {
+                if (!oldConversations) return [];
+                return oldConversations.map((c: any) =>
+                    c.id === conversationId ? { ...c, unreadCount: 0 } : c
+                );
+            });
+        }
     });
 };

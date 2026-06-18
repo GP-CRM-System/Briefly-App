@@ -32,6 +32,6 @@ export const customerService = {
     },
 
     async addNote(id: string, content: string): Promise<void> {
-        await apiClient.post(ENDPOINTS.CUSTOMER.CREATE_NOTE(id), { content });
+        await apiClient.post(ENDPOINTS.CUSTOMER.CREATE_NOTE(id), { body: content });
     },
 };

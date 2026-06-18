@@ -31,7 +31,7 @@ export default function LandingPageAbout() {
                     leading-relaxed 
                     max-w-300"
                 >
-                    Nexify streamlines your business operations by improving workflow efficiency across all departments.
+                    Briefly streamlines your business operations by improving workflow efficiency across all departments.
                     Our platform centralizes company data in one secure location, eliminating silos and reducing
                     redundancy. With built-in collaboration tools, your teams can work together seamlessly, share
                     insights in real-time, and make data-driven decisions that accelerate growth

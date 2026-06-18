@@ -80,8 +80,14 @@ export const useSocketEvents = () => {
 
             // Play sound for inbound messages
             if (message.direction === "INBOUND") {
-                console.log("[Socket] Playing chime for inbound message");
+                console.log("=========================================================");
+                console.log(`[Socket] 📥 RECEIVED INBOUND MESSAGE: "${message.content}"`);
+                console.log(`         Sender ID: ${message.externalId || "Customer"}`);
+                console.log(`         Conversation ID: ${message.conversationId}`);
+                console.log("=========================================================");
                 playChime();
+            } else {
+                console.log(`[Socket] Outbound message processed: "${message.content}"`);
             }
 
             // 1. Update the message thread cache if it exists
@@ -112,19 +118,31 @@ export const useSocketEvents = () => {
 
                         // Match and replace any pending optimistic message to prevent duplication
                         if (message.direction === "OUTBOUND" && newPages[0]) {
-                            // 1. Try exact content match first in the first page
-                            let pendingIndex = newPages[0].data.findIndex(
-                                (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND" && m.content === message.content
-                            );
+                            const eventTempId = message.metadata?.tempId;
+
+                            // 1. Try exact tempId match first
+                            let pendingIndex = -1;
+                            if (eventTempId) {
+                                pendingIndex = newPages[0].data.findIndex(
+                                    (m: any) => m.id === eventTempId
+                                );
+                            }
+
+                            // 2. Try exact content match as fallback
+                            if (pendingIndex === -1) {
+                                pendingIndex = newPages[0].data.findIndex(
+                                    (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND" && m.content === message.content
+                                );
+                            }
                             
-                            // 2. Fallback to trimmed content match
+                            // 3. Fallback to trimmed content match
                             if (pendingIndex === -1) {
                                 pendingIndex = newPages[0].data.findIndex(
                                     (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND" && m.content.trim() === message.content.trim()
                                 );
                             }
 
-                            // 3. Fallback to matching the first pending outbound message
+                            // 4. Fallback to matching the first pending outbound message
                             if (pendingIndex === -1) {
                                 pendingIndex = newPages[0].data.findIndex(
                                     (m: any) => m.status === "PENDING" && m.direction === "OUTBOUND"
@@ -134,7 +152,16 @@ export const useSocketEvents = () => {
                             if (pendingIndex > -1) {
                                 console.log("[Socket] Found matching pending optimistic message in first page, replacing it.");
                                 const newPageData = [...newPages[0].data];
-                                newPageData[pendingIndex] = message;
+                                const existingMsg = newPageData[pendingIndex];
+                                // Preserve status if already updated by status update socket event
+                                const mergedStatus = (existingMsg.status !== 'PENDING' && existingMsg.status !== 'UPLOADING' && existingMsg.status !== 'PROCESSING')
+                                    ? existingMsg.status
+                                    : message.status;
+                                newPageData[pendingIndex] = {
+                                    ...message,
+                                    status: mergedStatus,
+                                    errorMessage: existingMsg.errorMessage || message.errorMessage
+                                };
                                 newPages[0] = {
                                     ...newPages[0],
                                     data: newPageData
@@ -186,8 +213,9 @@ export const useSocketEvents = () => {
             status: string;
             errorMessage: string | null;
             message?: any;
+            tempId?: string;
         }) => {
-            const { conversationId, messageId, status, errorMessage, message } = data;
+            const { conversationId, messageId, status, errorMessage, message, tempId } = data;
 
             // Update message status in the thread cache (map over pages)
             queryClient.setQueryData(
@@ -199,7 +227,7 @@ export const useSocketEvents = () => {
                         pages: oldData.pages.map((page: any) => ({
                             ...page,
                             data: page.data.map((m: any) =>
-                                m.id === messageId
+                                (m.id === messageId || (tempId && m.id === tempId))
                                     ? message
                                         ? { ...m, ...message, status, errorMessage }
                                         : { ...m, status, errorMessage }

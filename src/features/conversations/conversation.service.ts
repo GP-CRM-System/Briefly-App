@@ -36,4 +36,8 @@ export const conversationService = {
         const { data } = await apiClient.post(`/messaging/conversations/${id}/assign`, { assignedAgentId });
         return data?.data || data;
     },
+
+    async markAsRead(id: string): Promise<void> {
+        await apiClient.post(`/messaging/conversations/${id}/read`);
+    },
 };

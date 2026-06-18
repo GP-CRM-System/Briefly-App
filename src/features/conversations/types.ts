@@ -14,6 +14,7 @@ export interface Conversation {
         name: string;
         email: string;
     } | null;
+    messages?: Message[];
 }
 
 export interface MessageMetadata {
@@ -31,7 +32,7 @@ export interface Message {
     id: string;
     conversationId: string;
     content: string;
-    type: "text" | "image" | "document" | "template" | "audio" | "video";
+    type: "text" | "image" | "document" | "template" | "audio" | "video" | "sticker";
     direction: "INBOUND" | "OUTBOUND";
     status: "SENT" | "DELIVERED" | "READ" | "FAILED" | "PENDING" | "PROCESSING" | "UPLOADING";
     errorMessage?: string | null;
@@ -41,7 +42,7 @@ export interface Message {
 
 export interface SendMessagePayload {
     content: string;
-    type?: "text" | "image" | "document" | "template" | "audio" | "video";
+    type?: "text" | "image" | "document" | "template" | "audio" | "video" | "sticker";
     metadata?: Record<string, unknown>;
 }
 
@@ -49,7 +50,7 @@ export interface StartConversationPayload {
     provider: "whatsapp" | "facebook" | "messenger" | "instagram";
     recipientId: string;
     content: string;
-    type?: "text" | "image" | "document" | "template" | "audio" | "video";
+    type?: "text" | "image" | "document" | "template" | "audio" | "video" | "sticker";
     customerPhone?: string;
     customerName?: string;
     metadata?: Record<string, unknown>;

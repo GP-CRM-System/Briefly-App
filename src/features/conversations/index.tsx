@@ -1,16 +1,18 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search01Icon, PlusSignIcon, BubbleChatIcon, ArrowLeft01Icon, User02Icon } from "hugeicons-react";
+import { Search01Icon, PlusSignIcon, BubbleChatIcon, ArrowLeft01Icon, User02Icon, AiChat02Icon } from "hugeicons-react";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { useConversations, useConversationMessages, useSendMessage, useAssignConversation } from "./conversation.hooks";
+import { useConversations, useConversationMessages, useSendMessage, useAssignConversation, conversationKeys, useMarkAsRead } from "./conversation.hooks";
 import { useEmployees } from "@/features/employees/employee.hooks";
 import { usePresenceStore } from "@/store/presence.store";
 import { useAuthStore } from "@/store/auth.store";
-import { getProviderBadge, getStatusBadge, formatConversationDate } from "./utils";
+import { getProviderBadge, formatConversationDate } from "./utils";
 import MessageThread from "./components/MessageThread";
 import MessageComposer from "./components/MessageComposer";
 import NewConversationModal from "./components/NewConversationModal";
 import { socket } from "@/lib/socket";
+import { useSocketEvents } from "@/core/hooks";
 import type { Conversation, Message } from "./types";
 
 const WhatsAppIcon = ({ className = "h-3.5 w-3.5" }: { className?: string }) => (
@@ -35,23 +37,25 @@ const getInitials = (name: string | null | undefined) =>
     (name || "?").split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
 const Conversations = () => {
+    useSocketEvents(); // Scoped socket listener activation
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { id: activeId } = useParams<{ id: string }>();
     const [search, setSearch] = useState("");
     const [newModalOpen, setNewModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"all" | "mine" | "unassigned">("all");
+    const [platformFilter, setPlatformFilter] = useState<"all" | "whatsapp" | "facebook" | "instagram">("all");
     const [assignOpen, setAssignOpen] = useState(false);
-    const [agentEnabledMap, setAgentEnabledMap] = useState<Record<string, boolean>>({});
 
-    const agentEnabled = activeId ? (agentEnabledMap[activeId] ?? true) : true;
-    const toggleAgent = () => {
-        if (activeId) {
-            setAgentEnabledMap((prev) => ({
-                ...prev,
-                [activeId]: !agentEnabled,
-            }));
-        }
-    };
+    // Global AI Auto-Responder setting (stored in localStorage)
+    const [globalAgentEnabled, setGlobalAgentEnabled] = useState(() => {
+        return localStorage.getItem("global_agent_enabled") !== "false";
+    });
+
+    useEffect(() => {
+        localStorage.setItem("global_agent_enabled", String(globalAgentEnabled));
+    }, [globalAgentEnabled]);
+
 
     const currentUserId = useAuthStore((state) => state.user?.id);
     const onlineUserIds = usePresenceStore((state) => state.onlineUsers);
@@ -70,11 +74,18 @@ const Conversations = () => {
     } = useConversationMessages(activeId);
     const sendMutation = useSendMessage(activeId);
     const assignMutation = useAssignConversation();
+    const markAsReadMutation = useMarkAsRead();
 
     const activeConversation = useMemo(() => 
         conversations.find((c: Conversation) => c.id === activeId),
         [conversations, activeId]
     );
+
+    useEffect(() => {
+        if (activeId && activeConversation && activeConversation.unreadCount && activeConversation.unreadCount > 0) {
+            markAsReadMutation.mutate(activeId);
+        }
+    }, [activeId, activeConversation?.unreadCount, activeConversation, markAsReadMutation]);
 
     const messages = useMemo(() => {
         if (!messagesData?.pages) return [];
@@ -117,6 +128,20 @@ const Conversations = () => {
 
     const handleRetry = (msg: Message) => {
         if (!activeId) return;
+        
+        // Remove failed message from cache to avoid duplicating items in the UI
+        queryClient.setQueryData(
+            conversationKeys.messages(activeId),
+            (oldData: any) => {
+                if (!oldData || !oldData.pages) return oldData;
+                const newPages = oldData.pages.map((page: any) => ({
+                    ...page,
+                    data: page.data.filter((m: any) => m.id !== msg.id)
+                }));
+                return { ...oldData, pages: newPages };
+            }
+        );
+
         sendMutation.mutate({
             content: msg.content,
             type: msg.type,
@@ -136,7 +161,7 @@ const Conversations = () => {
         [navigate]
     );
 
-    // Filter conversations based on tab and search
+    // Filter conversations based on tab, platform and search
     const filteredConversations = useMemo(() => {
         let list = conversations;
 
@@ -146,13 +171,22 @@ const Conversations = () => {
             list = list.filter((c) => !c.assignedAgentId);
         }
 
+        if (platformFilter !== "all") {
+            list = list.filter((c) => {
+                if (platformFilter === "facebook") {
+                    return c.provider === "facebook" || c.provider === "messenger";
+                }
+                return c.provider === platformFilter;
+            });
+        }
+
         if (!search) return list;
         const query = search.toLowerCase();
         return list.filter((c: Conversation) =>
             (c.customer?.name || "").toLowerCase().includes(query) ||
             (c.customer?.email || "").toLowerCase().includes(query)
         );
-    }, [conversations, activeTab, currentUserId, search]);
+    }, [conversations, activeTab, platformFilter, currentUserId, search]);
 
     const activeCustomerName = activeConversation?.customer?.name || "Unknown";
     const activeCustomerEmail = activeConversation?.customer?.email || "No email available";
@@ -185,68 +219,117 @@ const Conversations = () => {
 
     return (
         <div className="flex-1 flex min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden -mx-4 md:mx-0">
+            <style>{`
+                .platform-sidebar-container {
+                    container-type: inline-size;
+                    container-name: platform-sidebar;
+                }
+                @container platform-sidebar {
+                    .platform-label {
+                        display: none !important;
+                    }
+                }
+            `}</style>
             {/* Left Side: Conversations List */}
-            <div className={`w-full md:w-[380px] flex flex-col border-r border-gray-100 ${activeId ? 'hidden md:flex' : 'flex'}`}>
+            <div className={`w-full md:w-[380px] flex flex-col border-r border-gray-100 platform-sidebar-container ${activeId ? 'hidden md:flex' : 'flex'}`}>
                 {/* Search & New Chat Header */}
                 <div className="p-4 border-b border-gray-100 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                         <h1 className="text-xl font-bold text-gray-900">Chats</h1>
-                        <button
-                            onClick={() => setNewModalOpen(true)}
-                            className="p-2 bg-[var(--color-primary-500)] text-white hover:bg-[var(--color-primary-600)] rounded-xl transition-colors shadow-sm flex items-center justify-center cursor-pointer"
-                        >
-                            <PlusSignIcon className="h-5 w-5" />
-                        </button>
-                    </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                            {/* Compact AI toggle button */}
+                            <button
+                                onClick={() => setGlobalAgentEnabled(!globalAgentEnabled)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 text-xs font-bold ${
+                                    globalAgentEnabled 
+                                        ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/70"
+                                        : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100/70"
+                                }`}
+                                title={globalAgentEnabled ? "AI Auto-Responder: Active" : "AI Auto-Responder: Paused"}
+                            >
 
-                    <div className="relative">
-                        <Search01Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <AiChat02Icon size={22} className="stroke-[var(--color-primary-500)]" />
+                            </button>
+
+                            {/* New Chat Button */}
+                            <button
+                                onClick={() => setNewModalOpen(true)}
+                                className="p-2 bg-[var(--color-primary-500)] text-white hover:bg-[var(--color-primary-600)] rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center cursor-pointer active:scale-95"
+                            >
+                                <PlusSignIcon className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </div>
+ 
+                    <div className="relative group">
+                        <Search01Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search messages, names..."
-                            className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-100 focus:border-[var(--color-primary-400)] focus:bg-white rounded-xl outline-none transition-all placeholder:text-gray-400 text-gray-700"
+                            className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 shadow-md hover:bg-slate-100/50 focus:bg-white focus:border-blue-500/80 rounded-xl outline-none transition-all placeholder:text-slate-400 text-slate-700 shadow-2xs focus:shadow-sm"
                         />
                     </div>
                 </div>
+ 
+                {/* Platform Selector Segmented Control */}
+                <div className="px-4 py-2 border-b border-gray-100 bg-gray-50/10 platform-tabs-container">
+                    <div className="p-1 bg-slate-100/70 rounded-xl grid grid-cols-4 gap-1">
+                        {[
+                            { id: "all", label: "All", icon: <BubbleChatIcon className="h-3.5 w-3.5" /> },
+                            { id: "whatsapp", label: "WhatsApp", icon: <WhatsAppIcon className="h-3.5 w-3.5 text-emerald-600" /> },
+                            { id: "facebook", label: "Messenger", icon: <MessengerIcon className="h-3.5 w-3.5 text-blue-600" /> },
+                            { id: "instagram", label: "Instagram", icon: <InstagramIcon className="h-3.5 w-3.5 text-pink-600" /> }
+                        ].map((plat) => {
+                            const isSel = platformFilter === plat.id;
+                            return (
+                                <button
+                                    key={plat.id}
+                                    onClick={() => setPlatformFilter(plat.id as any)}
+                                    title={plat.label}
+                                    className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                                        isSel
+                                            ? "bg-white text-slate-900 shadow-2xs"
+                                            : "text-slate-500 hover:text-slate-900"
+                                    }`}
+                                >
+                                    {plat.icon}
+                                    <span className="platform-label truncate">{plat.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                {/* Filter Tabs */}
-                <div className="flex border-b border-gray-100 px-4 py-2 gap-2 bg-gray-50/50">
-                    <button
-                        onClick={() => setActiveTab("all")}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                            activeTab === "all"
-                                ? "bg-white text-gray-900 shadow-xs border border-gray-100"
-                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-100/50"
-                        }`}
-                    >
-                        All
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("mine")}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                            activeTab === "mine"
-                                ? "bg-white text-gray-900 shadow-xs border border-gray-100"
-                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-100/50"
-                        }`}
-                    >
-                        Mine
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("unassigned")}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                            activeTab === "unassigned"
-                                ? "bg-white text-gray-900 shadow-xs border border-gray-100"
-                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-100/50"
-                        }`}
-                    >
-                        Unassigned
-                    </button>
+                {/* Assignment Filters Segmented Control */}
+                <div className="px-4 py-2 border-b border-gray-100 bg-gray-50/10">
+                    <div className="p-1 bg-slate-100/70 rounded-xl grid grid-cols-3 gap-1">
+                        {[
+                            { id: "all", label: "All Chats" },
+                            { id: "mine", label: "Mine" },
+                            { id: "unassigned", label: "Unassigned" }
+                        ].map((tab) => {
+                            const isSel = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
+                                        isSel
+                                            ? "bg-white text-slate-900 shadow-2xs"
+                                            : "text-slate-500 hover:text-slate-900"
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Conversations Scroll Area */}
-                <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                <div className="flex-1 overflow-y-auto py-2 space-y-1.5 bg-slate-50/30">
                     {listLoading ? (
                         <div className="p-8 text-center text-gray-400">Loading chats...</div>
                     ) : filteredConversations.length === 0 ? (
@@ -261,11 +344,17 @@ const Conversations = () => {
                                 <div
                                     key={c.id}
                                     onClick={() => navigate(`/dashboard/conversations/${c.id}`)}
-                                    className={`p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-                                        isSelected ? "bg-blue-50/50 hover:bg-blue-50/50" : ""
+                                    className={`mx-3 p-3 flex items-center gap-3 cursor-pointer transition-all rounded-xl border relative duration-200 ${
+                                        isSelected 
+                                            ? "bg-blue-50/50 border-blue-100/65 shadow-2xs" 
+                                            : "border-transparent hover:bg-slate-100/40"
                                     }`}
                                     style={{ contentVisibility: "auto" } as React.CSSProperties}
                                 >
+                                    {/* Selection Indicator Line */}
+                                    {isSelected && (
+                                        <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-md" />
+                                    )}
                                     {/* Avatar */}
                                     <div className="relative flex-shrink-0">
                                         <div className="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600 border border-gray-200">
@@ -297,6 +386,40 @@ const Conversations = () => {
                                                 {formatConversationDate(c.lastMessageAt || c.createdAt)}
                                             </span>
                                         </div>
+                                        
+                                        {/* Last Message Preview */}
+                                        {(() => {
+                                            const lastMessage = c.messages?.[0] || (c as any).lastMessage;
+                                            if (!lastMessage) return null;
+                                            
+                                            const isOutbound = lastMessage.direction === "OUTBOUND";
+                                            const prefix = isOutbound ? "You: " : "";
+                                            let lastMsgText = "";
+                                            
+                                            if (lastMessage.type === "text") {
+                                                lastMsgText = lastMessage.content;
+                                            } else if (lastMessage.type === "image") {
+                                                lastMsgText = "📷 Photo";
+                                            } else if (lastMessage.type === "video") {
+                                                lastMsgText = "🎥 Video";
+                                            } else if (lastMessage.type === "audio") {
+                                                lastMsgText = "🎵 Voice message";
+                                            } else if (lastMessage.type === "document") {
+                                                lastMsgText = "📄 Document";
+                                            } else if (lastMessage.type === "sticker") {
+                                                lastMsgText = "💝 Sticker";
+                                            } else {
+                                                lastMsgText = lastMessage.content || "Attachment";
+                                            }
+                                            
+                                            return (
+                                                <p className="text-xs text-gray-500 truncate mb-1">
+                                                    <span className="text-gray-400 font-medium">{prefix}</span>
+                                                    {lastMsgText}
+                                                </p>
+                                            );
+                                        })()}
+
                                         {/* Status, Assigned Agent and Unread count */}
                                         <div className="flex items-center justify-between mt-1">
                                             <div className="flex items-center gap-1.5 min-w-0">
@@ -315,7 +438,7 @@ const Conversations = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            {c.unreadCount !== undefined && c.unreadCount > 0 && (
+                                            {c.unreadCount !== undefined && c.unreadCount > 0 && !isSelected && (
                                                 <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center justify-center animate-pulse min-w-[18px] text-center">
                                                     {c.unreadCount}
                                                 </span>
@@ -330,12 +453,13 @@ const Conversations = () => {
             </div>
 
             {/* Right Side: Message Thread or Blank Slate */}
-            <div className={`flex-1 flex flex-col bg-gray-50 h-full ${!activeId ? 'hidden md:flex' : 'flex'}`}>
+            <div className={`flex-1 flex flex-col min-w-0 bg-gray-50 h-full ${!activeId ? 'hidden md:flex' : 'flex'}`}>
                 {activeId && activeConversation ? (
                     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#f0f2f5]/40">
                         {/* Active Chat Header */}
-                        <div className="border-b border-gray-100 px-6 py-3.5 flex items-center justify-between bg-white shadow-xs z-10">
-                            <div className="flex items-center gap-3">
+                        <div className="border-b border-slate-100 px-6 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between bg-white/95 backdrop-blur-md gap-4 z-10 shadow-2xs">
+                            {/* Customer Info (Left) */}
+                            <div className="flex items-center gap-3 min-w-0">
                                 {/* Back button for mobile */}
                                 <button
                                     onClick={() => navigate("/dashboard/conversations")}
@@ -344,67 +468,83 @@ const Conversations = () => {
                                     <ArrowLeft01Icon className="h-5 w-5" />
                                 </button>
 
-                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600 border border-gray-200">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600 border border-slate-200 flex-shrink-0">
                                     {getInitials(activeCustomerName)}
                                 </div>
-                                <div>
-                                    <h2 className="text-sm font-semibold text-gray-900">{activeCustomerName}</h2>
-                                    <p className="text-xs text-gray-400 truncate max-w-[200px] md:max-w-md">{activeCustomerEmail}</p>
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h2 className="text-base font-bold text-slate-900 truncate max-w-[150px] sm:max-w-none">{activeCustomerName}</h2>
+                                        <span className={`text-[10px] font-semibold border px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 ${
+                                            getProviderBadge(activeConversation.provider).classes
+                                        }`}>
+                                            {activeConversation.provider === "whatsapp" ? (
+                                                <WhatsAppIcon className="h-2.5 w-2.5" />
+                                            ) : activeConversation.provider === "instagram" ? (
+                                                <InstagramIcon className="h-2.5 w-2.5" />
+                                            ) : (
+                                                <MessengerIcon className="h-2.5 w-2.5" />
+                                            )}
+                                            {getProviderBadge(activeConversation.provider).label}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-400 truncate mt-0.5">{activeCustomerEmail}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
+
+                            {/* Actions & Settings (Right) */}
+                            <div className="flex items-center flex-wrap gap-2 lg:self-center">
+                                {/* AI Agent Status Sub-badge */}
+                                {globalAgentEnabled ? (
+                                    <div className="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs">
+                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_6px_#10b981]"></span>
+                                        <span>AI Active</span>
+                                    </div>
+                                ) : (
+                                    <div className="text-[11px] font-semibold bg-slate-50 text-slate-400 border border-slate-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full"></span>
+                                        <span>AI Paused</span>
+                                    </div>
+                                )}
+
                                 {/* Customer Profile Link */}
                                 {activeConversation.customerId && (
                                     <button
                                         onClick={() => navigate(`/dashboard/customers/${activeConversation.customerId}`)}
-                                        className="text-xs font-semibold border px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 transition-colors shadow-xs flex items-center gap-1.5 text-gray-700 cursor-pointer"
+                                        className="text-xs font-semibold border border-slate-200 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
                                         title="View Customer Profile"
                                     >
-                                        <User02Icon className="h-4 w-4 text-gray-500" />
+                                        <User02Icon className="h-3.5 w-3.5 text-slate-500" />
                                         <span className="hidden sm:inline">Profile</span>
                                     </button>
                                 )}
-
-                                {/* Agent Toggle UI */}
-                                <button
-                                    onClick={toggleAgent}
-                                    className={`text-xs font-semibold border px-3 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
-                                        agentEnabled 
-                                            ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/50" 
-                                            : "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100"
-                                    }`}
-                                >
-                                    <span className={`w-2 h-2 rounded-full ${agentEnabled ? "bg-emerald-500 animate-pulse" : "bg-gray-400"}`}></span>
-                                    <span>Agent: {agentEnabled ? "ON" : "OFF"}</span>
-                                </button>
 
                                 {/* Assignment Selector */}
                                 <div className="relative">
                                     <button
                                         onClick={() => setAssignOpen(!assignOpen)}
-                                        className="text-xs font-semibold border px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 transition-colors shadow-xs flex items-center gap-1.5 text-gray-700 cursor-pointer"
+                                        className="text-xs font-semibold border border-slate-200 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
                                     >
-                                        <span className={`w-2 h-2 rounded-full ${assignedAgent ? "bg-blue-500" : "bg-gray-400"}`}></span>
-                                        {assignedAgent ? `${assignedAgent.name || assignedAgent.email}` : "Unassigned"}
-                                        <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <span className={`w-1.5 h-1.5 rounded-full ${assignedAgent ? "bg-blue-500" : "bg-gray-400"}`}></span>
+                                        <span>{assignedAgent ? `${assignedAgent.name || assignedAgent.email}` : "Unassigned"}</span>
+                                        <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
                                     {assignOpen && (
                                         <>
                                             <div className="fixed inset-0 z-40" onClick={() => setAssignOpen(false)} />
-                                            <div className="absolute right-0 mt-1.5 w-60 bg-white border border-gray-100 rounded-xl shadow-lg z-50 py-1.5 animate-in fade-in duration-100">
-                                                <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assign to Agent</div>
+                                            <div className="absolute right-0 mt-1.5 w-56 bg-white border border-slate-150 rounded-xl shadow-lg z-50 py-1.5 animate-in fade-in duration-100">
+                                                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assign to Agent</div>
                                                 <button
                                                     onClick={() => {
                                                         assignMutation.mutate({ conversationId: activeConversation.id, assignedAgentId: null });
                                                         setAssignOpen(false);
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center gap-2 text-red-600 font-medium cursor-pointer"
+                                                    className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center gap-2 text-red-600 font-medium cursor-pointer"
                                                 >
                                                     <span>Unassigned</span>
                                                 </button>
-                                                <div className="border-t border-gray-50 my-1"></div>
+                                                <div className="border-t border-slate-50 my-1"></div>
                                                 {employees.map((emp: any) => {
                                                     if (!emp.userId) return null;
                                                     const isOnline = onlineUserIds.includes(emp.userId);
@@ -416,12 +556,12 @@ const Conversations = () => {
                                                                 assignMutation.mutate({ conversationId: activeConversation.id, assignedAgentId: emp.userId! });
                                                                 setAssignOpen(false);
                                                             }}
-                                                            className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center justify-between cursor-pointer ${
-                                                                isCurrentAssignment ? "bg-blue-50/50 text-[var(--color-primary-600)] font-medium" : "text-gray-700"
+                                                            className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center justify-between cursor-pointer ${
+                                                                isCurrentAssignment ? "bg-blue-50/50 text-[var(--color-primary-600)] font-medium" : "text-slate-700"
                                                             }`}
                                                         >
                                                             <div className="flex items-center gap-2 truncate">
-                                                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-emerald-500" : "bg-gray-300"}`}></span>
+                                                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-emerald-500" : "bg-slate-300"}`}></span>
                                                                 <span className="truncate">{emp.name || emp.email}</span>
                                                             </div>
                                                             {isOnline && <span className="text-[9px] text-emerald-600 font-semibold uppercase">Online</span>}
@@ -437,36 +577,18 @@ const Conversations = () => {
                                 {!activeConversation.assignedAgentId && (
                                     <button
                                         onClick={() => assignMutation.mutate({ conversationId: activeConversation.id, assignedAgentId: currentUserId || null })}
-                                        className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100/50 transition-colors cursor-pointer"
+                                        className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-2xs active:scale-95 cursor-pointer"
                                     >
                                         Claim
                                     </button>
                                 )}
-
-                                <span className={`text-[11px] font-semibold border px-2.5 py-1 rounded-full flex items-center gap-1 ${
-                                    getProviderBadge(activeConversation.provider).classes
-                                }`}>
-                                    {activeConversation.provider === "whatsapp" ? (
-                                        <WhatsAppIcon className="h-3 w-3" />
-                                    ) : activeConversation.provider === "instagram" ? (
-                                        <InstagramIcon className="h-3 w-3" />
-                                    ) : (
-                                        <MessengerIcon className="h-3 w-3" />
-                                    )}
-                                    {getProviderBadge(activeConversation.provider).label}
-                                </span>
-                                <span className={`text-[11px] font-semibold border px-2.5 py-1 rounded-full ${
-                                    getStatusBadge(activeConversation.status).classes
-                                }`}>
-                                    {getStatusBadge(activeConversation.status).label}
-                                </span>
                             </div>
                         </div>
 
                         {/* Thread Scroll Box */}
-                        <div className="flex-1 overflow-hidden flex flex-col bg-[#efeae2] relative" style={{
-                            backgroundImage: "radial-gradient(#dfdcd6 10%, transparent 10%)",
-                            backgroundSize: "20px 20px"
+                        <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/50 relative" style={{
+                            backgroundImage: "radial-gradient(#cbd5e1 7%, transparent 7%)",
+                            backgroundSize: "16px 16px"
                         }}>
                             <MessageThread 
                                 messages={messages} 

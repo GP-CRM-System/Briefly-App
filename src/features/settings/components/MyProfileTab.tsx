@@ -287,33 +287,41 @@ const MyProfileTab = () => {
                     {/* Header Card */}
                     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
                         <div className="h-[140px] bg-gradient-to-r from-blue-400 to-blue-500 relative" />
-                        <div className="px-6 md:px-8 pb-6 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                            {/* Profile Info */}
-                            <div className="flex items-end gap-4 -mt-12 sm:-mt-16 relative z-10">
-                                <label className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-white shadow-md overflow-hidden flex-shrink-0 cursor-pointer group">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        className="hidden"
-                                    />
-                                    <img
-                                        src={user?.image || "/profile.jpg"}
-                                        alt={displayName}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150";
-                                        }}
-                                    />
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                </label>
-                                <div className="mb-2">
-                                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                        
+                        <div className="px-6 md:px-8 pb-6 relative flex flex-col sm:flex-row justify-between gap-4">
+                            
+                            {/* Left Side: Profile Image & User Info */}
+                            <div className="flex flex-col">
+                                
+                                {/* Profile image */}
+                                <div className="-mt-12 sm:-mt-16 relative z-10 mb-4 block">
+                                    <label className="relative block w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-white shadow-md overflow-hidden flex-shrink-0 cursor-pointer group">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
+                                            className="hidden"
+                                        />
+                                        <img
+                                            src={user?.image || "/profile.jpg"}
+                                            alt={displayName}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150";
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {/* User Info */}
+                                <div>
+                                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">
                                         {displayName}
                                     </h2>
                                     <p className="text-sm text-gray-500 font-medium capitalize mt-0.5">
@@ -321,17 +329,17 @@ const MyProfileTab = () => {
                                     </p>
                                     <div className="flex gap-2.5 mt-3">
                                         <a href="#" className="p-1.5 bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-500 rounded-md transition-colors">
-                                        <Linkedin01Icon size={18} />
+                                            <Linkedin01Icon size={18} />
                                         </a>
                                         <a href="#" className="p-1.5 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-black rounded-md transition-colors">
-                                        <NewTwitterIcon size={18} />
+                                            <NewTwitterIcon size={18} />
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Edit Profile Action */}
-                            <div className="mb-2">
+                            {/* Right Side: Edit Profile Action */}
+                            <div className="sm:mt-4 flex-shrink-0">
                                 {isEditing ? (
                                     <div className="flex gap-2.5">
                                         <button
@@ -360,6 +368,7 @@ const MyProfileTab = () => {
                                     </button>
                                 )}
                             </div>
+                            
                         </div>
                     </div>
 

@@ -431,15 +431,8 @@ export const useInitializeSubscription = () => {
     return useMutation({
         mutationFn: ({ planId, billingCycle }: { planId: string; billingCycle?: string }) =>
             settingsService.initializeSubscription(planId, billingCycle),
-        onSuccess: (data: any) => {
+        onSuccess: () => {
             qc.invalidateQueries({ queryKey: settingsKeys.subscription() });
-            // If Paymob returns a payment URL, redirect to it
-            const paymentUrl = data?.paymob?.paymentUrl || data?.paymentUrl || data?.redirectUrl;
-            if (paymentUrl) {
-                window.location.href = paymentUrl;
-            } else {
-                toast.success("Subscription activated!");
-            }
         },
         onError: (err: any) => {
             toast.error(err?.response?.data?.message || "Failed to initialize subscription");

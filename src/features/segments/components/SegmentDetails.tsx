@@ -330,7 +330,7 @@ const SegmentDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        <span className="font-['Inter'] font-semibold text-[#45464d] text-[12px] tracking-[0.6px]">
+                        <span className="font-semibold text-[#45464d] text-[12px] tracking-[0.6px]">
                             {segment.lastUpdated || "Last updated just now"}
                         </span>
                     </div>
@@ -340,9 +340,9 @@ const SegmentDetails = () => {
                 <div className="bg-white p-8 rounded-[14px] border border-[#e5e7eb] shadow-sm lg:col-span-3 flex flex-col justify-between min-h-[468px]">
                     <div className="flex flex-col gap-6">
                         <div className="flex items-center justify-between">
-                            <h3 className="font-['Manrope'] font-semibold text-[20px] text-[#191c1e] leading-none">Filter Logic & Conditions</h3>
+                            <h3 className=" font-semibold text-[20px] text-[#191c1e] leading-none">Filter Logic & Conditions</h3>
                             <span className="inline-flex items-center px-[12px] py-[4px] rounded-[12px] text-xs font-semibold bg-[rgba(74,144,226,0.09)] text-[#4a90e2] tracking-[0.6px] leading-none">
-                                Match all ( And )
+                                {segment.filter && (segment.filter as any).or ? "Match any ( Or )" : "Match all ( And )"}
                             </span>
                         </div>
 
@@ -353,13 +353,16 @@ const SegmentDetails = () => {
                                     totalSpent: "Total Spent", totalOrders: "Order Count",
                                     lifecycleStage: "Lifecycle Stage", country: "Country",
                                     city: "City", source: "Source", acceptsMarketing: "Accepts Marketing",
-                                    tags: "Tags",
+                                    tags: "Tags", churnRiskScore: "Churn Risk Score",
+                                    lastOrderAt: "Last Order", engagementScore: "Engagement Score",
+                                    satisfactionScore: "Satisfaction Score", supportTicketsCount: "Support Tickets"
                                 };
                                 const OP_LABELS: Record<string, string> = {
                                     eq: "is equal to", neq: "is not equal to",
                                     gt: "is greater than", lt: "is less than",
                                     gte: "is greater than or equal to", lte: "is less than or equal to",
-                                    contains: "contains", in: "is in list",
+                                    contains: "contains", in: "is in list", notIn: "is not in list",
+                                    isNull: "is empty", isNotNull: "is not empty"
                                 };
 
                                 const getIconForField = (field: string) => {
@@ -372,9 +375,10 @@ const SegmentDetails = () => {
                                     if (field === "country" || field === "city") return "Geography";
                                     return "Engagement";
                                 };
-                                const formatValue = (field: string, value: string) => {
+                                const formatValue = (field: string, value: any) => {
                                     if (field === "totalSpent") return `$${Number(value).toLocaleString()}`;
-                                    return value;
+                                    if (typeof value === "boolean") return value ? "Yes" : "No";
+                                    return String(value);
                                 };
 
                                 // Priority: explicit rules → conditions from API → single filter fallback
@@ -392,10 +396,26 @@ const SegmentDetails = () => {
                                     ));
                                 }
 
-                                // Derive from conditions array or single filter
-                                const conditionsList = (segment as any).conditions && (segment as any).conditions.length > 0
-                                    ? (segment as any).conditions
-                                    : (segment.filter as any)?.field ? [segment.filter] : [];
+                                // Recursive flattener for filter payload
+                                const flattenFilter = (node: any): any[] => {
+                                    if (!node) return [];
+                                    if (node.field && node.operator) {
+                                        return [node];
+                                    }
+                                    let list: any[] = [];
+                                    if (node.and && Array.isArray(node.and)) {
+                                        node.and.forEach((child: any) => {
+                                            list = [...list, ...flattenFilter(child)];
+                                        });
+                                    } else if (node.or && Array.isArray(node.or)) {
+                                        node.or.forEach((child: any) => {
+                                            list = [...list, ...flattenFilter(child)];
+                                        });
+                                    }
+                                    return list;
+                                };
+
+                                const conditionsList = flattenFilter(segment.filter);
 
                                 if (conditionsList.length === 0) {
                                     return (
@@ -405,13 +425,23 @@ const SegmentDetails = () => {
                                     );
                                 }
 
-                                return conditionsList.map((cond: { field: string; operator: string; value: string }, idx: number) => {
+                                return conditionsList.map((cond: { field: string; operator: string; value: any }, idx: number) => {
+                                    // Skip custom toggles from printing as general conditions if we want them to feel integrated,
+                                    // or print them nicely. We will print them nicely!
                                     const iconType = getIconForField(cond.field);
                                     const category = getCategoryForField(cond.field);
                                     const fieldLabel = FIELD_LABELS[cond.field] || cond.field;
                                     const opLabel = OP_LABELS[cond.operator] || cond.operator;
-                                    const displayVal = formatValue(cond.field, cond.value);
-                                    const description = `${fieldLabel} ${opLabel} ${displayVal}`;
+                                    
+                                    let description = "";
+                                    if (cond.operator === "isNull") {
+                                        description = `${fieldLabel} is empty`;
+                                    } else if (cond.operator === "isNotNull") {
+                                        description = `${fieldLabel} is not empty`;
+                                    } else {
+                                        const displayVal = formatValue(cond.field, cond.value);
+                                        description = `${fieldLabel} ${opLabel} ${displayVal}`;
+                                    }
 
                                     return (
                                         <div key={idx} className="flex items-center gap-[12px] bg-[#fbfcfd] border border-[#e5e7eb] px-[12px] py-[11px] rounded-[8px] w-full h-[79px]">

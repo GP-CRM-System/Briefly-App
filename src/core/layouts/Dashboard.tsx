@@ -23,7 +23,7 @@ import EmployeeProfile from "@/features/employees/components/EmployeeProfile";
 import Settings from "@/features/settings";
 import AnalyticsPage from "@/features/analytics/components/AnalyticsPage";
 import AiDashboard from "@/features/ai";
-import { useSocketEvents } from "@/core/hooks";
+
 import { PermissionGuard, AccessDenied, TourOverlay } from "@/core/components";
 import NotFoundPage from "@/pages/NotFoundPage";
 import apiClient from "@/api/client";
@@ -32,7 +32,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useTourStore } from "@/store/tour.store";
 
 const Dashboard = () => {
-  useSocketEvents();
+
   const { pathname } = useLocation();
   const isConversations = pathname.includes("/conversations");
   const { tourCompleted, startTour } = useTourStore();

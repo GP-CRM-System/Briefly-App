@@ -6,7 +6,9 @@ import ConnectionsTab from "./components/ConnectionsTab";
 import ImportsExportsTab from "./components/ImportsExportsTab";
 import AuditLogsTab from "./components/AuditLogsTab";
 import PaymentBillingTab from "./components/PaymentBillingTab";
-import { User02Icon, Building01Icon, Shield01Icon, Link01Icon, ArrowDataTransferHorizontalIcon, CreditCardIcon, ClipboardIcon } from "hugeicons-react";
+import { ClipboardIcon } from "hugeicons-react";
+
+import {profile, org, exim, link, payment, shield} from "@assets";
 
 const Settings = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -23,13 +25,13 @@ const Settings = () => {
     };
 
     const menuItems = [
-        { id: "profile" as const, label: "My Profile", icon: User02Icon },
-        { id: "org" as const, label: "Organization Profile", icon: Building01Icon },
-        { id: "roles" as const, label: "Roles & Permissions", icon: Shield01Icon },
-        { id: "connections" as const, label: "Connections", icon: Link01Icon },
-        { id: "imports" as const, label: "Imports & Exports", icon: ArrowDataTransferHorizontalIcon },
+        { id: "profile" as const, label: "My Profile", icon: profile },
+        { id: "org" as const, label: "Organization Profile", icon: org },
+        { id: "roles" as const, label: "Roles & Permissions", icon: shield },
+        { id: "connections" as const, label: "Connections", icon: link },
+        { id: "imports" as const, label: "Imports & Exports", icon: exim },
         { id: "audit" as const, label: "Audit Logs", icon: ClipboardIcon },
-        { id: "billing" as const, label: "Payment & Billing", icon: CreditCardIcon },
+        { id: "billing" as const, label: "Payment & Billing", icon: payment },
     ];
 
     const renderActiveTabContent = () => {

@@ -86,20 +86,26 @@ export const useUploadStore = create<UploadState>((set, get) => ({
 
             const messagesQueryKey = conversationKeys.messages(conversationId);
             queryClient.setQueryData(messagesQueryKey, (oldData: any) => {
-                if (!oldData) return oldData;
+                if (!oldData || !oldData.pages) return oldData;
+                const newPages = oldData.pages.map((page: any) => {
+                    return {
+                        ...page,
+                        data: page.data.map((m: any) =>
+                            m.id === tempId
+                                ? {
+                                      ...message,
+                                      metadata: {
+                                          ...message.metadata,
+                                          localPreviewUrl: m.metadata?.localPreviewUrl
+                                      }
+                                  }
+                                : m
+                        )
+                    };
+                });
                 return {
                     ...oldData,
-                    data: oldData.data.map((m: any) =>
-                        m.id === tempId
-                            ? {
-                                  ...message,
-                                  metadata: {
-                                      ...message.metadata,
-                                      localPreviewUrl: m.metadata?.localPreviewUrl
-                                  }
-                              }
-                            : m
-                    )
+                    pages: newPages
                 };
             });
 
@@ -128,21 +134,27 @@ export const useUploadStore = create<UploadState>((set, get) => ({
                     socket.emit("upload:progress", { conversationId, messageId, progress });
 
                     queryClient.setQueryData(messagesQueryKey, (oldData: any) => {
-                        if (!oldData) return oldData;
+                        if (!oldData || !oldData.pages) return oldData;
+                        const newPages = oldData.pages.map((page: any) => {
+                            return {
+                                ...page,
+                                data: page.data.map((m: any) =>
+                                    m.id === messageId
+                                        ? {
+                                              ...m,
+                                              status: progress === 100 ? 'PROCESSING' : 'UPLOADING',
+                                              metadata: {
+                                                  ...(m.metadata || {}),
+                                                  uploadProgress: progress
+                                              }
+                                          }
+                                        : m
+                                )
+                            };
+                        });
                         return {
                             ...oldData,
-                            data: oldData.data.map((m: any) =>
-                                m.id === messageId
-                                    ? {
-                                          ...m,
-                                          status: progress === 100 ? 'PROCESSING' : 'UPLOADING',
-                                          metadata: {
-                                              ...(m.metadata || {}),
-                                              uploadProgress: progress
-                                          }
-                                      }
-                                    : m
-                            )
+                            pages: newPages
                         };
                     });
                 },
@@ -198,12 +210,18 @@ export const useUploadStore = create<UploadState>((set, get) => ({
             });
 
             queryClient.setQueryData(conversationKeys.messages(conversationId), (oldData: any) => {
-                if (!oldData) return oldData;
+                if (!oldData || !oldData.pages) return oldData;
+                const newPages = oldData.pages.map((page: any) => {
+                    return {
+                        ...page,
+                        data: page.data.map((m: any) =>
+                            m.id === activeId ? { ...m, status: 'FAILED', errorMessage: errorMsg } : m
+                        )
+                    };
+                });
                 return {
                     ...oldData,
-                    data: oldData.data.map((m: any) =>
-                        m.id === activeId ? { ...m, status: 'FAILED', errorMessage: errorMsg } : m
-                    )
+                    pages: newPages
                 };
             });
         }
@@ -222,11 +240,19 @@ export const useUploadStore = create<UploadState>((set, get) => ({
         });
 
         queryClient.setQueryData(conversationKeys.messages(conversationId), (oldData: any) => {
-            if (!oldData) return oldData;
+            if (!oldData || !oldData.pages) return oldData;
+            const newPages = oldData.pages.map((page: any) => {
+                const filteredData = page.data.filter((m: any) => m.id !== messageId);
+                const removedCount = page.data.length - filteredData.length;
+                return {
+                    ...page,
+                    data: filteredData,
+                    total: Math.max(0, (page.total || 0) - removedCount)
+                };
+            });
             return {
                 ...oldData,
-                data: oldData.data.filter((m: any) => m.id !== messageId),
-                total: Math.max(0, (oldData.total || 0) - 1)
+                pages: newPages
             };
         });
 
@@ -268,12 +294,29 @@ export const useUploadStore = create<UploadState>((set, get) => ({
             };
 
             if (!oldData) {
-                return { data: [tempMessage], total: 1 };
+                return {
+                    pages: [
+                        {
+                            data: [tempMessage],
+                            total: 1,
+                            page: 1,
+                            pageSize: 50
+                        }
+                    ],
+                    pageParams: [1]
+                };
+            }
+            const newPages = [...oldData.pages];
+            if (newPages[0]) {
+                newPages[0] = {
+                    ...newPages[0],
+                    data: [...newPages[0].data, tempMessage],
+                    total: (newPages[0].total || 0) + 1
+                };
             }
             return {
                 ...oldData,
-                data: [...oldData.data, tempMessage],
-                total: (oldData.total || 0) + 1
+                pages: newPages
             };
         });
 
