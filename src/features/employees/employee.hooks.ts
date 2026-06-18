@@ -13,6 +13,13 @@ export const useEmployees = () =>
         queryFn: employeeService.getAll,
     });
 
+export const useOrgRoles = () =>
+    useQuery({
+        queryKey: [...employeeKeys.all, "org-roles"],
+        queryFn: employeeService.listOrgRoles,
+        staleTime: 5 * 60 * 1000, // roles change infrequently
+    });
+
 export const useInviteEmployee = () => {
     const qc = useQueryClient();
     return useMutation({

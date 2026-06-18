@@ -1,10 +1,28 @@
+import { useState } from "react";
 import { useAiHealth, useChurnResults, useSegmentResults, useComputeChurn, useComputeSegments, useComputeRecommendations } from "./ai.hooks";
+import AiCatalogIntelligence from "./components/AiCatalogIntelligence";
+import AiCustomer360 from "./components/AiCustomer360";
 
-/* ═══════════════════════════════════════════
-   AI Intelligence Dashboard
-   ═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   Tab definitions
+   ══════════════════════════════════════════════════════ */
+type TabId = "overview" | "catalog" | "customer360";
 
-const AiDashboard = () => {
+interface Tab {
+    id: TabId;
+    label: string;
+}
+
+const TABS: Tab[] = [
+    { id: "overview", label: "Overview" },
+    { id: "catalog", label: "Catalog Intelligence" },
+    { id: "customer360", label: "Customer 360" },
+];
+
+/* ══════════════════════════════════════════════════════
+   Overview Tab — existing AI dashboard content
+   ══════════════════════════════════════════════════════ */
+const OverviewTab = () => {
     const { data: health } = useAiHealth();
     const churnMutation = useComputeChurn();
     const segmentMutation = useComputeSegments();
@@ -15,15 +33,7 @@ const AiDashboard = () => {
     const isLoading = churnMutation.isPending || segmentMutation.isPending || recMutation.isPending;
 
     return (
-        <div data-tour="ai-page" className="space-y-6 max-w-[1200px]">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900">Insights Engine</h1>
-                    <p className="text-sm text-gray-400 mt-1">Machine learning-powered CRM insights</p>
-                </div>
-            </div>
-
+        <div data-tour="ai-page" className="space-y-6">
             {/* Health Status */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h2 className="text-base font-semibold text-gray-900 mb-4">Engine Health</h2>
@@ -104,7 +114,7 @@ const AiDashboard = () => {
                                     <th className="pb-2 font-medium">Customer</th>
                                     <th className="pb-2 font-medium">Risk Score</th>
                                     <th className="pb-2 font-medium">Risk Level</th>
-                                    <th className="pb-2 font-medium">Lifecycle</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,7 +131,6 @@ const AiDashboard = () => {
                                                 {c.churnRiskScore >= 0.8 ? "High" : c.churnRiskScore >= 0.5 ? "Low" : "Stable"}
                                             </span>
                                         </td>
-                                        <td className="py-2.5 text-gray-500">{c.lifecycleStage}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -186,6 +195,52 @@ const AiDashboard = () => {
                         Item-Based Collaborative Filtering with time decay. Recommends frequently co-purchased products to boost cross-sell opportunities.
                     </p>
                 </div>
+            </div>
+        </div>
+    );
+};
+
+/* ══════════════════════════════════════════════════════
+   AiDashboard — tabbed Insights page
+   ══════════════════════════════════════════════════════ */
+const AiDashboard = () => {
+    const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+    return (
+        <div className="space-y-6">
+            {/* Global header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl font-bold text-gray-900">Insights Engine</h1>
+                    <p className="text-sm text-gray-400 mt-1">Machine learning-powered CRM insights</p>
+                </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="flex gap-1 border-b border-gray-100">
+                {TABS.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-4 pb-3 text-sm font-medium transition-all relative ${
+                            activeTab === tab.id
+                                ? "text-[var(--color-primary-600)]"
+                                : "text-gray-400 hover:text-gray-600"
+                        }`}
+                    >
+                        {tab.label}
+                        {activeTab === tab.id && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--color-primary-500)] rounded-full" />
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* Tab Content */}
+            <div className="min-h-0">
+                {activeTab === "overview" && <OverviewTab />}
+                {activeTab === "catalog" && <AiCatalogIntelligence />}
+                {activeTab === "customer360" && <AiCustomer360 />}
             </div>
         </div>
     );

@@ -1,15 +1,22 @@
-export const getActionIcon = (action: string) => {
+export interface ActionIconStyle {
+    icon: string;
+    bg: string;
+    text: string;
+    border: string;
+}
+
+export const getActionIcon = (action: string): ActionIconStyle => {
     const a = action.toLowerCase();
-    if (a.includes("create")) return { icon: "➕", bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100" };
-    if (a.includes("update") || a.includes("change") || a.includes("role")) return { icon: "✏️", bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" };
-    if (a.includes("delete") || a.includes("remove")) return { icon: "🗑️", bg: "bg-red-50", text: "text-red-600", border: "border-red-100" };
-    if (a.includes("login") || a.includes("sign")) return { icon: "🔑", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" };
-    if (a.includes("logout") || a.includes("sign-out")) return { icon: "🚪", bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-100" };
-    if (a.includes("invite") || a.includes("accept")) return { icon: "📩", bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" };
-    if (a.includes("export") || a.includes("import")) return { icon: "📦", bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-100" };
-    if (a.includes("download")) return { icon: "⬇️", bg: "bg-indigo-50", text: "text-indigo-600", border: "border-indigo-100" };
-    if (a.includes("send")) return { icon: "📤", bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-100" };
-    return { icon: "📋", bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-100" };
+    if (a.includes("create")) return { icon: "add", bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100" };
+    if (a.includes("update") || a.includes("change") || a.includes("role")) return { icon: "edit", bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" };
+    if (a.includes("delete") || a.includes("remove")) return { icon: "delete", bg: "bg-red-50", text: "text-red-600", border: "border-red-100" };
+    if (a.includes("login") || a.includes("sign")) return { icon: "key", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" };
+    if (a.includes("logout") || a.includes("sign-out")) return { icon: "logout", bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-100" };
+    if (a.includes("invite") || a.includes("accept")) return { icon: "mail", bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" };
+    if (a.includes("export") || a.includes("import")) return { icon: "transfer", bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-100" };
+    if (a.includes("download")) return { icon: "download", bg: "bg-indigo-50", text: "text-indigo-600", border: "border-indigo-100" };
+    if (a.includes("send")) return { icon: "send", bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-100" };
+    return { icon: "clipboard", bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-100" };
 };
 
 export const fmtRelativeTime = (dStr: string) => {

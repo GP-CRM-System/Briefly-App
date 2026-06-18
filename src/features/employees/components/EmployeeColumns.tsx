@@ -9,11 +9,20 @@ export const columns: Column<Employee>[] = [
         width: "min-w-[240px]",
         render: (row) => (
             <div className="flex items-center gap-3">
-                <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${getEmployeeColor(row.name)}`}
-                >
-                    {getEmployeeInitials(row.name)}
-                </div>
+                {row.image ? (
+                    <img
+                        src={row.image}
+                        alt={row.name || "Employee"}
+                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${getEmployeeColor(row.name)}`}
+                    >
+                        {getEmployeeInitials(row.name)}
+                    </div>
+                )}
                 <div>
                     <p className="text-sm font-semibold text-gray-900 leading-tight">{row.name || "Unnamed Employee"}</p>
                     <p className="text-[10px] text-gray-400 mt-0.5">{row.location || "Office Location"}</p>
