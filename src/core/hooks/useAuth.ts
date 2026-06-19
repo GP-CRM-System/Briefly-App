@@ -4,6 +4,8 @@ import { useAuthStore } from "@/store/auth.store";
 import type { LoginRequest, RegisterRequest } from "@/core/types/api.type";
 import { authClient } from "@/lib/auth-client";
 import { fetchAuthSession } from "@/lib/auth-session";
+import apiClient from "@/api/client";
+import { ENDPOINTS } from "@/api/endpoints";
 
 /**
  * Central auth hook — uses Better Auth client + Zustand store.
@@ -26,41 +28,40 @@ export function useAuth() {
             activeOrganizationId?: string | null;
         };
 
+        // Extract token from the sign-in response BEFORE any session fetch attempts.
+        // This is critical on Vercel cross-origin where:
+        //  1) set-auth-token header is stripped (onSuccess callback can't set it)
+        //  2) fetchAuthSession() fails or returns session without token (cookies blocked by SameSite=Lax)
+        // The Bearer token is the only reliable auth mechanism cross-origin.
+        const loginToken = (fallback as any)?.session?.token || (fallback as any)?.token || null;
+        if (loginToken && !useAuthStore.getState().token) {
+            useAuthStore.setState({ token: loginToken });
+        }
+
         const session = (await fetchAuthSession(3, 200)) ?? parseFallbackSession(fallback, onboardingDone);
         if (!session) {
             return { ok: false as const, error: "Session data incomplete. Please try again." };
         }
 
         // Ensure the Bearer token is in the store for apiClient interceptor.
-        // The set-auth-token header may be stripped by Vercel's edge proxy.
+        // Covers the case where fetchAuthSession succeeded but didn't return a token.
         if (session.token && !useAuthStore.getState().token) {
             useAuthStore.setState({ token: session.token });
         }
 
-        // Recovery: if session lacks org, check via Better Auth client (cookie-based)
-        // Bearer-token API may fail cross-origin on Vercel (set-auth-token header stripped).
-        // Better Auth's own client uses cookies — works cross-origin by design.
+        // Recovery: if session lacks org, fetch orgs via Bearer token API (apiClient).
+        // Cookie-based (authClient) fails cross-origin on Vercel because Better Auth's
+        // default SameSite=Lax blocks cookies on XHR/fetch. The Bearer token is the
+        // reliable mechanism here — the backend has the bearer plugin enabled.
         if (!session.onboardingComplete) {
             try {
-                const { data: orgs } = await authClient.organization.list();
-                const orgList = Array.isArray(orgs) ? orgs : [];
+                const { data: orgs } = await apiClient.get(ENDPOINTS.ORGANIZATION.LIST);
+                const orgList = Array.isArray(orgs) ? orgs : (orgs?.organizations || []);
                 if (orgList.length > 0) {
-                    await authClient.organization.setActive({
+                    await apiClient.post(ENDPOINTS.ORGANIZATION.SET_ACTIVE, {
                         organizationId: orgList[0].id
                     });
-                    // Re-fetch the session so it has the updated activeOrganizationId
-                    // If re-fetch fails (e.g. cookie not yet propagated), mark complete anyway
-                    // since we successfully set the active org.
-                    const refreshed = await fetchAuthSession(3, 200);
-                    if (refreshed) {
-                        session.token = refreshed.token;
-                        session.user = refreshed.user;
-                        session.role = refreshed.role;
-                        session.permissions = refreshed.permissions;
-                        session.onboardingComplete = true; // org was explicitly set
-                    } else {
-                        session.onboardingComplete = true;
-                    }
+                    session.onboardingComplete = true;
                 }
             } catch (e) {
                 console.error("[Auth] Recovery failed:", e);
