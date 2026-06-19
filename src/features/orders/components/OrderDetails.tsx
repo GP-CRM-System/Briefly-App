@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { PackageIcon } from "hugeicons-react";
 import { useOrder, useAddOrderNote } from "../order.hooks";
 import { orderService } from "../order.service";
 import toast from "react-hot-toast";
@@ -223,7 +224,7 @@ const OrderDetails = () => {
                                         <tr key={item.id} className="align-middle">
                                             <td className="py-4 pr-3 flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
-                                                    📦
+                                                    <PackageIcon size={24} />
                                                 </div>
                                                 <div>
                                                     <p className="font-semibold text-gray-800 leading-tight">{item.product?.name || "—"}</p>
@@ -231,10 +232,10 @@ const OrderDetails = () => {
                                             </td>
                                             <td className="py-4 text-center font-semibold text-gray-600">{item.quantity}</td>
                                             <td className="py-4 text-right font-medium text-gray-700">
-                                                ${Number(item.product?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                ${Number(item.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="py-4 text-right font-bold text-gray-900">
-                                                ${(Number(item.product?.price ?? 0) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                ${(Number(item.price ?? 0) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                         </tr>
                                     ))}

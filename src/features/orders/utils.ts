@@ -137,11 +137,13 @@ export const MOCK_ORDERS: Order[] = [
             {
                 id: "item-1",
                 quantity: 2,
+                price: "450.00",
                 product: { id: "prod-1", name: "Software License - Annual", price: "450.00" },
             },
             {
                 id: "item-2",
                 quantity: 2,
+                price: "450.00",
                 product: { id: "prod-2", name: "Software License - Annual", price: "450.00" },
             }
         ]
@@ -167,6 +169,7 @@ export const MOCK_ORDERS: Order[] = [
             {
                 id: "item-3",
                 quantity: 1,
+                price: "1999.00",
                 product: { id: "prod-3", name: "MacBook Pro M3 - 14\"", price: "1999.00" },
             }
         ]
@@ -193,6 +196,7 @@ export const MOCK_ORDERS: Order[] = [
             {
                 id: "item-4",
                 quantity: 1,
+                price: "390.30",
                 product: { id: "prod-4", name: "Generic Gold Table", price: "390.30" },
             }
         ]
