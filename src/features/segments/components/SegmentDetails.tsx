@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSegment, useSegmentCustomers, useDeleteSegment } from "../segment.hooks";
 import { MOCK_CUSTOMERS, getAvatarColor, getInitials, getLifecycleClasses } from "@/features/customers/utils";
 import SegmentFormModal from "./SegmentFormModal";
-import toast from "react-hot-toast";
 
 // Condition list icons
 const FinanceIcon = () => (
@@ -121,10 +120,6 @@ const SegmentDetails = () => {
         });
     };
 
-    const handleExport = () => {
-        toast.success("Segment customers exported to CSV!");
-    };
-
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this segment? This action cannot be undone.")) {
             deleteMutation.mutate(id!, {
@@ -159,12 +154,9 @@ const SegmentDetails = () => {
 
     const matchedCustomers = getMatchedCustomers();
     
-    // Explicit details matching the second screenshot
-    const segmentOwnerName = id === "124578954" ? "Omar Ali" : (segment.creator || "Omar Ali");
-    const segmentOwnerRole = id === "124578954" ? "Lead Strategist" : (segment.creatorRole || "Lead Strategist");
-    const segmentOwnerImage = id === "124578954" 
-        ? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" 
-        : (segment.creatorImage || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150");
+    const segmentOwnerName = segment.creator || "Omar Ali";
+    const segmentOwnerRole = segment.creatorRole || "Lead Strategist";
+    const segmentOwnerImage = segment.creatorImage;
 
     const segmentSize = id === "124578954" ? "1,200" : matchedCustomers.length.toLocaleString();
     const segmentSizeTrend = id === "124578954" ? "↑ + 5% Since last week" : (segment.sizeTrend || "Stable");
@@ -202,17 +194,6 @@ const SegmentDetails = () => {
                         Edit
                     </button>
                     <button
-                        onClick={handleExport}
-                        className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] border border-[rgba(179,179,179,0.27)] bg-white text-sm font-medium text-gray-600 shadow-[2px_4px_5px_rgba(180,191,205,0.2)] hover:border-gray-300 hover:bg-gray-50 transition-all font-['Poppins']"
-                    >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        Export CSV
-                    </button>
-                    <button
                         onClick={handleDelete}
                         className="inline-flex items-center gap-2 h-[49px] px-4 rounded-[9px] bg-red-50 hover:bg-red-100 text-sm font-medium text-red-600 border border-red-100 transition-all font-['Poppins']"
                     >
@@ -232,11 +213,17 @@ const SegmentDetails = () => {
                     <div className="flex flex-col justify-between h-full py-0.5">
                         <p className="capitalize font-['Poppins'] text-[#8a8a8a] text-base leading-none">Segment Owner</p>
                         <div className="flex items-center gap-3">
-                            <img 
-                                src={segmentOwnerImage} 
-                                alt={segmentOwnerName} 
-                                className="w-12 h-12 rounded-full object-cover border-2 border-white" 
-                            />
+                            {segmentOwnerImage ? (
+                                <img 
+                                    src={segmentOwnerImage} 
+                                    alt={segmentOwnerName} 
+                                    className="w-12 h-12 rounded-full object-cover border-2 border-white" 
+                                />
+                            ) : (
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold text-white ${getAvatarColor(segmentOwnerName)}`}>
+                                    {getInitials(segmentOwnerName)}
+                                </div>
+                            )}
                             <div className="flex flex-col font-['Poppins'] leading-none">
                                 <h4 className="text-base font-semibold text-[#191c1e]">{segmentOwnerName}</h4>
                                 <p className="text-xs text-[#45464d] font-['Inter'] mt-1">{segmentOwnerRole}</p>

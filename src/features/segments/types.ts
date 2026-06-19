@@ -29,6 +29,7 @@ export interface Segment {
     type?: string | null;
     sizeTrend?: string | null;
     lastUpdated?: string | null;
+    usedInCount?: number;
     rules?: Array<{ icon: string; category: string; description: string }> | null;
     conditions?: Array<{ field: string; operator: string; value: string }> | null;
     createdAt: string;

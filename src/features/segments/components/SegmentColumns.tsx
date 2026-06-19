@@ -50,7 +50,7 @@ export const standardColumns: Column<Segment>[] = [
         width: "w-[80px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                {row.customerCount ?? row.size ?? 0}
+                {row.size ?? 0}
             </span>
         ),
     },
@@ -114,13 +114,13 @@ export const detailedColumns: Column<Segment>[] = [
         ),
     },
     {
-        key: "customerCount",
+        key: "size",
         header: "Size",
         align: "center",
         width: "w-[80px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                {row.customerCount ?? 0}
+                {row.size ?? 0}
             </span>
         ),
     },
@@ -182,24 +182,13 @@ export const detailedColumns: Column<Segment>[] = [
         ),
     },
     {
-        key: "id",
-        header: "Folder",
-        align: "center",
-        width: "w-[80px]",
-        render: (row) => (
-            <span className="font-['Poppins'] text-sm text-[#45464d]">
-                {(row as any).folder || "—"}
-            </span>
-        ),
-    },
-    {
-        key: "customerCount",
+        key: "usedInCount",
         header: "Used in",
         align: "center",
         width: "w-[90px]",
         render: (row) => (
             <span className="font-['Poppins'] font-medium text-[#1a1a1a] text-sm">
-                {(row as any).usedInCount ?? 0}
+                {row.usedInCount ?? 0}
             </span>
         ),
     },
