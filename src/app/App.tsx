@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AppRouter from "./router";
 import Providers from "./providers";
-import { fetchAuthSession } from "@/lib/auth-session";
+import { fetchAuthSession, fetchBearerAuthSession, recoverOrganizationSession } from "@/lib/auth-session";
 import { useAuthStore } from "@/store/auth.store";
 
 /**
@@ -9,6 +9,10 @@ import { useAuthStore } from "@/store/auth.store";
  *
  * Waits for Zustand persist hydration first so OAuth cookie sessions
  * are not overwritten by stale localStorage state.
+ *
+ * Cross-origin (Vercel): tries cookie-based fetchAuthSession() first.
+ * If that fails, falls back to Bearer-token fetchBearerAuthSession().
+ * Then recovers org if session lacks activeOrganizationId.
  */
 function SessionInitializer({ children }: { children: React.ReactNode }) {
     const user = useAuthStore((s) => s.user);
@@ -40,11 +44,20 @@ function SessionInitializer({ children }: { children: React.ReactNode }) {
 
         const restoreSession = async () => {
             try {
-                const session = await fetchAuthSession();
+                // 1. Try cookie-based session fetch (works same-origin)
+                let session = await fetchAuthSession(5, 400);
+
+                // 2. Fallback: Bearer token session fetch (works cross-origin on Vercel)
+                if (!session) {
+                    session = await fetchBearerAuthSession();
+                }
 
                 if (cancelled) return;
 
                 if (session) {
+                    // 3. Org recovery: shared helper uses Bearer token API
+                    session = await recoverOrganizationSession(session);
+
                     setSession(
                         session.token,
                         session.user,
@@ -89,4 +102,3 @@ function App() {
 }
 
 export default App;
-

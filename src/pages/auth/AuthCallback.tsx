@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchAuthSession } from "@/lib/auth-session";
+import { fetchAuthSession, fetchBearerAuthSession, recoverOrganizationSession } from "@/lib/auth-session";
 import { useAuthStore } from "@/store/auth.store";
 
 /**
  * OAuth callback landing page.
  * Better Auth redirects here after Google sign-in so we can hydrate
  * session state before entering protected routes.
+ *
+ * Cross-origin (Vercel): tries cookie-based fetchAuthSession() first.
+ * If that fails (SameSite=Lax blocks cookies), falls back to Bearer-token
+ * fetchBearerAuthSession(). Then recovers org if session lacks it.
  */
 export default function AuthCallback() {
     const navigate = useNavigate();
@@ -17,7 +21,13 @@ export default function AuthCallback() {
         let cancelled = false;
 
         const completeOAuth = async () => {
-            const session = await fetchAuthSession();
+            // 1. Try cookie-based session fetch (works same-origin)
+            let session = await fetchAuthSession(5, 400);
+
+            // 2. Fallback: Bearer token session fetch (works cross-origin on Vercel)
+            if (!session) {
+                session = await fetchBearerAuthSession();
+            }
 
             if (cancelled) return;
 
@@ -26,6 +36,9 @@ export default function AuthCallback() {
                 navigate("/login", { replace: true });
                 return;
             }
+
+            // 3. Org recovery: shared helper uses Bearer token API
+            session = await recoverOrganizationSession(session);
 
             setSession(
                 session.token,

@@ -3,9 +3,9 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/auth.store";
 import type { LoginRequest, RegisterRequest } from "@/core/types/api.type";
 import { authClient } from "@/lib/auth-client";
-import { fetchAuthSession } from "@/lib/auth-session";
-import apiClient from "@/api/client";
-import { ENDPOINTS } from "@/api/endpoints";
+import { fetchAuthSession, fetchBearerAuthSession, recoverOrganizationSession } from "@/lib/auth-session";
+import type { RestoredAuthSession } from "@/lib/auth-session";
+import type { AuthUser } from "@/store/auth.store";
 
 /**
  * Central auth hook — uses Better Auth client + Zustand store.
@@ -38,7 +38,15 @@ export function useAuth() {
             useAuthStore.setState({ token: loginToken });
         }
 
-        const session = (await fetchAuthSession(3, 200)) ?? parseFallbackSession(fallback, onboardingDone);
+        // Try cookie-based session fetch first, then Bearer token fallback,
+        // then finally parse the login response directly.
+        let session = await fetchAuthSession(3, 200);
+        if (!session) {
+            session = await fetchBearerAuthSession();
+        }
+        if (!session) {
+            session = parseFallbackSession(fallback, onboardingDone);
+        }
         if (!session) {
             return { ok: false as const, error: "Session data incomplete. Please try again." };
         }
@@ -49,24 +57,8 @@ export function useAuth() {
             useAuthStore.setState({ token: session.token });
         }
 
-        // Recovery: if session lacks org, fetch orgs via Bearer token API (apiClient).
-        // Cookie-based (authClient) fails cross-origin on Vercel because Better Auth's
-        // default SameSite=Lax blocks cookies on XHR/fetch. The Bearer token is the
-        // reliable mechanism here — the backend has the bearer plugin enabled.
-        if (!session.onboardingComplete) {
-            try {
-                const { data: orgs } = await apiClient.get(ENDPOINTS.ORGANIZATION.LIST);
-                const orgList = Array.isArray(orgs) ? orgs : (orgs?.organizations || []);
-                if (orgList.length > 0) {
-                    await apiClient.post(ENDPOINTS.ORGANIZATION.SET_ACTIVE, {
-                        organizationId: orgList[0].id
-                    });
-                    session.onboardingComplete = true;
-                }
-            } catch (e) {
-                console.error("[Auth] Recovery failed:", e);
-            }
-        }
+        // Recovery: if session lacks org, attempt to find and set active via Bearer token.
+        session = await recoverOrganizationSession(session);
 
         setSession(
             session.token,
@@ -87,7 +79,7 @@ export function useAuth() {
             activeOrganizationId?: string | null;
         },
         onboardingDone: boolean
-    ) => {
+    ): RestoredAuthSession | null => {
         if (!fallback.user) return null;
 
         const activeOrganizationId =
@@ -95,7 +87,7 @@ export function useAuth() {
 
         return {
             token: fallback.session?.token ?? fallback.token ?? "",
-            user: fallback.user,
+            user: fallback.user as AuthUser,
             role: null,
             permissions: null,
             onboardingComplete: onboardingDone || Boolean(activeOrganizationId),

@@ -1,6 +1,8 @@
 import { authClient } from "@/lib/auth-client";
 import { useAuthStore } from "@/store/auth.store";
 import type { AuthUser } from "@/store/auth.store";
+import apiClient from "@/api/client";
+import { ENDPOINTS } from "@/api/endpoints";
 
 export type RestoredAuthSession = {
     token: string;
@@ -37,6 +39,58 @@ function parseSessionPayload(session: unknown): RestoredAuthSession | null {
         permissions: payload.permissions ?? null,
         onboardingComplete: Boolean(activeOrganizationId),
     };
+}
+
+/** Fetch the current session using Bearer token instead of cookies.
+ * Falls back when cookie-based fetchAuthSession() fails cross-origin.
+ * The backend has the bearer plugin enabled — it accepts the session
+ * token as Authorization: Bearer <token> on all endpoints.
+ */
+export async function fetchBearerAuthSession(): Promise<RestoredAuthSession | null> {
+    const token = useAuthStore.getState().token;
+    if (!token) return null;
+
+    try {
+        const response = await apiClient.get(ENDPOINTS.AUTH.GET_SESSION);
+        return parseSessionPayload(response.data);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Attempt to recover a session that lacks activeOrganizationId.
+ * Fetches org list via Bearer-token API (works cross-origin) and sets
+ * the first org as active. Returns the refreshed session on success.
+ *
+ * Extracted as a shared helper — used in hydrateAuthState, AuthCallback,
+ * and SessionInitializer to keep recovery logic consistent.
+ */
+export async function recoverOrganizationSession(
+    session: RestoredAuthSession
+): Promise<RestoredAuthSession> {
+    if (session.onboardingComplete) return session;
+
+    try {
+        const { data: orgs } = await apiClient.get(ENDPOINTS.ORGANIZATION.LIST);
+        const orgList = Array.isArray(orgs) ? orgs : (orgs?.organizations || []);
+        if (orgList.length > 0) {
+            await apiClient.post(ENDPOINTS.ORGANIZATION.SET_ACTIVE, {
+                organizationId: orgList[0].id
+            });
+            // Re-fetch to get updated role/permissions from refreshed session
+            const refreshed = await fetchBearerAuthSession();
+            if (refreshed) {
+                return refreshed;
+            }
+            // Re-fetch failed but setActive succeeded — mark complete
+            session.onboardingComplete = true;
+        }
+    } catch (e) {
+        console.error("[OrgRecovery] Failed:", e);
+    }
+
+    return session;
 }
 
 /** Fetch the current Better Auth session, retrying for OAuth redirect races. */
