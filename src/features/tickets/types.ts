@@ -14,14 +14,24 @@ export interface Ticket {
     customerPhone?: string;
     customerId?: string;
     orderId?: string;
-    status: "open" | "pending" | "resolved" | "closed";
-    priority: "low" | "medium" | "high";
+    status: "OPEN" | "PENDING" | "CLOSED";
+    priority: "LOW" | "MEDIUM" | "HIGH";
     subject: string;
     description: string;
     assignee?: string;
     notes?: TicketNote[];
     createdAt: string;
     updatedAt: string;
+    customer?: {
+        id: string;
+        name: string;
+        email?: string;
+        phone?: string;
+        totalOrders?: number;
+        totalSpent?: number;
+        supportTicketsCount?: number;
+        createdAt?: string;
+    };
 }
 
 export interface TicketFormData {
@@ -29,8 +39,8 @@ export interface TicketFormData {
     customerName: string;
     subject: string;
     description: string;
-    priority: "low" | "medium" | "high";
-    status: "open" | "pending" | "resolved" | "closed";
+    priority: "LOW" | "MEDIUM" | "HIGH";
+    status: "OPEN" | "PENDING" | "CLOSED";
     orderId?: string;
 }
 

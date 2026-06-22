@@ -54,7 +54,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
                 <div>
                     <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Status</h4>
                     <div className="flex flex-wrap gap-2">
-                        {["open", "pending", "resolved", "closed"].map((st) => {
+                        {["OPEN", "PENDING", "CLOSED"].map((st) => {
                             const isSelected = status.has(st);
                             return (
                                 <button
@@ -76,7 +76,7 @@ const FilterPanel = ({ open, onClose, onApply }: FilterPanelProps) => {
                 <div>
                     <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Priority</h4>
                     <div className="flex flex-wrap gap-2">
-                        {["low", "medium", "high"].map((pr) => {
+                        {["LOW", "MEDIUM", "HIGH"].map((pr) => {
                             const isSelected = priority.has(pr);
                             return (
                                 <button

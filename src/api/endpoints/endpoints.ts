@@ -90,7 +90,20 @@ export const ENDPOINTS = {
     GET_ANALYTICS: (id: string) => `/customers/${id}/analytics`,
     COMPUTE_RFM: "/customers/analytics/compute",
     RFM_DISTRIBUTION: "/customers/analytics/rfm",
+    // Tags
+    SET_TAGS: (id: string) => `/customers/${id}/tags`,
   },
+
+  // ─── Tags ───
+  TAG: {
+    LIST: "/tags",
+    CREATE: "/tags",
+    GET_ONE: (id: string) => `/tags/${id}`,
+    UPDATE: (id: string) => `/tags/${id}`,
+    DELETE: (id: string) => `/tags/${id}`,
+  },
+
+  // ─── Orders ───
 
   // ─── Orders ───
   ORDER: {
@@ -224,6 +237,7 @@ export const ENDPOINTS = {
     SUBSCRIBE: "/subscriptions",
     CANCEL: "/subscriptions/cancel",
     INITIALIZE: "/subscriptions/initialize",
+    INVOICES: "/subscriptions/invoices",
   },
 
   // ─── Payments ───

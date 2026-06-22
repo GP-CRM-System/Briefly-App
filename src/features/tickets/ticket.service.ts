@@ -11,8 +11,8 @@ function normalizeTicket(t: any): Ticket {
         customerPhone: t.customer?.phone || t.customerPhone || "",
         customerId: t.customerId || t.customer?.id || "",
         orderId: t.orderId || t.order?.id || "",
-        status: (t.status || "open").toLowerCase(),
-        priority: (t.priority || "medium").toLowerCase(),
+        status: (t.status || "OPEN").toUpperCase(),
+        priority: (t.priority || "MEDIUM").toUpperCase(),
         createdAt: t.createdAt || t.updatedAt,
         assignee: t.assignedTo?.name || t.assignee || "Admin User",
         notes: (t.notes || []).map((n: any) => ({

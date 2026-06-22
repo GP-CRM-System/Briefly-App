@@ -52,8 +52,8 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
     const [customerId, setCustomerId] = useState("");
     const [subject, setSubject] = useState("");
     const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
-    const [status, setStatus] = useState<"open" | "pending" | "closed">("open");
+    const [priority, setPriority] = useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
+    const [status, setStatus] = useState<"OPEN" | "PENDING" | "CLOSED">("OPEN");
 
     const [prevOpen, setPrevOpen] = useState(open);
     const [prevTicket, setPrevTicket] = useState(ticket);
@@ -68,26 +68,26 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
                 setSubject(ticket.subject || "");
                 setDescription(ticket.description || "");
                 
-                const cleanPriority = ticket.priority?.toLowerCase();
+                const cleanPriority = ticket.priority?.toUpperCase();
                 setPriority(
-                    cleanPriority === "low" || cleanPriority === "medium" || cleanPriority === "high"
-                        ? (cleanPriority as "low" | "medium" | "high")
-                        : "medium"
+                    cleanPriority === "LOW" || cleanPriority === "MEDIUM" || cleanPriority === "HIGH"
+                        ? (cleanPriority as "LOW" | "MEDIUM" | "HIGH")
+                        : "MEDIUM"
                 );
                 
-                const cleanStatus = ticket.status?.toLowerCase();
+                const cleanStatus = ticket.status?.toUpperCase();
                 setStatus(
-                    cleanStatus === "open" || cleanStatus === "pending" || cleanStatus === "closed"
-                        ? (cleanStatus as "open" | "pending" | "closed")
-                        : "open"
+                    cleanStatus === "OPEN" || cleanStatus === "PENDING" || cleanStatus === "CLOSED"
+                        ? (cleanStatus as "OPEN" | "PENDING" | "CLOSED")
+                        : "OPEN"
                 );
             } else {
                 setName("");
                 setCustomerId("");
                 setSubject("");
                 setDescription("");
-                setPriority("medium");
-                setStatus("open");
+                setPriority("MEDIUM");
+                setStatus("OPEN");
             }
         }
     }
@@ -198,23 +198,23 @@ const TicketFormModal = ({ open, onClose, ticket }: TicketFormModalProps) => {
                     <FormField label="Priority">
                         <select
                             value={priority}
-                            onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
+                            onChange={(e) => setPriority(e.target.value as "LOW" | "MEDIUM" | "HIGH")}
                             className={selectClasses}
                         >
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
                         </select>
                     </FormField>
                     <FormField label="Status">
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value as "open" | "pending" | "closed")}
+                            onChange={(e) => setStatus(e.target.value as "OPEN" | "PENDING" | "CLOSED")}
                             className={selectClasses}
                         >
-                            <option value="open">Open</option>
-                            <option value="pending">Pending</option>
-                            <option value="closed">Closed</option>
+                            <option value="OPEN">Open</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="CLOSED">Closed</option>
                         </select>
                     </FormField>
                 </FormRow>

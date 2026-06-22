@@ -159,12 +159,13 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     
     let daysLeft = 5; // default fallback
     let percentLeft = 66.67; // default fallback
-    
-    if (endDate) {
+    const hasEndDate = !!sub?.endDate && sub.plan?.name !== "free";
+
+    if (endDate && hasEndDate) {
         const msPerDay = 1000 * 60 * 60 * 24;
         const diffMs = endDate.getTime() - today.getTime();
         daysLeft = Math.max(0, Math.ceil(diffMs / msPerDay));
-        
+
         const startDate = sub?.startDate ? new Date(sub.startDate) : null;
         if (startDate) {
             const totalMs = endDate.getTime() - startDate.getTime();
@@ -182,7 +183,7 @@ const UpgradeCard = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     return (
         <div className="w-full bg-white border border-[#f1f5f9] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex flex-col gap-[8px] items-start p-[17px] rounded-[12px] shrink-0">
             <div className="flex items-center justify-between w-full">
-                <span className="text-[14px] text-[#1a1a1a] leading-none font-semibold font-['Poppins']">{daysLeft} Days left !</span>
+                <span className="text-[14px] text-[#1a1a1a] leading-none font-semibold font-['Poppins']">{hasEndDate ? `${daysLeft} Days left !` : "Unlimited"}</span>
                 <div
                     onClick={() => setDismissed(true)}
                     className="bg-[#b3b3b3] hover:bg-gray-400 rounded-full cursor-pointer flex items-center justify-center size-[12px] transition-colors"

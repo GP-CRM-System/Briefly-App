@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTicket, useUpdateTicket, useDeleteTicket, useAddTicketNote } from "../ticket.hooks";
 import { MOCK_TICKETS } from "../utils";
+import TicketFormModal from "./TicketFormModal";
 import toast from "react-hot-toast";
 
 /* ── Date formatter matching Figma: "APR 22,2026  10:57 AM" ── */
@@ -113,6 +114,7 @@ const TicketDetails = () => {
     const [priority, setPriority] = useState<any>(ticket.priority);
     const [assignee, setAssignee] = useState<any>(ticket.assignee || "Admin User");
     const [newNote, setNewNote] = useState("");
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
     // Sync state when ticket data loads
     useEffect(() => {
@@ -204,7 +206,7 @@ const TicketDetails = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <button
-                                        onClick={() => toast.success("Edit ticket description...")}
+                                        onClick={() => setEditModalOpen(true)}
                                         className="flex items-center justify-center gap-2 h-[40px] px-4 bg-[#4a90e2] hover:bg-[#3a7bcc] text-white rounded-[8px] transition-all cursor-pointer min-w-[90px]"
                                     >
                                         <EditIcon />
@@ -337,10 +339,9 @@ const TicketDetails = () => {
                                             onChange={(e) => setStatus(e.target.value)}
                                             className="w-full h-[44px] px-3 pr-10 rounded-[8px] border border-[#b3b3b3] bg-white text-[12px] text-[#8a8a8a] font-['Poppins'] outline-none focus:border-[#4a90e2] transition-all appearance-none cursor-pointer capitalize"
                                         >
-                                            <option value="open">Open</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="resolved">Resolved</option>
-                                            <option value="closed">Closed</option>
+                                            <option value="OPEN">Open</option>
+                                            <option value="PENDING">Pending</option>
+                                            <option value="CLOSED">Closed</option>
                                         </select>
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronIcon />
@@ -359,9 +360,9 @@ const TicketDetails = () => {
                                             onChange={(e) => setPriority(e.target.value)}
                                             className="w-full h-[44px] px-3 pr-10 rounded-[8px] border border-[#b3b3b3] bg-white text-[12px] text-[#8a8a8a] font-['Poppins'] outline-none focus:border-[#4a90e2] transition-all appearance-none cursor-pointer capitalize"
                                         >
-                                            <option value="low">Low</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="high">High</option>
+                                            <option value="LOW">Low</option>
+                                            <option value="MEDIUM">Medium</option>
+                                            <option value="HIGH">High</option>
                                         </select>
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronIcon />
@@ -411,21 +412,35 @@ const TicketDetails = () => {
                             <div className="flex flex-col gap-4">
                                 <div className="flex justify-between items-center">
                                     <span className="text-[14px] font-normal text-[#8a8a8a] font-['Poppins']">Total Tickets</span>
-                                    <span className="text-[14px] font-medium text-[#1a1a1a] font-['Poppins']">4</span>
+                                    <span className="text-[14px] font-medium text-[#1a1a1a] font-['Poppins']">{ticket.customer?.supportTicketsCount ?? "—"}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[14px] font-normal text-[#8a8a8a] font-['Poppins']">Total Spend</span>
-                                    <span className="text-[14px] font-medium text-[#1a1a1a] font-['Poppins']">$1,240.00</span>
+                                    <span className="text-[14px] font-medium text-[#1a1a1a] font-['Poppins']">
+                                        {ticket.customer?.totalSpent != null
+                                            ? `$${Number(ticket.customer.totalSpent).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                            : "—"}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[14px] font-normal text-[#8a8a8a] font-['Poppins']">Member Since</span>
-                                    <span className="text-[14px] font-medium text-[#1a1a1a] uppercase font-['Poppins']">APR 2026</span>
+                                    <span className="text-[14px] font-medium text-[#1a1a1a] uppercase font-['Poppins']">
+                                        {ticket.customer?.createdAt
+                                            ? new Date(ticket.customer.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase()
+                                            : "—"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <TicketFormModal
+                open={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                ticket={ticket}
+            />
         </div>
     );
 };

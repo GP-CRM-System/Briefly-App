@@ -70,6 +70,73 @@ export interface BillingInvoice {
     status: "paid" | "unpaid" | "failed";
 }
 
+export interface Plan {
+    id: string;
+    name: string;
+    displayName: string;
+    price: number;
+    billingCycle: string;
+    features: Record<string, number>;
+    isActive: boolean;
+}
+
+export interface SubscriptionPlan {
+    id: string;
+    name: string;
+    displayName: string;
+    price: number;
+    billingCycle: string;
+    features: Record<string, number>;
+}
+
+export interface SubscriptionData {
+    id: string;
+    organizationId: string;
+    planId: string;
+    plan: SubscriptionPlan;
+    status: string;
+    startDate: string;
+    endDate: string | null;
+    cancelAt: string | null;
+    paymobSubscriptionId: string | null;
+    metadata: Record<string, unknown> | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SubscriptionWithUsage {
+    subscription: SubscriptionData | null;
+    usage: {
+        customers: number;
+        products: number;
+    };
+}
+
+export interface SubscriptionInvoiceData {
+    id: string;
+    subscriptionId: string;
+    organizationId: string;
+    planId: string;
+    planName: string;
+    amount: number;
+    currency: string;
+    status: "PAID" | "UNPAID" | "FAILED";
+    billingCycle: string;
+    periodStart: string;
+    periodEnd: string;
+    paidAt: string;
+    paymobTransactionId: string | null;
+    invoiceUrl: string | null;
+    createdAt: string;
+}
+
+export interface PaginatedInvoices {
+    invoices: SubscriptionInvoiceData[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 export interface UsageMetric {
     used: number;
     limit: number;

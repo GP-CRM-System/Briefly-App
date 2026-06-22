@@ -1,6 +1,6 @@
 import { type Column } from "@/core/components/DataTable";
 import type { Customer, CustomerEvent } from "../types";
-import { getAvatarColor, getInitials, getLifecycleClasses, TAG_COLORS } from "../utils";
+import { getAvatarColor, getInitials, getLifecycleClasses } from "../utils";
 import { orderIcon } from "@/assets";
 import { Icon } from "@/core/components";
 
@@ -69,18 +69,16 @@ export const columns: Column<Customer>[] = [
         render: (row) => (
             <div className="flex items-center justify-center gap-1 flex-wrap">
                 {row.tags && row.tags.length > 0 ? row.tags.map((tag) => {
-                    const tagStr = typeof tag === "string"
-                        ? tag
-                        : (tag && typeof tag === "object" && "name" in tag && typeof (tag as any).name === "string")
-                            ? (tag as any).name
-                            : String(tag ?? "");
+                    const tagObj = typeof tag === "string" ? null : tag as { id: string; name: string; color: string };
+                    const tagStr = tagObj ? tagObj.name : String(tag ?? "");
+                    const rawColor = tagObj?.color || "#6B7280";
+                    const tagColor = rawColor.startsWith("#") ? rawColor : `#${rawColor}`;
                     if (!tagStr) return null;
-                    const lc = tagStr.toLowerCase();
-                    const colors = TAG_COLORS[lc] || { bg: "bg-gray-50", text: "text-gray-600" };
                     return (
                         <span
-                            key={tagStr}
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}
+                            key={tagObj?.id || tagStr}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            style={{ backgroundColor: tagColor + "20", color: tagColor }}
                         >
                             {tagStr}
                         </span>

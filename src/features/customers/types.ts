@@ -12,7 +12,7 @@ export interface Customer {
     acceptMarketing?: boolean;
     acceptsMarketing?: boolean;
     lifecycleStage?: string;
-    tags?: string[];
+    tags?: { id: string; name: string; color: string }[];
     totalSpent?: string | number;
     totalOrders?: number;
     totalRefunded?: string | number;
@@ -70,9 +70,9 @@ export interface CustomerOrder {
 
 export interface CustomerNote {
     id: string;
-    content: string;
+    body: string;
     createdAt: string;
-    author?: string;
+    author?: { id: string; name: string };
 }
 
 export interface CustomerEvent {

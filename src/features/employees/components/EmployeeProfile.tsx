@@ -113,7 +113,7 @@ const EmployeeProfile = () => {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full bg-primary-500 flex items-center justify-center text-white text-3xl font-black">
+                            <div className="w-full h-full bg-[var(--color-primary-500)] flex items-center justify-center text-white text-3xl font-black">
                                 {getEmployeeInitials(employee.name)}
                             </div>
                         )}

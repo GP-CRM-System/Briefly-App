@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSegment, useSegmentCustomers, useDeleteSegment } from "../segment.hooks";
 import { MOCK_CUSTOMERS, getAvatarColor, getInitials, getLifecycleClasses } from "@/features/customers/utils";
+import type { CustomerEvent } from "@/features/customers/types";
 import SegmentFormModal from "./SegmentFormModal";
 
 // Condition list icons
@@ -306,17 +307,7 @@ const SegmentDetails = () => {
                         </div>
                     </div>
                     
-                    <div className="flex items-center justify-between mt-6 pt-[25px] border-t border-[#f1f5f9]">
-                        {/* Overlapping small avatar group */}
-                        <div className="flex items-center">
-                            <div className="flex -space-x-2">
-                                <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50" alt="user" />
-                                <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50" alt="user" />
-                                <div className="h-8 w-8 rounded-full bg-[#f1f5f9] border-2 border-white flex items-center justify-center text-[10px] font-bold text-[#64748b]">
-                                    +1.2k
-                                </div>
-                            </div>
-                        </div>
+                    <div className="flex justify-end mt-6 pt-[25px] border-t border-[#f1f5f9]">
                         <span className="font-semibold text-[#45464d] text-[12px] tracking-[0.6px]">
                             {segment.lastUpdated || "Last updated just now"}
                         </span>
@@ -506,8 +497,26 @@ const SegmentDetails = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-[18px] text-center">
-                                                    <p className="text-sm text-gray-700 leading-tight">{customer.lastActivity || "—"}</p>
-                                                    {customer.lastActivityDate && <p className="text-xs text-gray-400">{customer.lastActivityDate}</p>}
+                                                    {(() => {
+                                                        const events = (customer as any).customerEvents ?? [];
+                                                        const latest: CustomerEvent | undefined = events[0];
+                                                        const fallback = customer.lastActivity;
+                                                        const fallbackDate = customer.lastActivityDate;
+                                                        return (
+                                                            <>
+                                                                <p className="text-sm text-gray-700 leading-tight">
+                                                                    {latest?.description || fallback || "—"}
+                                                                </p>
+                                                                {(latest?.occurredAt || fallbackDate) && (
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {latest?.occurredAt
+                                                                            ? new Date(latest.occurredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                                                                            : fallbackDate}
+                                                                    </p>
+                                                                )}
+                                                            </>
+                                                        );
+                                                    })()}
                                                 </td>
                                             </tr>
                                         );

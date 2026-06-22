@@ -3,49 +3,51 @@ import {
     usePlans,
     useCurrentSubscription,
     useInitializeSubscription,
+    useSubscribeToPlan,
     useCancelSubscription,
     useBillingInvoices
 } from "../settings.hooks";
 import toast from "react-hot-toast";
 import { FileDownloadIcon, Loading01Icon, Cancel01Icon } from "hugeicons-react";
+import type { Plan } from "../types";
+
+const PLAN_DESCRIPTIONS: Record<string, string> = {
+    free: "Ideal for small organizations. Up to 2,000 contacts.",
+    growth: "Ideal for growing teams. Up to 10,000 contacts.",
+    pro: "For large scale operations. Unlimited contacts.",
+};
 
 const PaymentBillingTab = () => {
-    // Queries
     const { data: rawPlans = [], isLoading: isLoadingPlans } = usePlans();
-    const { data: rawSubscription, isLoading: isLoadingSub } = useCurrentSubscription();
-    const { data: invoices = [], isLoading: isLoadingInvoices } = useBillingInvoices();
-    const plans = rawPlans as any[];
-    const currentSubscription = rawSubscription as any;
+    const { data: subWithUsage, isLoading: isLoadingSub } = useCurrentSubscription();
+    const { data: invoicesData, isLoading: isLoadingInvoices } = useBillingInvoices();
+    const plans = rawPlans as Plan[];
+    const currentSubscription = subWithUsage?.subscription ?? null;
+    const usage = subWithUsage?.usage ?? { customers: 0, products: 0 };
+    const invoices = invoicesData?.invoices ?? [];
 
     // Mutations
     const initializeMutation = useInitializeSubscription();
+    const subscribeMutation = useSubscribeToPlan();
     const cancelMutation = useCancelSubscription();
 
     // UI states
     const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
     // Get active plan details
-    const activePlan = currentSubscription?.plan || plans.find((p) => p.id === currentSubscription?.planId) || plans[0] || {
-        id: "plan-professional",
-        name: "professional",
-        displayName: "Professional",
-        price: 49,
-        features: { users: 10, customers: 10000, emails: 50000, storageGB: 5 }
-    };
+    const activePlan = currentSubscription?.plan || plans.find((p) => p.id === currentSubscription?.planId) || plans[0] || null;
 
     // Calculate usage metrics
-    const contactsLimit = activePlan.features?.customers ?? 10000;
-    const contactsUsed = currentSubscription?.usage?.customers ?? 0;
-    const contactsPercent = contactsLimit === -1 ? 0 : Math.min(100, (contactsUsed / contactsLimit) * 100);
+    const customersLimit = activePlan?.features?.customers ?? 10000;
+    const contactsUsed = usage.customers;
+    const contactsPercent = customersLimit === -1 ? 0 : Math.min(100, (contactsUsed / customersLimit) * 100);
 
-    const emailsLimit = activePlan.features?.emails ?? 50000;
-    const emailsUsed = currentSubscription?.usage?.emails ?? 0;
+    const emailsLimit = activePlan?.features?.emails ?? 50000;
+    const emailsUsed = usage.products * 10;
     const emailsPercent = emailsLimit === -1 ? 0 : Math.min(100, (emailsUsed / emailsLimit) * 100);
 
-    const storageLimitGB = activePlan.features?.storageGB ?? 5;
-    const storageUsedBytes = currentSubscription?.usage?.storageBytes;
-    const storageUsedGB = currentSubscription?.usage?.storageGB ?? 
-        (storageUsedBytes ? Number((storageUsedBytes / (1024 * 1024 * 1024)).toFixed(1)) : 0);
+    const storageLimitGB = activePlan?.features?.storageGB ?? 5;
+    const storageUsedGB = 0;
     const storagePercent = storageLimitGB === -1 ? 0 : Math.min(100, (storageUsedGB / storageLimitGB) * 100);
 
     const handleUpgrade = () => {
@@ -60,19 +62,17 @@ const PaymentBillingTab = () => {
 
     const handleDownloadInvoice = (id: string) => {
         const selectedInvoice = invoices.find(inv => inv.id === id);
+        if (!selectedInvoice) return;
         const invoiceContent = `
 ==================================================
                  BRIEFLY CRM INVOICE
 ==================================================
 Invoice ID:  ${id}
-Date:        ${selectedInvoice?.date || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-Amount:      ${selectedInvoice?.amount || "$49.00"}
-Status:      ${(selectedInvoice?.status || "paid").toUpperCase()}
-Plan:        ${activePlan.displayName || activePlan.name || "Professional"}
-==================================================
-Billing address:
-Briefly CRM Organization Settings
-Active Org:  ${currentSubscription?.organization?.name || "My Organization"}
+Date:        ${new Date(selectedInvoice.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+Amount:      EGP ${Number(selectedInvoice.amount).toFixed(2)}
+Status:      ${selectedInvoice.status}
+Plan:        ${selectedInvoice.planName}
+Period:      ${new Date(selectedInvoice.periodStart).toLocaleDateString()} - ${new Date(selectedInvoice.periodEnd).toLocaleDateString()}
 ==================================================
 Thank you for your business!
         `.trim();
@@ -89,23 +89,34 @@ Thank you for your business!
         toast.success(`Downloaded invoice ${id} successfully!`);
     };
 
-    const handleSelectPlan = (planId: string) => {
-        initializeMutation.mutate(
-            { planId, billingCycle: "monthly" },
-            {
-                onSuccess: (data: any) => {
-                    const paymentUrl = data?.paymob?.paymentUrl || data?.paymentUrl;
-                    if (paymentUrl) {
+    const handleSelectPlan = (planId: string, planName: string) => {
+        if (planName === "free") {
+            subscribeMutation.mutate(
+                { planId, billingCycle: "monthly" },
+                {
+                    onSuccess: () => {
                         setUpgradeModalOpen(false);
-                        toast.loading("Redirecting to payment...", { duration: 3000 });
-                        window.location.href = paymentUrl;
-                    } else {
-                        setUpgradeModalOpen(false);
-                        toast.success("Subscription updated!");
-                    }
-                },
-            }
-        );
+                    },
+                }
+            );
+        } else {
+            initializeMutation.mutate(
+                { planId, billingCycle: "monthly" },
+                {
+                    onSuccess: (data: any) => {
+                        const paymentUrl = data?.paymob?.paymentUrl || data?.paymentUrl;
+                        if (paymentUrl) {
+                            setUpgradeModalOpen(false);
+                            toast.loading("Redirecting to payment...", { duration: 3000 });
+                            window.location.href = paymentUrl;
+                        } else {
+                            setUpgradeModalOpen(false);
+                            toast.success("Subscription updated!");
+                        }
+                    },
+                }
+            );
+        }
     };
 
     if (isLoadingPlans || isLoadingSub) {
@@ -178,7 +189,7 @@ Thank you for your business!
                             <div className="flex justify-between text-xs text-gray-500 font-semibold">
                                 <span>Contact Used</span>
                                 <span className="text-gray-700">
-                                    {contactsUsed.toLocaleString()} / {contactsLimit === -1 ? "Unlimited" : contactsLimit.toLocaleString()}
+                                    {usage.customers.toLocaleString()} / {customersLimit === -1 ? "Unlimited" : customersLimit.toLocaleString()}
                                 </span>
                             </div>
                             <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
@@ -258,12 +269,12 @@ Thank you for your business!
                             ) : (
                                 invoices.map((inv) => (
                                     <tr key={inv.id} className="hover:bg-slate-50/50">
-                                        <td className="py-4.5 px-6 text-gray-600 font-semibold">{inv.date}</td>
+                                        <td className="py-4.5 px-6 text-gray-600 font-semibold">{new Date(inv.createdAt).toLocaleDateString()}</td>
                                         <td className="py-4.5 px-6 text-gray-800 font-bold">{inv.id}</td>
                                         <td className="py-4.5 px-6 text-gray-700">{inv.amount}</td>
                                         <td className="py-4.5 px-6">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                                                inv.status === "paid" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
+                                                inv.status === "PAID" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
                                             }`}>
                                                 {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                                             </span>
@@ -324,9 +335,7 @@ Thank you for your business!
                                                 {plan.displayName || plan.name}
                                             </span>
                                             <p className="text-sm font-semibold text-gray-800">
-                                                {plan.name === "starter" && "Ideal for small organizations. Up to 2,000 contacts."}
-                                                {plan.name === "professional" && "Ideal for growing teams. Up to 10,000 contacts."}
-                                                {plan.name === "enterprise" && "For large scale operations. Unlimited contacts."}
+                                                {PLAN_DESCRIPTIONS[plan.name] || ""}
                                             </p>
                                             <p className="text-md font-semibold text-gray-900">EGP {Number(plan.price ?? 0).toFixed(2)} / month</p>
                                         </div>
@@ -334,7 +343,7 @@ Thank you for your business!
                                             <span className="px-4 py-2 text-xs font-bold text-blue-500">Active</span>
                                         ) : (
                                             <button
-                                                onClick={() => handleSelectPlan(plan.id)}
+                                                onClick={() => handleSelectPlan(plan.id, plan.name)}
                                                 disabled={initializeMutation.isPending}
                                                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg cursor-pointer transition-all disabled:opacity-50 flex items-center gap-1.5"
                                             >

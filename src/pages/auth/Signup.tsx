@@ -3,6 +3,7 @@ import {
     register as registerIllustration, 
     google, 
     facebook,
+    microsoft,
     eye,
     eyeOff
 } from '@assets';
@@ -15,7 +16,7 @@ import { Icon, Image } from '@/core/components';
 const Signup = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    const { register, loginWithGoogle, loginWithFacebook, isPending } = useAuth();
+    const { register, loginWithGoogle, loginWithFacebook, loginWithMicrosoft, isPending } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const initialValues = { name: '', email: '', password: '', confirmPassword: '', terms: false };
@@ -161,6 +162,13 @@ const Signup = () => {
                                 className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300"
                             >
                                 <Icon icon={facebook} className="h-8 w-8" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={loginWithMicrosoft}
+                                className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300"
+                            >
+                                <Icon icon={microsoft} className="h-8 w-8" />
                             </button>
                         </div>
                     </div>

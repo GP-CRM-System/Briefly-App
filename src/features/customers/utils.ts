@@ -133,7 +133,7 @@ export const filterCustomers = (
     if (filters.tags.size > 0) {
         const selectedTags = new Set(Array.from(filters.tags).map((t) => t.toLowerCase()));
         result = result.filter((c) => {
-            const customerTags = (c.tags || []).map((t) => t.toLowerCase());
+            const customerTags = (c.tags || []).map((t) => (typeof t === 'string' ? t : t.name).toLowerCase());
             return Array.from(selectedTags).some((t) => customerTags.includes(t));
         });
     }
@@ -202,7 +202,7 @@ export const MOCK_CUSTOMERS: Customer[] = Array.from({ length: 40 }, (_, i) => (
     name: "Sarah Ahmed",
     email: `sarah.ahmed${i + 1}@email.com`,
     city: "New York",
-    tags: ["Churned"],
+    tags: [{ id: "tag-1", name: "Churned", color: "#EF4444" }],
     lifecycleStage: "Loyal",
     totalSpent: "2340",
     totalOrders: 12,

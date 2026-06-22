@@ -199,6 +199,13 @@ export function useAuth() {
         });
     };
 
+    const loginWithMicrosoft = async () => {
+        await authClient.signIn.social({
+            provider: "microsoft",
+            callbackURL: `${window.location.origin}/auth/callback`,
+        });
+    };
+
     // ─── Logout ───
     const logout = async () => {
         try {
@@ -222,6 +229,7 @@ export function useAuth() {
         register,
         loginWithGoogle,
         loginWithFacebook,
+        loginWithMicrosoft,
         logout,
     };
 }

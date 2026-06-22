@@ -14,27 +14,20 @@ export const countActiveFilters = (filters: TicketFilterState): number => {
 };
 
 export const getTicketStatusClasses = (status: string) => {
-    const s = status?.toLowerCase();
-    switch (s) {
-        case "open":
+    switch (status) {
+        case "OPEN":
             return {
                 bg: "bg-blue-50/80",
                 text: "text-blue-600",
                 border: "border-blue-100",
             };
-        case "pending":
+        case "PENDING":
             return {
                 bg: "bg-amber-50/80",
                 text: "text-amber-600",
                 border: "border-amber-100",
             };
-        case "resolved":
-            return {
-                bg: "bg-emerald-50/80",
-                text: "text-emerald-600",
-                border: "border-emerald-100",
-            };
-        case "closed":
+        case "CLOSED":
             return {
                 bg: "bg-gray-50/80",
                 text: "text-gray-600",
@@ -50,21 +43,20 @@ export const getTicketStatusClasses = (status: string) => {
 };
 
 export const getTicketPriorityClasses = (priority: string) => {
-    const p = priority?.toLowerCase();
-    switch (p) {
-        case "high":
+    switch (priority) {
+        case "HIGH":
             return {
                 bg: "bg-rose-50/80",
                 text: "text-rose-600",
                 border: "border-rose-100",
             };
-        case "medium":
+        case "MEDIUM":
             return {
                 bg: "bg-amber-50/80",
                 text: "text-amber-600",
                 border: "border-amber-100",
             };
-        case "low":
+        case "LOW":
             return {
                 bg: "bg-gray-50/80",
                 text: "text-gray-600",
@@ -112,8 +104,8 @@ export const MOCK_TICKETS: Ticket[] = [
         customerPhone: "+201068551047",
         customerId: "cust-1",
         orderId: "ORD-1245",
-        status: "open",
-        priority: "high",
+        status: "OPEN",
+        priority: "HIGH",
         subject: "Flight cancellation refund request",
         description: "Hi Support Team,\n\nI recently booked a flight from New York to London (Order ID: ORD-5821), but I received an email stating that the flight has been cancelled due to operational reasons.\n\nI would like to know the process for requesting a full refund, as I won't be able to rebook the trip on a later flight.\n\nCould you please confirm the next steps and let me know if you need any additional details from my side to proceed with the refund request as soon as possible?\n\nThanks,\nAhmed Hassan",
         assignee: "Admin User",
@@ -135,8 +127,8 @@ export const MOCK_TICKETS: Ticket[] = [
         customerEmail: "ali.ibrahim@example.com",
         customerPhone: "+201145678901",
         customerId: "cust-2",
-        status: "pending",
-        priority: "medium",
+        status: "PENDING",
+        priority: "MEDIUM",
         subject: "Cannot sign in to dashboard",
         description: "Customer reports 500 error when clicking standard google login button. Tested locally, credentials appear valid.",
         assignee: "Sarah Ahmed",
@@ -151,8 +143,8 @@ export const MOCK_TICKETS: Ticket[] = [
         customerPhone: "+201234567890",
         customerId: "cust-3",
         orderId: "ORD-1247",
-        status: "resolved",
-        priority: "low",
+        status: "CLOSED",
+        priority: "LOW",
         subject: "Table corner chipped",
         description: "Table arrived with minor scratches on top corner and minor wood chipping. Sent partial refund of $150.",
         assignee: "Admin User",

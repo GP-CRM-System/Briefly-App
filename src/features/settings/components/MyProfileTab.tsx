@@ -13,7 +13,8 @@ import {
 } from "../settings.hooks";
 import { inputClasses } from "@/core/components/Modal";
 import toast from "react-hot-toast";
-import { Linkedin01Icon, NewTwitterIcon, ViewOffSlashIcon, GoogleIcon, LockPasswordIcon, CompassIcon } from "hugeicons-react";
+import { ViewOffSlashIcon, GoogleIcon, LockPasswordIcon, CompassIcon } from "hugeicons-react";
+import { facebook as FacebookIcon, microsoft as MicrosoftIcon } from "@assets";
 
 const MyProfileTab = () => {
     const user = useAuthStore((s) => s.user);
@@ -279,9 +280,9 @@ const MyProfileTab = () => {
                             >
                                 Update Password
                             </button>
+                            </div>
                         </div>
                     </div>
-                </div>
             ) : (
                 <>
                     {/* Header Card */}
@@ -327,14 +328,6 @@ const MyProfileTab = () => {
                                     <p className="text-sm text-gray-500 font-medium capitalize mt-0.5">
                                         {role || "Manager"}
                                     </p>
-                                    <div className="flex gap-2.5 mt-3">
-                                        <a href="#" className="p-1.5 bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-500 rounded-md transition-colors">
-                                            <Linkedin01Icon size={18} />
-                                        </a>
-                                        <a href="#" className="p-1.5 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-black rounded-md transition-colors">
-                                            <NewTwitterIcon size={18} />
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
 
@@ -427,13 +420,10 @@ const MyProfileTab = () => {
                                     </span>
                                     <span className="text-sm font-semibold text-gray-700">Google Account</span>
                                 </div>
-                                {linkedAccounts.some((acc: any) => acc.provider === "google") ? (
+                                {linkedAccounts.some((acc: any) => (acc.provider === "google" || acc.providerId === "google")) ? (
                                     <button
                                         onClick={() => {
-                                            const googleAcc = linkedAccounts.find((acc: any) => acc.provider === "google");
-                                            if ((googleAcc as any)?.id) {
-                                                unlinkAccountMutation.mutate((googleAcc as any).id);
-                                            }
+                                            unlinkAccountMutation.mutate("google");
                                         }}
                                         disabled={unlinkAccountMutation.isPending}
                                         className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
@@ -443,6 +433,58 @@ const MyProfileTab = () => {
                                 ) : (
                                     <button
                                         onClick={() => linkSocialMutation.mutate("google")}
+                                        disabled={linkSocialMutation.isPending}
+                                        className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-blue-500 border border-gray-200 hover:bg-blue-50 hover:border-blue-100 disabled:opacity-50"
+                                    >
+                                        Connect
+                                    </button>
+                                )}
+                            </div>
+                            {/* Facebook */}
+                            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-slate-50 rounded-lg border border-slate-100/70 transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <span className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                        <FacebookIcon width={18} height={18} />
+                                    </span>
+                                    <span className="text-sm font-semibold text-gray-700">Facebook Account</span>
+                                </div>
+                                {linkedAccounts.some((acc: any) => (acc.provider === "facebook" || acc.providerId === "facebook")) ? (
+                                    <button
+                                        onClick={() => unlinkAccountMutation.mutate("facebook")}
+                                        disabled={unlinkAccountMutation.isPending}
+                                        className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
+                                    >
+                                        Disconnect
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => linkSocialMutation.mutate("facebook")}
+                                        disabled={linkSocialMutation.isPending}
+                                        className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-blue-500 border border-gray-200 hover:bg-blue-50 hover:border-blue-100 disabled:opacity-50"
+                                    >
+                                        Connect
+                                    </button>
+                                )}
+                            </div>
+                            {/* Microsoft */}
+                            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-slate-50 rounded-lg border border-slate-100/70 transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <span className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                        <MicrosoftIcon width={18} height={18} />
+                                    </span>
+                                    <span className="text-sm font-semibold text-gray-700">Microsoft Account</span>
+                                </div>
+                                {linkedAccounts.some((acc: any) => (acc.provider === "microsoft" || acc.providerId === "microsoft")) ? (
+                                    <button
+                                        onClick={() => unlinkAccountMutation.mutate("microsoft")}
+                                        disabled={unlinkAccountMutation.isPending}
+                                        className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
+                                    >
+                                        Disconnect
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => linkSocialMutation.mutate("microsoft")}
                                         disabled={linkSocialMutation.isPending}
                                         className="px-4.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-blue-500 border border-gray-200 hover:bg-blue-50 hover:border-blue-100 disabled:opacity-50"
                                     >

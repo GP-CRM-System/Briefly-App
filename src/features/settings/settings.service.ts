@@ -1,16 +1,19 @@
 import apiClient from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints/endpoints";
+import { authClient } from "@/lib/auth-client";
 import type {
     Role,
     ConnectionDetails,
     ImportExportJob,
-    BillingInvoice,
     SyncLog,
     BackendRole,
     BackendIntegration,
     BackendSyncLog,
     BackendImportExportJob,
     ResourcePermissions,
+    Plan,
+    SubscriptionWithUsage,
+    PaginatedInvoices,
 } from "./types";
 
 export const settingsService = {
@@ -49,24 +52,27 @@ export const settingsService = {
         return data;
     },
 
-    // ─── Social Account Linking ───
+    // ─── Social Account Linking (Better Auth client) ───
     async linkSocial(provider: string): Promise<unknown> {
-        const { data } = await apiClient.post(ENDPOINTS.AUTH.LINK_SOCIAL, {
+        const { data, error } = await authClient.linkSocial({
             provider,
             callbackURL: window.location.href,
         });
+        if (error) throw error;
         return data;
     },
 
     async unlinkAccount(providerId: string): Promise<unknown> {
-        const { data } = await apiClient.post(ENDPOINTS.AUTH.UNLINK_ACCOUNT, { providerId });
+        const { data, error } = await authClient.unlinkAccount({ providerId });
+        if (error) throw error;
         return data;
     },
 
     async listAccounts(): Promise<unknown[]> {
         try {
-            const { data } = await apiClient.get(ENDPOINTS.AUTH.LIST_ACCOUNTS);
-            return data?.data || data || [];
+            const { data, error } = await authClient.listAccounts();
+            if (error) throw error;
+            return data || [];
         } catch {
             return [];
         }
@@ -433,7 +439,7 @@ export const settingsService = {
     },
 
     // ─── Subscriptions & Billing ───
-    async getPlans(): Promise<unknown[]> {
+    async getPlans(): Promise<Plan[]> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.LIST_PLANS, {
                 params: { limit: 1000 }
@@ -444,21 +450,20 @@ export const settingsService = {
         }
     },
 
-    async getCurrentSubscription(): Promise<unknown> {
+    async getCurrentSubscription(): Promise<SubscriptionWithUsage | null> {
         try {
             const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.CURRENT);
-            return data?.data || data;
+            return data?.data || null;
         } catch {
             return null;
         }
     },
 
-    async initializeSubscription(planId: string, billingCycle: string = "monthly"): Promise<unknown> {
+    async initializeSubscription(planId: string, billingCycle: string = "monthly") {
         try {
             const { data } = await apiClient.post(ENDPOINTS.SUBSCRIPTION.INITIALIZE, { planId, billingCycle });
             return data?.data || data;
         } catch (err: any) {
-            // 402 Payment Required is expected — it contains the Paymob payment URL
             if (err?.response?.status === 402) {
                 const data = err.response.data;
                 return data?.data || data;
@@ -467,14 +472,19 @@ export const settingsService = {
         }
     },
 
-    async cancelSubscription(immediately: boolean = false): Promise<unknown> {
+    async subscribeToPlan(planId: string, billingCycle: string = "monthly") {
+        const { data } = await apiClient.post(ENDPOINTS.SUBSCRIPTION.SUBSCRIBE, { planId, billingCycle });
+        return data?.data || data;
+    },
+
+    async cancelSubscription(immediately: boolean = false) {
         const { data } = await apiClient.patch(ENDPOINTS.SUBSCRIPTION.CANCEL, { immediately });
         return data?.data || data;
     },
 
-    async getBillingInvoices(): Promise<BillingInvoice[]> {
-        // Backend doesn't have a dedicated invoices endpoint yet.
-        return [];
+    async getBillingInvoices(): Promise<PaginatedInvoices> {
+        const { data } = await apiClient.get(ENDPOINTS.SUBSCRIPTION.INVOICES);
+        return data?.data || { invoices: [], total: 0, page: 1, limit: 10 };
     }
 };
 

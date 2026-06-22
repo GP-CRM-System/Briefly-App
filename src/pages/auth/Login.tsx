@@ -3,6 +3,7 @@ import {
     login as loginIllustration, 
     google, 
     facebook,
+    microsoft,
     eye,
     eyeOff
 } from '@assets';
@@ -18,7 +19,7 @@ const Login = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [searchParams] = useSearchParams();
     const invitationId = searchParams.get('invitationId');
-    const { login, loginWithGoogle, loginWithFacebook, isPending } = useAuth();
+    const { login, loginWithGoogle, loginWithFacebook, loginWithMicrosoft, isPending } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const initialValues = { email: '', password: '', remember: false };
@@ -143,6 +144,13 @@ const Login = () => {
                                 className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300"
                             >
                                 <Icon icon={facebook} className="h-8 w-8" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={loginWithMicrosoft}
+                                className="h-12 w-12 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 hover:border-blue-600 transition-all duration-300"
+                            >
+                                <Icon icon={microsoft} className="h-8 w-8" />
                             </button>
                         </div>
                     </div>

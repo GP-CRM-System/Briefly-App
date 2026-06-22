@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useCustomer, useAddCustomerNote } from "../customer.hooks";
+import { useCustomer, useAddCustomerNote, useDeleteCustomer } from "../customer.hooks";
+import CustomerFormModal from "./CustomerFormModal";
 import { getInitials } from "../utils";
+import TagPicker from "../../tags/components/TagPicker";
+import { useSetCustomerTags } from "../../tags/tag.hooks";
 import type { TimelineEntry, CustomerProductInteraction, CustomerEvent } from "../types";
 
 /* ═══════════════════════════════════════════
@@ -30,22 +33,17 @@ const fmtSimpleDate = (d: string | null | undefined) => {
     }
 };
 
-const fmtCreatedDate = (d: string | null | undefined) => {
-    if (!d) return "—";
-    try {
-        const date = new Date(d);
-        if (isNaN(date.getTime())) return d;
-        return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-    } catch {
-        return d;
-    }
-};
-
 const scoreLabel = (score: number | null | undefined): string => {
     if (score == null) return "—";
     if (score >= 0.7) return "High";
     if (score >= 0.4) return "Medium";
     return "Low";
+};
+
+const tagBg = (color: string) => {
+    const hex = color.startsWith("#") ? color.slice(1) : color;
+    if (hex.length === 6) return `#${hex}20`;
+    return color + "20";
 };
 
 const frequencyLabel = (f: string | number | null | undefined): string => {
@@ -136,6 +134,17 @@ const CustomerProfile = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [noteText, setNoteText] = useState("");
+    const [editModalOpen, setEditModalOpen] = useState(false);
+
+    const deleteMutation = useDeleteCustomer();
+
+    const handleDelete = () => {
+        if (window.confirm("Delete this customer? This can't be undone.")) {
+            deleteMutation.mutate(id!, {
+                onSuccess: () => navigate("/dashboard/customers"),
+            });
+        }
+    };
 
     /* ── Redirect non-UUID slugs like "create" or "new" ── */
     useEffect(() => {
@@ -147,6 +156,7 @@ const CustomerProfile = () => {
     /* ── React Query ── */
     const { data: customer, isLoading } = useCustomer(id);
     const addNoteMutation = useAddCustomerNote(id);
+    const setTags = useSetCustomerTags(id!);
 
     const handleAddNote = () => {
         if (!noteText.trim()) return;
@@ -218,9 +228,51 @@ const CustomerProfile = () => {
                     <div className="w-14 h-14 rounded-full bg-[#4A90E2] text-white flex items-center justify-center text-lg font-bold">
                         {getInitials(c.name)}
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                         <h1 className="text-xl font-bold text-gray-900 leading-tight">{c.name}</h1>
-                        <p className="text-xs text-gray-400 mt-1">Created at : {fmtCreatedDate(c.createdAt)}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                            {c.tags && c.tags.length > 0 ? c.tags.map((tag) => (
+                                <span
+                                    key={tag.id}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold group"
+                                    style={{ backgroundColor: tagBg(tag.color), color: tag.color }}
+                                >
+                                    {tag.name}
+                                    <button
+                                        onClick={() => {
+                                            const next = (c.tags || []).filter((t) => t.id !== tag.id).map((t) => t.id);
+                                            setTags.mutate(next);
+                                        }}
+                                        className="opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity"
+                                    >
+                                        <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </span>
+                            )) : (
+                                <span className="text-xs text-gray-400">No tags</span>
+                            )}
+                            <TagPicker
+                                customerId={id!}
+                                selectedTagIds={(c.tags || []).map((t) => t.id)}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                            onClick={() => setEditModalOpen(true)}
+                            className="h-[32px] px-3 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-50 transition-all flex items-center gap-1.5"
+                        >
+                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Edit
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            disabled={deleteMutation.isPending}
+                            className="h-[32px] px-3 rounded-lg border border-red-200 text-red-500 text-xs font-semibold hover:bg-red-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                        </button>
                     </div>
                 </div>
 
@@ -578,14 +630,14 @@ const CustomerProfile = () => {
                                 <div key={note.id} className="border border-gray-100 bg-[#F8FAFC] rounded-xl p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
-                                            {getInitials(note.author || "User")}
+                                            {getInitials(note.author?.name || "User")}
                                         </div>
                                         <div>
-                                            <span className="text-xs font-semibold text-gray-800 block leading-none">{note.author || "User"}</span>
+                                            <span className="text-xs font-semibold text-gray-800 block leading-none">{note.author?.name || "User"}</span>
                                             <span className="text-[10px] text-gray-400 mt-1 block">Created: {note.createdAt ? fmtDate(note.createdAt) : "—"}</span>
                                         </div>
                                     </div>
-                                    <p className="text-sm text-gray-600 leading-relaxed pl-9">{note.content}</p>
+                                    <p className="text-sm text-gray-600 leading-relaxed pl-9">{note.body}</p>
                                 </div>
                             )) : (
                                 <p className="text-sm text-gray-400 text-center py-8">No notes yet</p>
@@ -733,6 +785,12 @@ const CustomerProfile = () => {
                     </div>
                 </div>
             )}
+
+            <CustomerFormModal
+                open={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                customer={c}
+            />
         </div>
     );
 };

@@ -48,7 +48,7 @@ const Tickets = () => {
     const handleResolve = (t: Ticket) => {
         updateMutation.mutate({
             id: t.id,
-            payload: { status: "resolved" }
+            payload: { status: "CLOSED" }
         });
     };
     const handleEdit = (t: Ticket) => {

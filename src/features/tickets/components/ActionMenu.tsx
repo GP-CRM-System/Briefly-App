@@ -22,9 +22,9 @@ const ActionMenu = ({ row, onView, onResolve, onEdit, onDelete }: ActionMenuProp
             )
         },
         {
-            label: "Mark Resolved",
+            label: "Mark Closed",
             onClick: () => onResolve(row),
-            visible: row.status !== "resolved",
+            visible: row.status !== "CLOSED",
             variant: "success",
             icon: (
                 <svg className="h-4 w-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

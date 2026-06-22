@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { settingsService } from "./settings.service";
-import { useAuthStore } from "@/store/auth.store";
 import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/auth.store";
 
 export const settingsKeys = {
     all: ["settings"] as const,
@@ -117,7 +117,6 @@ export const useLinkSocial = () => {
         mutationFn: (provider: string) => settingsService.linkSocial(provider),
         onSuccess: (data: any) => {
             qc.invalidateQueries({ queryKey: settingsKeys.accounts() });
-            // If the backend returns a redirect URL for OAuth, redirect the browser
             if (data?.url) {
                 window.location.href = data.url;
             } else {
@@ -125,7 +124,7 @@ export const useLinkSocial = () => {
             }
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to link account");
+            toast.error(err?.message || "Failed to link account");
         },
     });
 };
@@ -139,7 +138,7 @@ export const useUnlinkAccount = () => {
             toast.success("Account unlinked successfully!");
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to unlink account");
+            toast.error(err?.message || "Failed to unlink account");
         },
     });
 };
@@ -436,6 +435,21 @@ export const useInitializeSubscription = () => {
         },
         onError: (err: any) => {
             toast.error(err?.response?.data?.message || "Failed to initialize subscription");
+        },
+    });
+};
+
+export const useSubscribeToPlan = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ planId, billingCycle }: { planId: string; billingCycle?: string }) =>
+            settingsService.subscribeToPlan(planId, billingCycle),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: settingsKeys.subscription() });
+            toast.success("Plan updated successfully!");
+        },
+        onError: (err: any) => {
+            toast.error(err?.response?.data?.message || "Failed to update plan");
         },
     });
 };
